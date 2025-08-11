@@ -16,12 +16,14 @@ public static class ApplicationServiceExtension
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IBrandRepository, BrandRepository>();
+        services.AddScoped<IAddressRepository, AddressRepository>();
     }
 
     public static void AddServices(this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IBrandService, BrandService>();
+        services.AddScoped<IAddressService, AddressService>();
     }
     
     public static IServiceCollection AddGhtkClient(this IServiceCollection services, IConfiguration configuration)

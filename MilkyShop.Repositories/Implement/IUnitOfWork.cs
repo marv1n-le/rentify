@@ -6,6 +6,7 @@ public interface IUnitOfWork
 {
     IBrandRepository BrandRepository { get; }
     IUserRepository UserRepository { get; }
+    IAddressRepository AddressRepository { get; }
     int SaveChanges();
     Task<int> SaveChangesAsync();
     void BeginTransaction();

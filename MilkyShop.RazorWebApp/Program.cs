@@ -11,12 +11,13 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddRazorPages();
+        builder.Services.AddDatabase(builder.Configuration);
+        builder.Services.AddHttpContextAccessor();
         builder.Services.Configure<SepaySettings>(builder.Configuration.GetSection("SepaySettings"));
         builder.Services.Configure<GhtkSettings>(builder.Configuration.GetSection("GhtkSettings"));
         builder.Services.AddGhtkClient(builder.Configuration);
         builder.Services.AddApplicationServices(builder.Configuration);
         builder.Services.AddHttpClientServices();
-
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
