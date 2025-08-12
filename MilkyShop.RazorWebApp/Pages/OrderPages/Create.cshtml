@@ -1,0 +1,130 @@
+﻿@page
+@model MilkyShop.RazorWebApp.Pages.OrderPages.CreateModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+
+<h4>Order</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Order.UserId" class="control-label"></label>
+                <select asp-for="Order.UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.AddressId" class="control-label"></label>
+                <select asp-for="Order.AddressId" class ="form-control" asp-items="ViewBag.AddressId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.DiscountId" class="control-label"></label>
+                <select asp-for="Order.DiscountId" class ="form-control" asp-items="ViewBag.DiscountId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.Code" class="control-label"></label>
+                <input asp-for="Order.Code" class="form-control" />
+                <span asp-validation-for="Order.Code" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.TrackingCode" class="control-label"></label>
+                <input asp-for="Order.TrackingCode" class="form-control" />
+                <span asp-validation-for="Order.TrackingCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.TotalPrice" class="control-label"></label>
+                <input asp-for="Order.TotalPrice" class="form-control" />
+                <span asp-validation-for="Order.TotalPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.DiscountPrice" class="control-label"></label>
+                <input asp-for="Order.DiscountPrice" class="form-control" />
+                <span asp-validation-for="Order.DiscountPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.ProductPrice" class="control-label"></label>
+                <input asp-for="Order.ProductPrice" class="form-control" />
+                <span asp-validation-for="Order.ProductPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.PaymentStatus" class="control-label"></label>
+                <select asp-for="Order.PaymentStatus" class="form-control"></select>
+                <span asp-validation-for="Order.PaymentStatus" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.PaymentMethod" class="control-label"></label>
+                <select asp-for="Order.PaymentMethod" class="form-control"></select>
+                <span asp-validation-for="Order.PaymentMethod" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.DeliveryMethod" class="control-label"></label>
+                <select asp-for="Order.DeliveryMethod" class="form-control"></select>
+                <span asp-validation-for="Order.DeliveryMethod" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.Status" class="control-label"></label>
+                <select asp-for="Order.Status" class="form-control"></select>
+                <span asp-validation-for="Order.Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.ReceivedDate" class="control-label"></label>
+                <input asp-for="Order.ReceivedDate" class="form-control" />
+                <span asp-validation-for="Order.ReceivedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.Id" class="control-label"></label>
+                <input asp-for="Order.Id" class="form-control" />
+                <span asp-validation-for="Order.Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.CreatedBy" class="control-label"></label>
+                <input asp-for="Order.CreatedBy" class="form-control" />
+                <span asp-validation-for="Order.CreatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.UpdatedBy" class="control-label"></label>
+                <input asp-for="Order.UpdatedBy" class="form-control" />
+                <span asp-validation-for="Order.UpdatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.CreatedAt" class="control-label"></label>
+                <input asp-for="Order.CreatedAt" class="form-control" />
+                <span asp-validation-for="Order.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.UpdatedAt" class="control-label"></label>
+                <input asp-for="Order.UpdatedAt" class="form-control" />
+                <span asp-validation-for="Order.UpdatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Order.IsDeleted" /> @Html.DisplayNameFor(model => model.Order.IsDeleted)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+</body>
+</html>

@@ -1,0 +1,146 @@
+﻿@page
+@model MilkyShop.RazorWebApp.Pages.OrderPages.IndexModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].TrackingCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].TotalPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].DiscountPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].ProductPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].PaymentStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].PaymentMethod)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].DeliveryMethod)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].ReceivedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].Discount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].UpdatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].UpdatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order[0].IsDeleted)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Order) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrackingCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DiscountPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaymentStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaymentMethod)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeliveryMethod)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReceivedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Address.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Discount.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsDeleted)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
