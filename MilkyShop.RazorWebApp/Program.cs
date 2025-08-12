@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using MilkyShop.RazorWebApp.DependencyInjection;
 using MilkyShop.Repositories.Helper;
 
@@ -18,6 +19,15 @@ public class Program
         builder.Services.AddGhtkClient(builder.Configuration);
         builder.Services.AddApplicationServices(builder.Configuration);
         builder.Services.AddHttpClientServices();
+        
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/Forbidden";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            });
+        
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -33,9 +43,10 @@ public class Program
 
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapRazorPages();
+        app.MapRazorPages().RequireAuthorization();
 
         app.Run();
     }
