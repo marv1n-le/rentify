@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MilkyShop.BusinessObjects.Migrations
 {
     [DbContext(typeof(MilkyShopDbContext))]
-    [Migration("20250811105618_init")]
-    partial class init
+    [Migration("20250812020059_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
