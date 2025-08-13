@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Rentify.Services\Rentify.Services.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\BranchPages\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\BranchPages\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\BranchPages\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\BranchPages\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\BranchPages\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FeedbackPages\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FeedbackPages\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FeedbackPages\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FeedbackPages\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\FeedbackPages\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderItemPages\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderItemPages\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderItemPages\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderItemPages\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderItemPages\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderPages\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderPages\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderPages\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderPages\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\OrderPages\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\ProductPages\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\ProductPages\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\ProductPages\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\ProductPages\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\ProductPages\Index.cshtml" />
+    </ItemGroup>
+
+</Project>
