@@ -21,6 +21,7 @@ public class UnitOfWork : IUnitOfWork
         _disposed = false;
         UserRepository = userRepository;
         PostRepository = postRepository;
+        RoleRepository = roleRepository;
     }
 
     public int SaveChanges()
