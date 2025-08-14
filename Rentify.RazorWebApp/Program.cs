@@ -15,7 +15,7 @@ public class Program
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddApplicationServices(builder.Configuration);
         builder.Services.AddHttpClientServices();
-        
+
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
@@ -23,7 +23,7 @@ public class Program
                 options.AccessDeniedPath = "/Account/Forbidden";
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
-        
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -42,7 +42,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapRazorPages().RequireAuthorization();
+        app.MapRazorPages();
 
         app.Run();
     }

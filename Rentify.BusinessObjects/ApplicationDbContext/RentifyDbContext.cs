@@ -3,18 +3,18 @@ using Rentify.BusinessObjects.Entities;
 
 namespace Rentify.BusinessObjects.ApplicationDbContext;
 
-public class MilkyShopDbContext : DbContext
+public class RentifyDbContext : DbContext
 {
-    public MilkyShopDbContext()
+    public RentifyDbContext()
     {
-        
+
     }
-    
-    public MilkyShopDbContext(DbContextOptions<MilkyShopDbContext> options) : base(options)
+
+    public RentifyDbContext(DbContextOptions<RentifyDbContext> options) : base(options)
     {
-        
+
     }
-    
+
     //DbSet
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
@@ -25,12 +25,12 @@ public class MilkyShopDbContext : DbContext
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Rental> Rentals { get; set; }
     public DbSet<RentalItem> RentalItems { get; set; }
-    
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<User>().ToTable("User");
         modelBuilder.Entity<Role>().ToTable("Role");
         modelBuilder.Entity<Category>().ToTable("Category");
@@ -40,7 +40,7 @@ public class MilkyShopDbContext : DbContext
         modelBuilder.Entity<Comment>().ToTable("Comment");
         modelBuilder.Entity<Rental>().ToTable("Rental");
         modelBuilder.Entity<RentalItem>().ToTable("RentalItem");
-        
+
         modelBuilder.Entity<RentalItem>(entity =>
         {
             entity.HasKey(ri => new { ri.RentalId, ri.ItemId });
@@ -51,6 +51,12 @@ public class MilkyShopDbContext : DbContext
                 .WithMany(i => i.RentalItems)
                 .HasForeignKey(ri => ri.ItemId);
         });
+
+        modelBuilder.Entity<Item>(options =>
+        {
+            options.HasOne(i => i.Post)
+                .WithOne(i => i.Item)
+                .HasForeignKey<Post>(p => p.ItemId);
+        });
     }
-        
 }

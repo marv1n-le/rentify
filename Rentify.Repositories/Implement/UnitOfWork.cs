@@ -5,21 +5,27 @@ namespace Rentify.Repositories.Implement;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly MilkyShopDbContext _context;
+    private readonly RentifyDbContext _context;
     private bool _disposed;
     public IUserRepository UserRepository { get; }
     public ICategoryRepository CategoryRepository { get; }
+    public IRoleRepository RoleRepository { get; }
+    public IPostRepository PostRepository { get; }
 
-    public UnitOfWork(MilkyShopDbContext context,
-        IUserRepository userRepository, ICategoryRepository categoryRepository)
- 
+    public UnitOfWork(RentifyDbContext context,
+        IUserRepository userRepository, ICategoryRepository categoryRepository,
+        IRoleRepository roleRepository,
+        IPostRepository postRepository)
+
     {
         _context = context;
         _disposed = false;
         UserRepository = userRepository;
         CategoryRepository = categoryRepository;
+        PostRepository = postRepository;
+        RoleRepository = roleRepository;
     }
-    
+
     public int SaveChanges()
     {
         int result;

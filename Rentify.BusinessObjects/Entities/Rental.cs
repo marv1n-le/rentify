@@ -11,7 +11,7 @@ public class Rental : BaseEntity
     public decimal? TotalAmount { get; set; } = 0;
     public RentalStatus Status { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
-    
+
     public virtual User? User { get; set; }
     public virtual ICollection<RentalItem> RentalItems { get; set; } = new List<RentalItem>();
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();

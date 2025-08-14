@@ -4,9 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Rentify.BusinessObjects.ApplicationDbContext;
 
-public class DbContextFactory : IDesignTimeDbContextFactory<MilkyShopDbContext>
+public class DbContextFactory : IDesignTimeDbContextFactory<RentifyDbContext>
 {
-    public MilkyShopDbContext CreateDbContext(string[] args)
+    public RentifyDbContext CreateDbContext(string[] args)
     {
         Console.WriteLine("Current Directory: " + Directory.GetCurrentDirectory());
 
@@ -17,9 +17,9 @@ public class DbContextFactory : IDesignTimeDbContextFactory<MilkyShopDbContext>
 
         var connectionString = config.GetConnectionString("DefaultConnection");
 
-        var optionsBuilder = new DbContextOptionsBuilder<MilkyShopDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<RentifyDbContext>();
         optionsBuilder.UseNpgsql(connectionString);
 
-        return new MilkyShopDbContext(optionsBuilder.Options);
+        return new RentifyDbContext(optionsBuilder.Options);
     }
 }
