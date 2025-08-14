@@ -6,6 +6,8 @@ public interface IUnitOfWork
 {
     IUserRepository UserRepository { get; }
     IRoleRepository RoleRepository { get; }
+    IPostRepository PostRepository { get; }
+
     int SaveChanges();
     Task<int> SaveChangesAsync();
     void BeginTransaction();

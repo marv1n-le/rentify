@@ -1,0 +1,88 @@
+﻿@page
+@model Rentify.RazorWebApp.Pages.RentalPages.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Rental</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Rental.UserId" class="control-label"></label>
+                <select asp-for="Rental.UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.RentalDate" class="control-label"></label>
+                <input asp-for="Rental.RentalDate" class="form-control" />
+                <span asp-validation-for="Rental.RentalDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.ReturnDate" class="control-label"></label>
+                <input asp-for="Rental.ReturnDate" class="form-control" />
+                <span asp-validation-for="Rental.ReturnDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.TotalAmount" class="control-label"></label>
+                <input asp-for="Rental.TotalAmount" class="form-control" />
+                <span asp-validation-for="Rental.TotalAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.Status" class="control-label"></label>
+                <select asp-for="Rental.Status" class="form-control"></select>
+                <span asp-validation-for="Rental.Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.PaymentStatus" class="control-label"></label>
+                <select asp-for="Rental.PaymentStatus" class="form-control"></select>
+                <span asp-validation-for="Rental.PaymentStatus" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.Id" class="control-label"></label>
+                <input asp-for="Rental.Id" class="form-control" />
+                <span asp-validation-for="Rental.Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.CreatedBy" class="control-label"></label>
+                <input asp-for="Rental.CreatedBy" class="form-control" />
+                <span asp-validation-for="Rental.CreatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.UpdatedBy" class="control-label"></label>
+                <input asp-for="Rental.UpdatedBy" class="form-control" />
+                <span asp-validation-for="Rental.UpdatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.CreatedAt" class="control-label"></label>
+                <input asp-for="Rental.CreatedAt" class="form-control" />
+                <span asp-validation-for="Rental.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental.UpdatedAt" class="control-label"></label>
+                <input asp-for="Rental.UpdatedAt" class="form-control" />
+                <span asp-validation-for="Rental.UpdatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Rental.IsDeleted" /> @Html.DisplayNameFor(model => model.Rental.IsDeleted)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

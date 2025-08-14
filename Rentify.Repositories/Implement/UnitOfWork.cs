@@ -9,15 +9,18 @@ public class UnitOfWork : IUnitOfWork
     private bool _disposed;
     public IUserRepository UserRepository { get; }
     public IRoleRepository RoleRepository { get; }
+    public IPostRepository PostRepository { get; }
 
     public UnitOfWork(MilkyShopDbContext context,
         IUserRepository userRepository,
-        IRoleRepository roleRepository)
+        IRoleRepository roleRepository,
+        IPostRepository postRepository)
 
     {
         _context = context;
         _disposed = false;
         UserRepository = userRepository;
+        PostRepository = postRepository;
     }
 
     public int SaveChanges()

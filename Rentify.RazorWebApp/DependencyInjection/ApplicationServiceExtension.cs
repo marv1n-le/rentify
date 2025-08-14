@@ -1,9 +1,11 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.Repositories.Implement;
 using Rentify.Repositories.Interface;
 using Rentify.Repositories.Repository;
 using Rentify.Services.Interface;
+using Rentify.Services.Mapper;
 using Rentify.Services.Service;
 
 namespace Rentify.RazorWebApp.DependencyInjection;
@@ -16,12 +18,14 @@ public static class ApplicationServiceExtension
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPostRepository, PostRepository>();
     }
 
     public static void AddServices(this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IPostService, PostService>();
     }
 
     public static IServiceCollection AddGhtkClient(this IServiceCollection services, IConfiguration configuration)
@@ -52,7 +56,12 @@ public static class ApplicationServiceExtension
 
     public static void AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAutoMapper(
+            cfg => { },
+            typeof(MapperEntities).Assembly
+        );
         services.AddRepositories();
         services.AddServices();
     }
+
 }
