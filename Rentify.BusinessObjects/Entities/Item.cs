@@ -12,8 +12,8 @@ public class Item : BaseEntity
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int Quantity { get; set; }
-    public ItemStatus Status { get; set; } 
-    
+    public ItemStatus Status { get; set; }
+
     public virtual Category? Category { get; set; }
     public virtual User? User { get; set; }
     public virtual ICollection<RentalItem> RentalItems { get; set; } = new List<RentalItem>();

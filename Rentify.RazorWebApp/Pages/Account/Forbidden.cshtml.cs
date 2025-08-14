@@ -6,6 +6,6 @@ public class Forbidden : PageModel
 {
     public void OnGet()
     {
-        
+
     }
 }

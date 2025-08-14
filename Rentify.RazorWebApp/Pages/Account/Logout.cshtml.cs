@@ -6,6 +6,6 @@ public class Logout : PageModel
 {
     public void OnGet()
     {
-        
+
     }
 }
