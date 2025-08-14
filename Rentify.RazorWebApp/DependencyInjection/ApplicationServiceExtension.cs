@@ -17,6 +17,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRentalRepository, RentalRepository>();
         services.AddScoped<IPostRepository, PostRepository>();
     }
 
@@ -24,6 +25,7 @@ public static class ApplicationServiceExtension
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPostService, PostService>();
+        services.AddScoped<IRentalService, RentalService>();
     }
 
     public static IServiceCollection AddGhtkClient(this IServiceCollection services, IConfiguration configuration)
