@@ -10,11 +10,15 @@ public class UnitOfWork : IUnitOfWork
     public IUserRepository UserRepository { get; }
     public IRoleRepository RoleRepository { get; }
     public IPostRepository PostRepository { get; }
+    public IRentalRepository RentalRepository { get; }
 
-    public UnitOfWork(MilkyShopDbContext context,
+    public UnitOfWork(
+        MilkyShopDbContext context,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IPostRepository postRepository)
+        IPostRepository postRepository,
+        IRentalRepository rentalRepository
+        )
 
     {
         _context = context;
@@ -22,6 +26,7 @@ public class UnitOfWork : IUnitOfWork
         UserRepository = userRepository;
         PostRepository = postRepository;
         RoleRepository = roleRepository;
+        RentalRepository = rentalRepository;
     }
 
     public int SaveChanges()

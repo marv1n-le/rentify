@@ -1,12 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rentify.BusinessObjects.Enum;
 
 namespace Rentify.BusinessObjects.DTO.RentalDTO
 {
     public class RentalBaseDTO
     {
+        public string? UserId { get; set; }
+        public DateTime? RentalDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
+        public decimal? TotalAmount { get; set; }
+        public RentalStatus Status { get; set; }
+        public PaymentStatus PaymentStatus { get; set; }
     }
 }

@@ -1,17 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Rentify.BusinessObjects.DTO.RentalDTO;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
-using Rentify.Repositories.Interface;
 using Rentify.Services.Interface;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Rentify.Services.Service
 {
     public class RentalService : IRentalService
     {
-        private readonly IRentalRepository _rentalRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IMapper _mapper;
@@ -23,24 +20,76 @@ namespace Rentify.Services.Service
             _mapper = mapper;
         }
 
-        IEnumerable<Rental> IRentalService.GetAll()
+        public async Task<string> CreateRental(RentalCreateDTO rental)
         {
-            return _rentalRepository.GetAll();
+            var userId = GetCurrentUserId();
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new Exception($"Please log in first");
+
+            Rental newRental = new Rental
+            {
+                UserId = userId,
+                User = user,
+                RentalDate = rental.RentalDate,
+                ReturnDate = rental.ReturnDate,
+                TotalAmount = rental.TotalAmount,
+                Status = rental.Status,
+                PaymentStatus = rental.PaymentStatus
+            };
+
+            await _unitOfWork.RentalRepository.InsertAsync(newRental);
+            await _unitOfWork.SaveChangesAsync();
+            return newRental.Id;
         }
 
-        async Task<IEnumerable<Rental>> IRentalService.GetAllAsync()
+        public async Task DeleteRental(string postId)
         {
-            return await _rentalRepository.GetAllAsync();
+            var post = await _unitOfWork.PostRepository.GetById(postId);
+
+            if (post == null)
+                throw new Exception($"Rental with id: {postId} has not found");
+
+            await _unitOfWork.PostRepository.SoftDeleteAsync(post);
         }
 
-        Rental IRentalService.GetById(object id)
+        public async Task<List<Rental>> GetAllRental()
         {
-            return _rentalRepository.GetById(id);
+            var rentals = await _unitOfWork.RentalRepository.GetAllRental();
+
+            if (rentals == null)
+                throw new Exception("Has no record for Rental");
+
+            return rentals;
         }
 
-        async Task<Rental> IRentalService.GetByIdAsync(object id)
+        public async Task<Rental> GetRentalById(string rentalId)
         {
-            return await _rentalRepository.GetByIdAsync(id);
+            var rental = await _unitOfWork.RentalRepository.GetById(rentalId);
+
+            if (rental == null)
+                throw new Exception($"Rental with id: {rentalId} has not found");
+
+            return rental;
+        }
+
+        public async Task UpdateRental(RentalUpdateDTO request)
+        {
+            var rental = await _unitOfWork.RentalRepository.GetById(request.RentalId);
+
+            if (rental == null)
+                throw new Exception($"Rental with id: {request.RentalId} has not found");
+
+            _mapper.Map(rental, request);
+
+            await _unitOfWork.RentalRepository.UpdateAsync(rental);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        private string GetCurrentUserId()
+        {
+            var userId = _contextAccessor.HttpContext.Request.Cookies.TryGetValue("userId", out var value) ? value.ToString() : null;
+            return userId;
         }
     }
 }

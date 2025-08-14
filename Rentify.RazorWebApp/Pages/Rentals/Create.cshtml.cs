@@ -1,44 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Rentify.BusinessObjects.ApplicationDbContext;
-using Rentify.BusinessObjects.Entities;
+using Rentify.BusinessObjects.DTO.RentalDTO;
+using Rentify.BusinessObjects.Enum;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.Rentals
 {
     public class CreateModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext _context;
+        private readonly IRentalService _rentalService;
 
-        public CreateModel(Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext context)
+        public CreateModel(IRentalService rentalService)
         {
-            _context = context;
+            _rentalService = rentalService;
         }
-
-        public IActionResult OnGet()
-        {
-        ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
-            return Page();
-        }
-
         [BindProperty]
-        public Rental Rental { get; set; } = default!;
+        public RentalCreateDTO Rental { get; set; } = default!;
+        public IEnumerable<SelectListItem> StatusList { get; set; } = [];
+        public IEnumerable<SelectListItem> PaymentStatusList { get; set; } = [];
+        public void OnGet()
+        {
+            StatusList = Enum.GetValues(typeof(RentalStatus))
+                .Cast<RentalStatus>()
+                .Select(s => new SelectListItem { Value = s.ToString(), Text = s.ToString() });
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
+            PaymentStatusList = Enum.GetValues(typeof(PaymentStatus))
+                .Cast<PaymentStatus>()
+                .Select(s => new SelectListItem { Value = s.ToString(), Text = s.ToString() });
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                OnGet();
                 return Page();
             }
-
-            _context.Rentals.Add(Rental);
-            await _context.SaveChangesAsync();
-
+            await _rentalService.CreateRental(Rental);
             return RedirectToPage("./Index");
         }
     }

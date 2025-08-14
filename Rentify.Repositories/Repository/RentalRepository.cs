@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
@@ -13,28 +14,26 @@ namespace Rentify.Repositories.Repository
 {
     public class RentalRepository : GenericRepository<Rental>, IRentalRepository
     {
-        public RentalRepository(MilkyShopDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
+        public RentalRepository(MilkyShopDbContext context, IHttpContextAccessor httpContextAccessor) : base(context, httpContextAccessor)
         {
         }
 
-        IEnumerable<Rental> IRentalRepository.GetAll()
+        public async Task<List<Rental>> GetAllRental()
         {
-            return base.GetAll();
+            var resultList = await _dbSet.AsNoTracking()
+                .Include(p => p.User).ThenInclude(u => u.Role)
+                .ToListAsync();
+
+            return resultList;
         }
 
-        async Task<IEnumerable<Rental>> IRentalRepository.GetAllAsync()
+        public async Task<Rental> GetById(string postId)
         {
-            return await base.GetAllAsync();
-        }
+            var result = await _dbSet
+                .Include(p => p.User).ThenInclude(u => u.Role)
+                .FirstOrDefaultAsync(p => p.Id == postId);
 
-        Rental IRentalRepository.GetById(object id)
-        {
-            return base.GetById(id);
-        }
-
-        async Task<Rental> IRentalRepository.GetByIdAsync(object id)
-        {
-            return await base.GetByIdAsync(id);
+            return result;
         }
     }
 }

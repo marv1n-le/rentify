@@ -10,9 +10,7 @@ namespace Rentify.Repositories.Interface
 {
     public interface IRentalRepository : IGenericRepository<Rental>
     {
-        IEnumerable<Rental> GetAll();
-        Task<IEnumerable<Rental>> GetAllAsync();
-        Rental GetById(object id);
-        Task<Rental> GetByIdAsync(object id);
+        Task<List<Rental>> GetAllRental();
+        Task<Rental> GetById(string postId);
     }
 }

@@ -1,30 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Rentify.BusinessObjects.ApplicationDbContext;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.Rentals
 {
     public class IndexModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext _context;
-
-        public IndexModel(Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext context)
+        private readonly IRentalService _rentalService;
+        public IndexModel(IRentalService rentalService)
         {
-            _context = context;
+            _rentalService = rentalService;
         }
-
-        public IList<Rental> Rental { get;set; } = default!;
-
+        public IList<Rental> Rental { get; set; } = default!;
         public async Task OnGetAsync()
         {
-            Rental = await _context.Rentals
-                .Include(r => r.User).ToListAsync();
+            Rental = await _rentalService.GetAllRental();
         }
     }
 }

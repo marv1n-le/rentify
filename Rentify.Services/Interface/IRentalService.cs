@@ -1,4 +1,6 @@
-﻿using Rentify.BusinessObjects.Entities;
+﻿using Rentify.BusinessObjects.DTO.PostDto;
+using Rentify.BusinessObjects.DTO.RentalDTO;
+using Rentify.BusinessObjects.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,9 +8,10 @@ namespace Rentify.Services.Interface
 {
     public interface IRentalService
     {
-        IEnumerable<Rental> GetAll();
-        Task<IEnumerable<Rental>> GetAllAsync();
-        Rental GetById(object id);
-        Task<Rental> GetByIdAsync(object id);
+        Task<List<Rental>> GetAllRental();
+        Task<Rental> GetRentalById(string postId);
+        Task<string> CreateRental(RentalCreateDTO request);
+        Task UpdateRental(RentalUpdateDTO request);
+        Task DeleteRental(string postId);
     }
 }
