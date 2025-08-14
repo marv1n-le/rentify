@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
+using Rentify.Services.Service;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Rentify.RazorWebApp
 {
@@ -33,7 +34,6 @@ namespace Rentify.RazorWebApp
                 return NotFound();
             }
 
-            //var category = await _context.Categories.FirstOrDefaultAsync(m => m.Id == id);
             var category = await _categoryService.GetCategoryById(id);
 
             if (category == null)
@@ -54,13 +54,13 @@ namespace Rentify.RazorWebApp
                 return NotFound();
             }
 
-            //var category = await _context.Categories.FindAsync(id);
-            //if (category != null)
-            //{
-            //    Category = category;
-            //    _context.Categories.Remove(Category);
-            //    await _context.SaveChangesAsync();
-            //}
+            var category = await _categoryService.GetCategoryById(id);
+            if (category != null)
+            {
+                Category = category;
+                Category.IsDeleted = true;
+                await _categoryService.UpdateCategory(Category);
+            }
 
             return RedirectToPage("./Index");
         }

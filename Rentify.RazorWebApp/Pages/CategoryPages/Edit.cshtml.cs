@@ -25,7 +25,7 @@ namespace Rentify.RazorWebApp
         }
 
         [BindProperty]
-        public Category Category { get; set; } = default!;
+        public Rentify.BusinessObjects.Entities.Category Category { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
@@ -34,13 +34,13 @@ namespace Rentify.RazorWebApp
                 return NotFound();
             }
 
-            //var category =  await _context.Categories.FirstOrDefaultAsync(m => m.Id == id);
             var category = await _categoryService.GetCategoryById(id);
 
             if (category == null)
             {
                 return NotFound();
             }
+
             Category = category;
             return Page();
         }
@@ -54,30 +54,20 @@ namespace Rentify.RazorWebApp
                 return Page();
             }
 
-            //_context.Attach(Category).State = EntityState.Modified;
+            var category = await _categoryService.GetCategoryById(Category.Id);
 
-            //try
-            //{
-            //    await _context.SaveChangesAsync();
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    if (!CategoryExists(Category.Id))
-            //    {
-            //        return NotFound();
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
+            if(category == null)
+            {
+                return NotFound();
+            }
 
+            //TODO: Need to add validation
+
+            category.Name = Category.Name ?? "";
+            category.Description = Category.Description;
+
+            await _categoryService.UpdateCategory(category);
             return RedirectToPage("./Index");
         }
-
-        //private bool CategoryExists(string id)
-        //{
-        //    return _context.Categories.Any(e => e.Id == id);
-        //}
     }
 }

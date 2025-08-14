@@ -123,15 +123,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public async Task InsertAsync(T obj)
     {
-        try
-        {
-            obj.CreatedAt = DateTime.UtcNow;
-            obj.CreatedBy = GetCurrentUserName();
-            await _dbSet.AddAsync(obj);
-        }
-        catch (Exception ex) { 
-            Console.WriteLine(ex.ToString());
-        }
+        obj.CreatedAt = DateTime.UtcNow;
+        obj.CreatedBy = GetCurrentUserName();
+        await _dbSet.AddAsync(obj);
     }
 
     public async Task InsertWithoutAuditAsync(T obj)

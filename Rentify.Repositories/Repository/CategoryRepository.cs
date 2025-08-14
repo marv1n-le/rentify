@@ -14,7 +14,7 @@ namespace Rentify.Repositories.Repository;
 
 public class CategoryRepository : GenericRepository<Category>, ICategoryRepository
 {
-    public CategoryRepository(MilkyShopDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
+    public CategoryRepository(RentifyDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
     {
     }
 }

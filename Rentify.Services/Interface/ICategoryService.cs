@@ -13,5 +13,5 @@ public interface ICategoryService
     Task<Category?> GetCategoryById(string id);
     Task<string> CreateCategory(Category category);
     Task UpdateCategory(Category category);
-    Task DeleteCategory(object id);
+    Task SoftDeleteCategory(object id);
 }

@@ -6,9 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rentify.Repositories.Interface
+namespace Rentify.Repositories.Interface;
+
+public interface ICategoryRepository : IGenericRepository<Category>
 {
-    public interface ICategoryRepository : IGenericRepository<Category>
-    {
-    }
 }
