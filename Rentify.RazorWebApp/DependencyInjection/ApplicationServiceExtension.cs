@@ -48,7 +48,7 @@ public static class ApplicationServiceExtension
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<MilkyShopDbContext>(options =>
+        services.AddDbContext<RentifyDbContext>(options =>
             options.UseNpgsql(connectionString)
         );
         return services;

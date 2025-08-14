@@ -9,11 +9,11 @@ namespace Rentify.Repositories.Implement;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 {
-    protected readonly MilkyShopDbContext _context;
+    protected readonly RentifyDbContext _context;
     protected readonly DbSet<T> _dbSet;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GenericRepository(MilkyShopDbContext context, IHttpContextAccessor httpContextAccessor)
+    public GenericRepository(RentifyDbContext context, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _dbSet = _context.Set<T>();

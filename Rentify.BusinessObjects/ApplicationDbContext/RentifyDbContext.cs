@@ -3,14 +3,14 @@ using Rentify.BusinessObjects.Entities;
 
 namespace Rentify.BusinessObjects.ApplicationDbContext;
 
-public class MilkyShopDbContext : DbContext
+public class RentifyDbContext : DbContext
 {
-    public MilkyShopDbContext()
+    public RentifyDbContext()
     {
 
     }
 
-    public MilkyShopDbContext(DbContextOptions<MilkyShopDbContext> options) : base(options)
+    public RentifyDbContext(DbContextOptions<RentifyDbContext> options) : base(options)
     {
 
     }
@@ -51,6 +51,12 @@ public class MilkyShopDbContext : DbContext
                 .WithMany(i => i.RentalItems)
                 .HasForeignKey(ri => ri.ItemId);
         });
-    }
 
+        modelBuilder.Entity<Item>(options =>
+        {
+            options.HasOne(i => i.Post)
+                .WithOne(i => i.Item)
+                .HasForeignKey<Post>(p => p.ItemId);
+        });
+    }
 }

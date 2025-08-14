@@ -15,6 +15,7 @@ public class Item : BaseEntity
     public ItemStatus Status { get; set; }
 
     public virtual Category? Category { get; set; }
+    public virtual Post? Post { get; set; }
     public virtual User? User { get; set; }
     public virtual ICollection<RentalItem> RentalItems { get; set; } = new List<RentalItem>();
 }

@@ -7,10 +7,10 @@ namespace Rentify.RazorWebApp.Pages.Role
 {
     public class IndexModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext _context;
+        private readonly Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext _context;
         private readonly IRoleService _roleService;
 
-        public IndexModel(Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext context, IRoleService roleService)
+        public IndexModel(Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext context, IRoleService roleService)
         {
             _context = context;
             _roleService = roleService;

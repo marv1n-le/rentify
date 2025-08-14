@@ -14,7 +14,7 @@ namespace Rentify.Repositories.Repository
 {
     public class PostRepository : GenericRepository<Post>, IPostRepository
     {
-        public PostRepository(MilkyShopDbContext context, IHttpContextAccessor httpContextAccessor) : base(context, httpContextAccessor)
+        public PostRepository(RentifyDbContext context, IHttpContextAccessor httpContextAccessor) : base(context, httpContextAccessor)
         {
         }
 
