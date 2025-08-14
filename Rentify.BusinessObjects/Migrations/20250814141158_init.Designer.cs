@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Rentify.BusinessObjects.ApplicationDbContext;
@@ -11,10 +12,12 @@ using Rentify.BusinessObjects.ApplicationDbContext;
 
 namespace Rentify.BusinessObjects.Migrations
 {
-    [DbContext(typeof(MilkyShopDbContext))]
-    partial class MilkyShopDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(RentifyDbContext))]
+    [Migration("20250814141158_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,6 +213,9 @@ namespace Rentify.BusinessObjects.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("ItemId")
+                        .HasColumnType("text");
+
                     b.Property<List<string>>("Tags")
                         .IsRequired()
                         .HasColumnType("text[]");
@@ -227,6 +233,9 @@ namespace Rentify.BusinessObjects.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ItemId")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -420,9 +429,15 @@ namespace Rentify.BusinessObjects.Migrations
 
             modelBuilder.Entity("Rentify.BusinessObjects.Entities.Post", b =>
                 {
+                    b.HasOne("Rentify.BusinessObjects.Entities.Item", "Item")
+                        .WithOne("Post")
+                        .HasForeignKey("Rentify.BusinessObjects.Entities.Post", "ItemId");
+
                     b.HasOne("Rentify.BusinessObjects.Entities.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Item");
 
                     b.Navigation("User");
                 });
@@ -471,6 +486,8 @@ namespace Rentify.BusinessObjects.Migrations
 
             modelBuilder.Entity("Rentify.BusinessObjects.Entities.Item", b =>
                 {
+                    b.Navigation("Post");
+
                     b.Navigation("RentalItems");
                 });
 

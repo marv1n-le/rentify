@@ -12,9 +12,9 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
 {
     public class DeleteModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext _context;
+        private readonly Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext _context;
 
-        public DeleteModel(Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext context)
+        public DeleteModel(Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext context)
         {
             _context = context;
         }

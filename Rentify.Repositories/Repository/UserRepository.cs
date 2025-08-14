@@ -9,7 +9,7 @@ namespace Rentify.Repositories.Repository;
 
 public class UserRepository : GenericRepository<User>, IUserRepository
 {
-    public UserRepository(MilkyShopDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
+    public UserRepository(RentifyDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
     {
     }
 

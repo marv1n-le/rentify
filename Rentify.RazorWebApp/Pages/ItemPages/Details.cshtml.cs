@@ -12,9 +12,9 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
 {
     public class DetailsModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext _context;
+        private readonly Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext _context;
 
-        public DetailsModel(Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext context)
+        public DetailsModel(Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext context)
         {
             _context = context;
         }
