@@ -1,6 +1,5 @@
-using System.Linq.Expressions;
 using Rentify.BusinessObjects.Entities.Base;
-using Rentify.Repositories.Infrastructure;
+using System.Linq.Expressions;
 
 namespace Rentify.Repositories.Implement;
 

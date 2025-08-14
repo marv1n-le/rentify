@@ -1,0 +1,49 @@
+﻿@page
+@model Rentify.RazorWebApp.Pages.Role.IndexModel
+
+@{
+    ViewData["Title"] = "Roles";
+}
+
+<h1>Roles</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-success">Create New Role</a>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Roles[0].Name)</th>
+            <th>@Html.DisplayNameFor(model => model.Roles[0].Description)</th>
+            <th>@Html.DisplayNameFor(model => model.Roles[0].CreatedAt)</th>
+            <th>@Html.DisplayNameFor(model => model.Roles[0].UpdatedAt)</th>
+            <th>@Html.DisplayNameFor(model => model.Roles[0].IsDeleted)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Roles) {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.Name)</td>
+            <td>@Html.DisplayFor(modelItem => item.Description)</td>
+            <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+            <td>@item.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+            <td>
+                @if (item.IsDeleted)
+                {
+                    <span class="badge bg-danger">Deleted</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

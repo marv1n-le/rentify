@@ -1,19 +1,19 @@
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities.Base;
 using Rentify.Repositories.Infrastructure;
+using System.Linq.Expressions;
 
 namespace Rentify.Repositories.Implement;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 {
-    protected readonly MilkyShopDbContext _context;
+    protected readonly RentifyDbContext _context;
     protected readonly DbSet<T> _dbSet;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GenericRepository(MilkyShopDbContext context, IHttpContextAccessor httpContextAccessor)
+    public GenericRepository(RentifyDbContext context, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _dbSet = _context.Set<T>();
@@ -147,7 +147,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         _context.Entry(obj).State = EntityState.Modified;
     }
-    
+
 
     public async Task UpdateAsync(T obj)
     {

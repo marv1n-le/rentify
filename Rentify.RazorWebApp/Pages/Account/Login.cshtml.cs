@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -6,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
-using Rentify.Services.Service;
+using System.Security.Claims;
 
 namespace Rentify.RazorWebApp.Pages.Account;
 
@@ -42,15 +41,23 @@ public class Login : PageModel
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, Username),
-                new Claim(ClaimTypes.Role, account.RoleId.ToString()),
+                new Claim(ClaimTypes.Role, account.Role!.Name!),
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-            Response.Cookies.Append("UserName", account.Username);
+            Response.Cookies.Append("UserName", account.Username!);
             Response.Cookies.Append("userId", account.Id);
-            return RedirectToPage("/Index");
+            
+            if ( account.Role != null && account.Role.Name == "Admin")
+            {
+                return RedirectToPage("/Admin/Dashboard");
+            }
+            else
+            {
+                return RedirectToPage("/Index");
+            }
         }
         else
         {
