@@ -9,7 +9,7 @@ public class User : BaseEntity
     public string? FullName { get; set; }
     public DateTime? BirthDate { get; set; }
     public string? RoleId { get; set; }
-    
+
     public virtual Role? Role { get; set; }
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();

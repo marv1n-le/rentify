@@ -8,10 +8,12 @@ public class UnitOfWork : IUnitOfWork
     private readonly MilkyShopDbContext _context;
     private bool _disposed;
     public IUserRepository UserRepository { get; }
+    public IRoleRepository RoleRepository { get; }
     public IPostRepository PostRepository { get; }
 
     public UnitOfWork(MilkyShopDbContext context,
         IUserRepository userRepository,
+        IRoleRepository roleRepository,
         IPostRepository postRepository)
 
     {
@@ -19,6 +21,7 @@ public class UnitOfWork : IUnitOfWork
         _disposed = false;
         UserRepository = userRepository;
         PostRepository = postRepository;
+        RoleRepository = roleRepository;
     }
 
     public int SaveChanges()
