@@ -1,0 +1,84 @@
+@page
+@model Rentify.RazorWebApp.Pages.Account.Register
+
+@{
+    Layout = null;
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body class="body">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">Rentify Shop</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="row">
+            <h2 class="text-center">Register Account</h2>
+            <div class="col-md-6 mx-auto">
+                @if (TempData["Message"] != null)
+                {
+                    <div class="alert alert-info">@TempData["Message"]</div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <form method="post">
+                    <div class="form-group mb-3">
+                        <label asp-for="Username" class="form-label">Tên đăng nhập</label>
+                        <input type="text" class="form-control" asp-for="Username" required />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Password" class="form-label">Mật khẩu</label>
+                        <input type="password" class="form-control" asp-for="Password" required />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                        <input type="password" class="form-control" asp-for="ConfirmPassword" required />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="FullName" class="form-label">Họ và tên</label>
+                        <input type="text" class="form-control" asp-for="FullName" required />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="BirthDate" class="form-label">Ngày sinh</label>
+                        <input type="date" class="form-control" asp-for="BirthDate" />
+                        <span asp-validation-for="BirthDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">Đăng ký</button>
+                        <a asp-page="/Account/Login" class="btn btn-outline-primary">Đã có tài khoản? Đăng nhập</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>

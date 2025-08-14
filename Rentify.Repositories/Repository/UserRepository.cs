@@ -16,6 +16,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     public async Task<User?> GetUserAccount(string userName, string password)
     {
         var userAccount = await _dbSet
+            .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Username == userName && u.Password == password && u.IsDeleted == false);
         return userAccount;
     }
