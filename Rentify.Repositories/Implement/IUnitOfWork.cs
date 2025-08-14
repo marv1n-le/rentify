@@ -5,6 +5,7 @@ namespace Rentify.Repositories.Implement;
 public interface IUnitOfWork
 {
     IUserRepository UserRepository { get; }
+    IPostRepository PostRepository { get; }
     int SaveChanges();
     Task<int> SaveChangesAsync();
     void BeginTransaction();

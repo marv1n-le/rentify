@@ -49,6 +49,7 @@ public class Login : PageModel
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
             Response.Cookies.Append("UserName", account.Username);
+            Response.Cookies.Append("userId", account.Id);
             return RedirectToPage("/Index");
         }
         else
