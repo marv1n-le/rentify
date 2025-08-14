@@ -18,10 +18,13 @@ namespace Rentify.Repositories.Repository
         {
         }
 
-        public async Task<List<Post>> GetAllPost()
+        public async Task<List<Post>> GetAllPost(int index, int pageSize)
         {
             var resultList = await _dbSet.AsNoTracking()
+                .OrderBy(x => Guid.NewGuid())
                 .Include(p => p.User).ThenInclude(u => u.Role)
+                .Skip((index - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return resultList;

@@ -5,86 +5,98 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1 class="mb-4">Bài viết</h1>
 
 <p>
-    <a asp-page="Create">Create New</a>
+    <a asp-page="Create" class="btn btn-primary mb-3">Tạo bài viết mới</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].Images)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].Tags)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].UpdatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].UpdatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Post[0].IsDeleted)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Post) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Images)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tags)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsDeleted)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+<div id="post-container" class="container">
+    @foreach (var item in Model.Post)
+    {
+        @Html.Partial("_PostCard", item)
+    }
+</div>
+
+<div id="loading" class="text-center my-3" style="display:none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Đang tải...</span>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f0f2f5;
+    }
+
+    .card {
+        border-radius: 10px;
+        background-color: white;
+    }
+
+    .post-content {
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* Giới hạn 3 dòng */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .show-more-link {
+        color: #1877f2;
+        font-size: 0.9rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+        .show-more-link:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<script>
+    let page = 1;
+    let isLoading = false;
+    const pageSize = 5; // số bài mỗi lần load
+
+    window.addEventListener('scroll', () => {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+            if (!isLoading) {
+                loadMorePosts();
+            }
+        }
+    });
+
+    function loadMorePosts() {
+        isLoading = true;
+        document.getElementById("loading").style.display = "block";
+
+        fetch(`?handler=MorePosts&page=${++page}&pageSize=${pageSize}`)
+            .then(res => res.text())
+            .then(html => {
+                if (html.trim() !== "") {
+                    document.getElementById("post-container").insertAdjacentHTML('beforeend', html);
+                }
+                document.getElementById("loading").style.display = "none";
+                isLoading = false;
+            })
+            .catch(() => {
+                document.getElementById("loading").style.display = "none";
+                isLoading = false;
+            });
+    }
+
+    function toggleContent(id) {
+        const content = document.getElementById("content-" + id);
+        const btn = document.getElementById("showmore-" + id);
+
+        if (content.classList.contains("expanded")) {
+            content.classList.remove("expanded");
+            content.style.display = "-webkit-box";
+            btn.innerText = "Hiển thị thêm";
+        } else {
+            content.classList.add("expanded");
+            content.style.display = "block";
+            btn.innerText = "Thu gọn";
+        }
+    }
+</script>
