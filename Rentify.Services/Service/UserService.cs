@@ -1,3 +1,4 @@
+using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
@@ -23,11 +24,51 @@ public class UserService : IUserService
         return await _unitOfWork.UserRepository.GetByIdAsync(id);
     }
 
-    public async Task<string> CreateUser(User user)
+    public async Task<string> CreateUser(UserRegisterDto dto)
     {
-        await _unitOfWork.UserRepository.InsertAsync(user);
+        var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Username == dto.Username);
+        if (existingUser)
+        {
+            throw new Exception($"Username {dto.Username} already exists.");
+        }
+
+        var userRole = await _unitOfWork.RoleRepository.FindAsync(r => r.Name == "User");
+        if (userRole == null)
+            throw new Exception("User role not found");
+        
+        User newUser = new User
+        {
+            Username = dto.Username,
+            Password = dto.Password,
+            FullName = dto.FullName,
+            ProfilePicture = dto.ProfilePicture,
+            RoleId = userRole.Id,
+        };
+
+        await _unitOfWork.UserRepository.InsertAsync(newUser);
         await _unitOfWork.SaveChangesAsync();
-        return user.Id;
+
+        return newUser.Id;
+    }
+
+    public async Task<string> CreateSystemUser(SystemUserCreateDto dto)
+    {
+        var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Username == dto.Username);
+        if (existingUser)
+            throw new Exception($"Username {dto.Username} already exists.");
+        
+        User newUser = new User
+        {
+            Username = dto.Username,
+            Password = dto.Password,
+            FullName = dto.FullName,
+            ProfilePicture = dto.ProfilePicture,
+            RoleId = dto.RoleId
+        };
+        
+        await _unitOfWork.UserRepository.InsertAsync(newUser);
+        await _unitOfWork.SaveChangesAsync();
+        return newUser.Id;
     }
 
     public async Task UpdateUser(User user)

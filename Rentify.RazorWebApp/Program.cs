@@ -42,7 +42,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapRazorPages();
+        app.MapRazorPages().RequireAuthorization();
 
         app.Run();
     }

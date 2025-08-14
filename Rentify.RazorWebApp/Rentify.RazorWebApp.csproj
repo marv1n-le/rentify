@@ -11,6 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.19" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.19" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -44,6 +46,10 @@
       <_ContentIncludedByDefault Remove="Pages\ProductPages\Details.cshtml" />
       <_ContentIncludedByDefault Remove="Pages\ProductPages\Edit.cshtml" />
       <_ContentIncludedByDefault Remove="Pages\ProductPages\Index.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Pages\UserPages\" />
     </ItemGroup>
 
 </Project>
