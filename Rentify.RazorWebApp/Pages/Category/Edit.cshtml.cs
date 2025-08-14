@@ -8,16 +8,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Repositories.Implement;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp
 {
     public class EditModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext _context;
+        private readonly ICategoryService _categoryService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EditModel(Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext context)
+        public EditModel(ICategoryService categoryService, IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _categoryService = categoryService;
+            _unitOfWork = unitOfWork;
         }
 
         [BindProperty]
@@ -30,7 +34,9 @@ namespace Rentify.RazorWebApp
                 return NotFound();
             }
 
-            var category =  await _context.Categories.FirstOrDefaultAsync(m => m.Id == id);
+            //var category =  await _context.Categories.FirstOrDefaultAsync(m => m.Id == id);
+            var category = await _categoryService.GetCategoryById(id);
+
             if (category == null)
             {
                 return NotFound();
@@ -48,30 +54,30 @@ namespace Rentify.RazorWebApp
                 return Page();
             }
 
-            _context.Attach(Category).State = EntityState.Modified;
+            //_context.Attach(Category).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CategoryExists(Category.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            //try
+            //{
+            //    await _context.SaveChangesAsync();
+            //}
+            //catch (DbUpdateConcurrencyException)
+            //{
+            //    if (!CategoryExists(Category.Id))
+            //    {
+            //        return NotFound();
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
 
             return RedirectToPage("./Index");
         }
 
-        private bool CategoryExists(string id)
-        {
-            return _context.Categories.Any(e => e.Id == id);
-        }
+        //private bool CategoryExists(string id)
+        //{
+        //    return _context.Categories.Any(e => e.Id == id);
+        //}
     }
 }

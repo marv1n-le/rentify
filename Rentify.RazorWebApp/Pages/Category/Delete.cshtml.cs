@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Repositories.Implement;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp
 {
     public class DeleteModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext _context;
+        private readonly ICategoryService _categoryService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteModel(Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext context)
+        public DeleteModel(ICategoryService categoryService, IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _categoryService = categoryService;
+            _unitOfWork = unitOfWork;
         }
 
         [BindProperty]
@@ -29,7 +33,8 @@ namespace Rentify.RazorWebApp
                 return NotFound();
             }
 
-            var category = await _context.Categories.FirstOrDefaultAsync(m => m.Id == id);
+            //var category = await _context.Categories.FirstOrDefaultAsync(m => m.Id == id);
+            var category = await _categoryService.GetCategoryById(id);
 
             if (category == null)
             {
@@ -49,13 +54,13 @@ namespace Rentify.RazorWebApp
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
-            {
-                Category = category;
-                _context.Categories.Remove(Category);
-                await _context.SaveChangesAsync();
-            }
+            //var category = await _context.Categories.FindAsync(id);
+            //if (category != null)
+            //{
+            //    Category = category;
+            //    _context.Categories.Remove(Category);
+            //    await _context.SaveChangesAsync();
+            //}
 
             return RedirectToPage("./Index");
         }

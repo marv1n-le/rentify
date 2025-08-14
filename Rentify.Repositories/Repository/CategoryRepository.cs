@@ -16,7 +16,5 @@ public class CategoryRepository : GenericRepository<Category>, ICategoryReposito
 {
     public CategoryRepository(MilkyShopDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
     {
-
-        
     }
 }

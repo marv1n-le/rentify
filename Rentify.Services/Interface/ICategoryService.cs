@@ -10,7 +10,7 @@ namespace Rentify.Services.Interface;
 public interface ICategoryService
 {
     Task<IEnumerable<Category>> GetAllCategories();
-    Task<Category?> GetCategoryById(int id);
+    Task<Category?> GetCategoryById(string id);
     Task<string> CreateCategory(Category category);
     Task UpdateCategory(Category category);
     Task DeleteCategory(object id);

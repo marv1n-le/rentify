@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Repositories.Implement;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp
 {
     public class CreateModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext _context;
+        private readonly ICategoryService _categoryService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateModel(Rentify.BusinessObjects.ApplicationDbContext.MilkyShopDbContext context)
+        public CreateModel(ICategoryService categoryService, IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _categoryService = categoryService;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult OnGet()
@@ -35,8 +39,7 @@ namespace Rentify.RazorWebApp
                 return Page();
             }
 
-            _context.Categories.Add(Category);
-            await _context.SaveChangesAsync();
+            await _categoryService.CreateCategory(Category);
 
             return RedirectToPage("./Index");
         }
