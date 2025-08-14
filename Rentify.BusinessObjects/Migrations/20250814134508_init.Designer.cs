@@ -13,7 +13,7 @@ using Rentify.BusinessObjects.ApplicationDbContext;
 namespace Rentify.BusinessObjects.Migrations
 {
     [DbContext(typeof(MilkyShopDbContext))]
-    [Migration("20250812165416_init")]
+    [Migration("20250814134508_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -354,6 +354,9 @@ namespace Rentify.BusinessObjects.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Password")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProfilePicture")
                         .HasColumnType("text");
 
                     b.Property<string>("RoleId")

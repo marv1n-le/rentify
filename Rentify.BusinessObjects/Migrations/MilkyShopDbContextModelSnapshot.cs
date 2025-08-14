@@ -353,6 +353,9 @@ namespace Rentify.BusinessObjects.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("text");
 
+                    b.Property<string>("ProfilePicture")
+                        .HasColumnType("text");
+
                     b.Property<string>("RoleId")
                         .HasColumnType("text");
 
