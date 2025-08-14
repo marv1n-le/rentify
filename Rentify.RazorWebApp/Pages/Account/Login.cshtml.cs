@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -6,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
-using Rentify.Services.Service;
+using System.Security.Claims;
 
 namespace Rentify.RazorWebApp.Pages.Account;
 

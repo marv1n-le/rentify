@@ -12,7 +12,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     public UserRepository(MilkyShopDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
     {
     }
-    
+
     public async Task<User?> GetUserAccount(string userName, string password)
     {
         var userAccount = await _dbSet

@@ -9,7 +9,7 @@ public class Post : BaseEntity
     public string? Content { get; set; }
     public List<string> Images { get; set; } = new List<string>();
     public List<string> Tags { get; set; } = new List<string>();
-    
+
     public virtual User? User { get; set; }
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }

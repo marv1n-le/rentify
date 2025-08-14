@@ -24,6 +24,7 @@ public static class ApplicationServiceExtension
     public static void AddServices(this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IPostService, PostService>();
         services.AddScoped<IRentalService, RentalService>();
     }

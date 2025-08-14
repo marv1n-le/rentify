@@ -7,14 +7,14 @@ public class MilkyShopDbContext : DbContext
 {
     public MilkyShopDbContext()
     {
-        
+
     }
-    
+
     public MilkyShopDbContext(DbContextOptions<MilkyShopDbContext> options) : base(options)
     {
-        
+
     }
-    
+
     //DbSet
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
@@ -25,12 +25,12 @@ public class MilkyShopDbContext : DbContext
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Rental> Rentals { get; set; }
     public DbSet<RentalItem> RentalItems { get; set; }
-    
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<User>().ToTable("User");
         modelBuilder.Entity<Role>().ToTable("Role");
         modelBuilder.Entity<Category>().ToTable("Category");
@@ -40,7 +40,7 @@ public class MilkyShopDbContext : DbContext
         modelBuilder.Entity<Comment>().ToTable("Comment");
         modelBuilder.Entity<Rental>().ToTable("Rental");
         modelBuilder.Entity<RentalItem>().ToTable("RentalItem");
-        
+
         modelBuilder.Entity<RentalItem>(entity =>
         {
             entity.HasKey(ri => new { ri.RentalId, ri.ItemId });
@@ -52,5 +52,5 @@ public class MilkyShopDbContext : DbContext
                 .HasForeignKey(ri => ri.ItemId);
         });
     }
-        
+
 }

@@ -1,9 +1,9 @@
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities.Base;
 using Rentify.Repositories.Infrastructure;
+using System.Linq.Expressions;
 
 namespace Rentify.Repositories.Implement;
 
@@ -147,7 +147,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         _context.Entry(obj).State = EntityState.Modified;
     }
-    
+
 
     public async Task UpdateAsync(T obj)
     {
