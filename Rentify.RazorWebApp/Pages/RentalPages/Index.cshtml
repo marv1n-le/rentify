@@ -1,0 +1,96 @@
+﻿@page
+@model Rentify.RazorWebApp.Pages.RentalPages.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].RentalDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].ReturnDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].TotalAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].PaymentStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].UpdatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].UpdatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental[0].IsDeleted)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Rental) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RentalDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReturnDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaymentStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsDeleted)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
