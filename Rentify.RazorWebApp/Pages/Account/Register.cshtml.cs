@@ -39,7 +39,7 @@ public class Register : PageModel
 
     [BindProperty]
     public DateTime? BirthDate { get; set; }
-    
+
 
     public void OnGet()
     {
@@ -63,7 +63,7 @@ public class Register : PageModel
             };
 
             await _userService.CreateUser(registerDto);
-            
+
             TempData["Message"] = "Đăng ký thành công! Vui lòng đăng nhập.";
             return RedirectToPage("/Account/Login");
         }

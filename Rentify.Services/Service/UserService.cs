@@ -35,7 +35,7 @@ public class UserService : IUserService
         var userRole = await _unitOfWork.RoleRepository.FindAsync(r => r.Name == "User");
         if (userRole == null)
             throw new Exception("User role not found");
-        
+
         User newUser = new User
         {
             Username = dto.Username,
@@ -56,7 +56,7 @@ public class UserService : IUserService
         var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Username == dto.Username);
         if (existingUser)
             throw new Exception($"Username {dto.Username} already exists.");
-        
+
         User newUser = new User
         {
             Username = dto.Username,
@@ -65,7 +65,7 @@ public class UserService : IUserService
             ProfilePicture = dto.ProfilePicture,
             RoleId = dto.RoleId
         };
-        
+
         await _unitOfWork.UserRepository.InsertAsync(newUser);
         await _unitOfWork.SaveChangesAsync();
         return newUser.Id;

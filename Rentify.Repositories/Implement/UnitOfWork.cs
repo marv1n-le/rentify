@@ -10,11 +10,13 @@ public class UnitOfWork : IUnitOfWork
     public IUserRepository UserRepository { get; }
     public IRoleRepository RoleRepository { get; }
     public IPostRepository PostRepository { get; }
+    public ICommentRepository CommentRepository { get; }
 
     public UnitOfWork(RentifyDbContext context,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IPostRepository postRepository)
+        IPostRepository postRepository,
+        ICommentRepository commentRepository)
 
     {
         _context = context;
@@ -22,6 +24,7 @@ public class UnitOfWork : IUnitOfWork
         UserRepository = userRepository;
         PostRepository = postRepository;
         RoleRepository = roleRepository;
+        CommentRepository = commentRepository;
     }
 
     public int SaveChanges()

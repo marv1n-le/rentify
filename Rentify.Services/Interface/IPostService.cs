@@ -1,6 +1,5 @@
 ﻿using Rentify.BusinessObjects.DTO.PostDto;
 using Rentify.BusinessObjects.Entities;
-using Rentify.Repositories.Implement;
 
 namespace Rentify.Services.Interface
 {
