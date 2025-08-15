@@ -7,6 +7,8 @@ public interface IUnitOfWork
     IUserRepository UserRepository { get; }
     IRoleRepository RoleRepository { get; }
     IPostRepository PostRepository { get; }
+    IRentalRepository RentalRepository { get; }
+
     ICategoryRepository CategoryRepository { get;  }
     int SaveChanges();
     Task<int> SaveChangesAsync();

@@ -17,6 +17,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRentalRepository, RentalRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPostRepository, PostRepository>();
@@ -27,6 +28,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IPostService, PostService>();
+        services.AddScoped<IRentalService, RentalService>();
         services.AddScoped<ICategoryService, CategoryService>();
     }
 
