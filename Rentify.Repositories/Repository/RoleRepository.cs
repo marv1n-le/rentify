@@ -12,5 +12,5 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
     {
     }
 
-    
+
 }

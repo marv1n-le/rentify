@@ -49,8 +49,8 @@ public class Login : PageModel
 
             Response.Cookies.Append("UserName", account.Username!);
             Response.Cookies.Append("userId", account.Id);
-            
-            if ( account.Role != null && account.Role.Name == "Admin")
+
+            if (account.Role != null && account.Role.Name == "Admin")
             {
                 return RedirectToPage("/Admin/Dashboard");
             }
