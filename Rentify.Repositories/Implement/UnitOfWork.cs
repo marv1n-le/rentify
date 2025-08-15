@@ -8,11 +8,12 @@ public class UnitOfWork : IUnitOfWork
     private readonly RentifyDbContext _context;
     private bool _disposed;
     public IUserRepository UserRepository { get; }
+    public ICategoryRepository CategoryRepository { get; }
     public IRoleRepository RoleRepository { get; }
     public IPostRepository PostRepository { get; }
 
     public UnitOfWork(RentifyDbContext context,
-        IUserRepository userRepository,
+        IUserRepository userRepository, ICategoryRepository categoryRepository,
         IRoleRepository roleRepository,
         IPostRepository postRepository)
 
@@ -20,6 +21,7 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
         _disposed = false;
         UserRepository = userRepository;
+        CategoryRepository = categoryRepository;
         PostRepository = postRepository;
         RoleRepository = roleRepository;
     }
