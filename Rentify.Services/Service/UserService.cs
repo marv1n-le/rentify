@@ -51,7 +51,7 @@ public class UserService : IUserService
         return newUser.Id;
     }
 
-    public async Task<string> CreateSystemUser(SystemUserCreateDto dto)
+    public async Task<bool> CreateSystemUser(SystemUserCreateDto dto)
     {
         var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Username == dto.Username);
         if (existingUser)
@@ -68,7 +68,7 @@ public class UserService : IUserService
 
         await _unitOfWork.UserRepository.InsertAsync(newUser);
         await _unitOfWork.SaveChangesAsync();
-        return newUser.Id;
+        return true;
     }
 
     public async Task UpdateUser(User user)
@@ -80,5 +80,12 @@ public class UserService : IUserService
     public async Task<User?> GetUserAccount(string username, string password)
     {
         return await _unitOfWork.UserRepository.GetUserAccount(username, password);
+    }
+    
+    public async Task<bool> SoftDeleteUser(string id)
+    {
+        await _unitOfWork.UserRepository.SoftDeleteAsync(id);
+        await _unitOfWork.SaveChangesAsync();
+        return true;
     }
 }

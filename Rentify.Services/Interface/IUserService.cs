@@ -9,6 +9,7 @@ public interface IUserService
     Task<User?> GetUserById(int id);
     Task<IEnumerable<User>> GetAllUsers();
     Task<string> CreateUser(UserRegisterDto user);
-    Task<string> CreateSystemUser(SystemUserCreateDto user);
+    Task<bool> CreateSystemUser(SystemUserCreateDto user);
     Task UpdateUser(User user);
+    Task<bool> SoftDeleteUser(string id);
 }

@@ -1,0 +1,91 @@
+@page
+@model Rentify.RazorWebApp.Pages.Admin.Users.Create
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+@{
+    ViewData["Title"] = "Create System User";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Create System User</h1>
+                <a asp-page="/Admin/Users/Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Users
+                </a>
+            </div>
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>User Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="SystemUser.Username" class="form-label">Username *</label>
+                                    <input type="text" class="form-control" asp-for="SystemUser.Username" required />
+                                    <span asp-validation-for="SystemUser.Username" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="SystemUser.RoleId" class="form-label">Role *</label>
+                                    <select class="form-select" asp-for="SystemUser.RoleId" required>
+                                        <option value="">Select Role</option>
+                                        <option value="1">User</option>
+                                        <option value="2">Admin</option>
+                                    </select>
+                                    <span asp-validation-for="SystemUser.RoleId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SystemUser.Password" class="form-label">Password *</label>
+                            <input type="password" class="form-control" asp-for="SystemUser.Password" required />
+                            <span asp-validation-for="SystemUser.Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SystemUser.FullName" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" asp-for="SystemUser.FullName" required />
+                            <span asp-validation-for="SystemUser.FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SystemUser.BirthDate" class="form-label">Birth Date</label>
+                            <input type="date" class="form-control" asp-for="SystemUser.BirthDate" />
+                            <span asp-validation-for="SystemUser.BirthDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SystemUser.ProfilePicture" class="form-label">Profile Picture URL</label>
+                            <input type="url" class="form-control" asp-for="SystemUser.ProfilePicture" />
+                            <span asp-validation-for="SystemUser.ProfilePicture" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-page="/Admin/Users/Index" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create User
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
