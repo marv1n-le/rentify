@@ -19,7 +19,7 @@ public class UserService : IUserService
         return await _unitOfWork.UserRepository.GetAllAsync();
     }
 
-    public async Task<User?> GetUserById(int id)
+    public async Task<User?> GetUserById(string id)
     {
         return await _unitOfWork.UserRepository.GetByIdAsync(id);
     }
