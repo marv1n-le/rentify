@@ -9,6 +9,7 @@ public interface IUnitOfWork
     IPostRepository PostRepository { get; }
     IRentalRepository RentalRepository { get; }
 
+    ICategoryRepository CategoryRepository { get;  }
     int SaveChanges();
     Task<int> SaveChangesAsync();
     void BeginTransaction();
