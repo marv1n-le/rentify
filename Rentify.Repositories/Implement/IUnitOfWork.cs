@@ -8,8 +8,8 @@ public interface IUnitOfWork
     IRoleRepository RoleRepository { get; }
     IPostRepository PostRepository { get; }
     ICommentRepository CommentRepository { get; }
-
-
+    ICategoryRepository CategoryRepository { get;  }
+    
     int SaveChanges();
     Task<int> SaveChangesAsync();
     void BeginTransaction();
