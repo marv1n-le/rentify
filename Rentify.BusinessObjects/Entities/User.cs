@@ -7,6 +7,7 @@ public class User : BaseEntity
     public string? Username { get; set; }
     public string? Password { get; set; }
     public string? FullName { get; set; }
+    public string? ProfilePicture { get; set; }
     public DateTime? BirthDate { get; set; }
     public string? RoleId { get; set; }
 

@@ -1,0 +1,222 @@
+﻿@model Rentify.BusinessObjects.Entities.Post
+
+<div id="post-@Model.Id" class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-0">
+        <!-- Header bài viết -->
+        <div class="p-3 pb-2">
+            <div class="d-flex justify-content-between align-items-start post-menu-wrapper position-relative">
+                <!-- Thông tin người dùng -->
+                <div class="d-flex align-items-center">
+                    <img src="@(Model.User?.ProfilePicture ?? "https://via.placeholder.com/40")"
+                         alt="User avatar" class="rounded-circle me-3" width="40" height="40" />
+                    <div>
+                        <div class="fw-bold text-dark">@Model.User?.FullName</div>
+                        <div class="text-muted small">
+                            <span class="me-1">@Model.CreatedAt.ToString("dd-08-2025 lúc HH:mm")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nút 3 chấm + Menu custom -->
+                <button class="post-menu-btn" type="button" aria-label="Mở menu" onclick="togglePostMenu('@Model.Id')">⋯</button>
+                <div id="menu-@Model.Id" class="post-menu">
+                    <a href="javascript:void(0)" onclick="openEditModal('@Model.Id', '@Html.Raw((Model.Title ?? "").Replace("'", "\\'"))', '@Html.Raw((Model.Content ?? "").Replace("'", "\\'"))', '@string.Join(",", Model.Tags ?? new List<string>())', '@string.Join(",", Model.Images ?? new List<string>())')">
+                        Chỉnh sửa
+                    </a>
+                    <a class="text-danger" href="javascript:void(0)" onclick="deletePost('@Model.Id')">Xóa</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nội dung bài viết -->
+        <div class="px-3 pb-2">
+            @if (!string.IsNullOrEmpty(Model.Title))
+            {
+                <h6 class="fw-bold mb-2">@Model.Title</h6>
+            }
+            
+            <div id="content-@Model.Id" class="post-content mb-2">
+                @Model.Content
+            </div>
+            
+            @if (Model.Content?.Length > 100)
+            {
+                <a href="javascript:void(0)" id="showmore-@Model.Id" class="show-more-link" onclick="toggleContent('@Model.Id')">
+                    Hiển thị thêm
+                </a>
+            }
+        </div>
+
+        <!-- Hình ảnh -->
+        @if (Model.Images != null && Model.Images.Any())
+        {
+            <div class="px-3 pb-2">
+                @if (Model.Images.Count == 1)
+                {
+                    <img src="@Model.Images.First()" alt="Post image" class="img-fluid rounded clickable-image" 
+                         style="max-height: 400px; width: 100%; object-fit: cover;" 
+                         onclick="openImageModal('@Model.Images.First()')">
+                }
+                else if (Model.Images.Count == 2)
+                {
+                    <div class="row g-1">
+                        <div class="col-6">
+                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image" 
+                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                                 onclick="openImageModal('@Model.Images[0]')">
+                        </div>
+                        <div class="col-6">
+                            <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image" 
+                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                                 onclick="openImageModal('@Model.Images[1]')">
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-1">
+                        <div class="col-8">
+                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image" 
+                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                                 onclick="openImageModal('@Model.Images[0]')">
+                        </div>
+                        <div class="col-4">
+                            <div class="d-flex flex-column g-1">
+                                <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image mb-1" 
+                                     style="height: 98px; width: 100%; object-fit: cover;" 
+                                     onclick="openImageModal('@Model.Images[1]')">
+                                @if (Model.Images.Count > 2)
+                                {
+                                    <div class="position-relative">
+                                        <img src="@Model.Images[2]" alt="Post image" class="img-fluid rounded clickable-image" 
+                                             style="height: 98px; width: 100%; object-fit: cover;" 
+                                             onclick="openImageModal('@Model.Images[2]')">
+                                        @if (Model.Images.Count > 3)
+                                        {
+                                            <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 rounded d-flex align-items-center justify-content-center">
+                                                <span class="text-white fw-bold">+@(Model.Images.Count - 3)</span>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Tags -->
+        @if (Model.Tags != null && Model.Tags.Any())
+        {
+            <div class="px-3 pb-2">
+                @foreach (var tag in Model.Tags)
+                {
+                    <span class="badge bg-light text-primary me-1">#@tag</span>
+                }
+            </div>
+        }
+
+        <!-- Thống kê tương tác -->
+        <div class="px-3 py-2 border-top">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    <span>0 bình luận</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút bình luận -->
+        <div class="px-3 py-2 border-top">
+            <div class="row text-center">
+                <div class="col-12">
+                    <button class="btn btn-link text-muted text-decoration-none w-100 py-2 rounded" onclick="commentPost('@Model.Id')">
+                        <i class="bi bi-chat me-2"></i>
+                        Bình luận
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .post-menu-btn {
+        background: transparent;
+        border: none;
+        color: #65676b;
+        font-size: 22px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .post-menu-btn:hover { background: #f0f2f5; }
+    .post-menu {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #fff;
+        border: 1px solid #e4e6eb;
+        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        border-radius: 8px;
+        min-width: 160px;
+        display: none;
+        z-index: 1050;
+    }
+    .post-menu.show { display: block; }
+    .post-menu a { display: block; padding: 8px 12px; color: #111; text-decoration: none; }
+    .post-menu a:hover { background: #f2f2f2; }
+    .post-menu a.text-danger { color: #e03131; }
+</style>
+
+<script>
+    function togglePostMenu(postId) {
+        closeAllPostMenus();
+        const menu = document.getElementById('menu-' + postId);
+        if (menu) { menu.classList.toggle('show'); }
+    }
+    function closeAllPostMenus() {
+        document.querySelectorAll('.post-menu').forEach(m => m.classList.remove('show'));
+    }
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.post-menu') && !e.target.closest('.post-menu-btn')) {
+            closeAllPostMenus();
+        }
+    });
+
+    function deletePost(postId) {
+        if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+            fetch(`/PostPages/Delete?id=${postId}`, { 
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById(`post-${postId}`).remove();
+                } else {
+                    alert("Xóa thất bại. Vui lòng thử lại.");
+                }
+            })
+            .catch(() => alert("Có lỗi xảy ra. Vui lòng thử lại."));
+        }
+    }
+
+    function toggleContent(postId) {
+        const content = document.getElementById(`content-${postId}`);
+        const link = document.getElementById(`showmore-${postId}`);
+        if (content.classList.contains("expanded")) {
+            content.classList.remove("expanded");
+            link.textContent = "Hiển thị thêm";
+        } else {
+            content.classList.add("expanded");
+            link.textContent = "Thu gọn";
+        }
+    }
+
+    function commentPost(postId) {
+        console.log("Comment post:", postId);
+    }
+</script>

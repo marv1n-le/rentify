@@ -5,15 +5,14 @@ namespace Rentify.Repositories.Implement;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly MilkyShopDbContext _context;
+    private readonly RentifyDbContext _context;
     private bool _disposed;
     public IUserRepository UserRepository { get; }
     public IRoleRepository RoleRepository { get; }
     public IPostRepository PostRepository { get; }
     public IRentalRepository RentalRepository { get; }
 
-    public UnitOfWork(
-        MilkyShopDbContext context,
+    public UnitOfWork(RentifyDbContext context,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IPostRepository postRepository,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
 
-namespace Rentify.RazorWebApp.Pages.ItemPages
+namespace Rentify.RazorWebApp.Pages.UserPages
 {
     public class CreateModel : PageModel
     {
@@ -21,13 +21,12 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
 
         public IActionResult OnGet()
         {
-        ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Id");
-        ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+        ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id");
             return Page();
         }
 
         [BindProperty]
-        public Item Item { get; set; } = default!;
+        public User User { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -37,7 +36,7 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
                 return Page();
             }
 
-            _context.Items.Add(Item);
+            _context.Users.Add(User);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

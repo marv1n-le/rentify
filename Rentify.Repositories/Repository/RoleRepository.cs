@@ -8,8 +8,9 @@ namespace Rentify.Repositories.Repository;
 
 public class RoleRepository : GenericRepository<Role>, IRoleRepository
 {
-    public RoleRepository(MilkyShopDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
+    public RoleRepository(RentifyDbContext context, IHttpContextAccessor accessor) : base(context, accessor)
     {
     }
 
+    
 }

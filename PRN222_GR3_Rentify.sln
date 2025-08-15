@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36327.8 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. RazorWebApp", "1. RazorWebApp", "{CC90B6DA-2D67-4A88-AEEE-2EF0C0F800B9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Service", "2. Service", "{7D444654-C730-4B2B-8D08-C74F5FDA6FA8}"
@@ -38,6 +41,9 @@ Global
 		{7EA1CE5C-BFB4-4312-991F-721EF0806595}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EA1CE5C-BFB4-4312-991F-721EF0806595}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EA1CE5C-BFB4-4312-991F-721EF0806595}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E28EABBF-DB63-409E-9911-9FF3D078CEA0} = {7D444654-C730-4B2B-8D08-C74F5FDA6FA8}

@@ -1,0 +1,85 @@
+@page
+@model Rentify.RazorWebApp.Pages.UserPages.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>User</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="User.Username" class="control-label"></label>
+                <input asp-for="User.Username" class="form-control" />
+                <span asp-validation-for="User.Username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.Password" class="control-label"></label>
+                <input asp-for="User.Password" class="form-control" />
+                <span asp-validation-for="User.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.FullName" class="control-label"></label>
+                <input asp-for="User.FullName" class="form-control" />
+                <span asp-validation-for="User.FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.BirthDate" class="control-label"></label>
+                <input asp-for="User.BirthDate" class="form-control" />
+                <span asp-validation-for="User.BirthDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.ProfilePicture" class="control-label"></label>
+                <input asp-for="User.ProfilePicture" class="form-control" />
+                <span asp-validation-for="User.ProfilePicture" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.RoleId" class="control-label"></label>
+                <select asp-for="User.RoleId" class ="form-control" asp-items="ViewBag.RoleId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.Id" class="control-label"></label>
+                <input asp-for="User.Id" class="form-control" />
+                <span asp-validation-for="User.Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.CreatedBy" class="control-label"></label>
+                <input asp-for="User.CreatedBy" class="form-control" />
+                <span asp-validation-for="User.CreatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.UpdatedBy" class="control-label"></label>
+                <input asp-for="User.UpdatedBy" class="form-control" />
+                <span asp-validation-for="User.UpdatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.CreatedAt" class="control-label"></label>
+                <input asp-for="User.CreatedAt" class="form-control" />
+                <span asp-validation-for="User.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="User.UpdatedAt" class="control-label"></label>
+                <input asp-for="User.UpdatedAt" class="form-control" />
+                <span asp-validation-for="User.UpdatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="User.IsDeleted" /> @Html.DisplayNameFor(model => model.User.IsDeleted)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+

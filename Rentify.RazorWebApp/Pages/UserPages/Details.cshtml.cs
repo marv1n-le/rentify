@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
 
-namespace Rentify.RazorWebApp.Pages.ItemPages
+namespace Rentify.RazorWebApp.Pages.UserPages
 {
     public class DetailsModel : PageModel
     {
@@ -19,7 +19,7 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
             _context = context;
         }
 
-        public Item Item { get; set; } = default!;
+        public User User { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
@@ -28,14 +28,14 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
                 return NotFound();
             }
 
-            var item = await _context.Items.FirstOrDefaultAsync(m => m.Id == id);
-            if (item == null)
+            var user = await _context.Users.FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
                 return NotFound();
             }
             else
             {
-                Item = item;
+                User = user;
             }
             return Page();
         }

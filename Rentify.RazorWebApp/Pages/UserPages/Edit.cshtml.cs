@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
 
-namespace Rentify.RazorWebApp.Pages.ItemPages
+namespace Rentify.RazorWebApp.Pages.UserPages
 {
     public class EditModel : PageModel
     {
@@ -21,7 +21,7 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
         }
 
         [BindProperty]
-        public Item Item { get; set; } = default!;
+        public User User { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
@@ -30,14 +30,13 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
                 return NotFound();
             }
 
-            var item =  await _context.Items.FirstOrDefaultAsync(m => m.Id == id);
-            if (item == null)
+            var user =  await _context.Users.FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
                 return NotFound();
             }
-            Item = item;
-           ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Id");
-           ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            User = user;
+           ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id");
             return Page();
         }
 
@@ -50,7 +49,7 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
                 return Page();
             }
 
-            _context.Attach(Item).State = EntityState.Modified;
+            _context.Attach(User).State = EntityState.Modified;
 
             try
             {
@@ -58,7 +57,7 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ItemExists(Item.Id))
+                if (!UserExists(User.Id))
                 {
                     return NotFound();
                 }
@@ -71,9 +70,9 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
             return RedirectToPage("./Index");
         }
 
-        private bool ItemExists(string id)
+        private bool UserExists(string id)
         {
-            return _context.Items.Any(e => e.Id == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }
