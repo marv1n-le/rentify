@@ -1,0 +1,69 @@
+﻿@page "{id}"
+@using Rentify.BusinessObjects.Enum
+@model Rentify.RazorWebApp.Pages.Rentals.DetailsModel
+
+@{
+    ViewData["Title"] = "Rental Details";
+}
+
+<h1>Rental Details</h1>
+
+<div>
+    <h4>Rental</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">User</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Rental.User.FullName)</dd>
+
+        <dt class="col-sm-3">Rental Date</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Rental.RentalDate)</dd>
+
+        <dt class="col-sm-3">Return Date</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Rental.ReturnDate)</dd>
+
+        <dt class="col-sm-3">Total Amount</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Rental.TotalAmount)</dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+            <span class="badge @GetStatusBadgeClass(Model.Rental.Status)">
+                @Html.DisplayFor(model => model.Rental.Status)
+            </span>
+        </dd>
+
+        <dt class="col-sm-3">Payment Status</dt>
+        <dd class="col-sm-9">
+            <span class="badge @GetPaymentStatusBadgeClass(Model.Rental.PaymentStatus)">
+                @Html.DisplayFor(model => model.Rental.PaymentStatus)
+            </span>
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.Rental.Id" class="btn btn-warning">Edit</a>
+    <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
+</div>
+
+@functions {
+    string GetStatusBadgeClass(RentalStatus status)
+    {
+        return status switch
+        {
+            RentalStatus.Active => "bg-success",
+            RentalStatus.Completed => "bg-primary",
+            RentalStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+
+    string GetPaymentStatusBadgeClass(PaymentStatus status)
+    {
+        return status switch
+        {
+            PaymentStatus.Paid => "bg-success",
+            PaymentStatus.Pending => "bg-warning",
+            PaymentStatus.Failed => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

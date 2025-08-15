@@ -8,6 +8,7 @@ public interface IUnitOfWork
     IRoleRepository RoleRepository { get; }
     IPostRepository PostRepository { get; }
     ICommentRepository CommentRepository { get; }
+    IRentalRepository RentalRepository { get; }
     ICategoryRepository CategoryRepository { get;  }
     
     int SaveChanges();

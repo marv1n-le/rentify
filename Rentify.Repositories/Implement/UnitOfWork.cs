@@ -12,12 +12,14 @@ public class UnitOfWork : IUnitOfWork
     public IRoleRepository RoleRepository { get; }
     public IPostRepository PostRepository { get; }
     public ICommentRepository CommentRepository { get; }
+    public IRentalRepository RentalRepository { get; }
 
     public UnitOfWork(RentifyDbContext context,
         IUserRepository userRepository, ICategoryRepository categoryRepository,
         IRoleRepository roleRepository,
         IPostRepository postRepository,
-        ICommentRepository commentRepository)
+        ICommentRepository commentRepository,
+        IRentalRepository rentalRepository)
 
     {
         _context = context;
@@ -27,6 +29,7 @@ public class UnitOfWork : IUnitOfWork
         PostRepository = postRepository;
         RoleRepository = roleRepository;
         CommentRepository = commentRepository;
+        RentalRepository = rentalRepository;
     }
 
     public int SaveChanges()
