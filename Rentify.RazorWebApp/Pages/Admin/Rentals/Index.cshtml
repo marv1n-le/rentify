@@ -29,7 +29,7 @@
             @foreach (var item in Model.Rental)
             {
                 <tr>
-                    <td>@Html.DisplayFor(modelItem => item.User.FullName)</td>
+                    <td>@(item.User?.FullName ?? "Unknown")</td>
                     <td>@Html.DisplayFor(modelItem => item.RentalDate)</td>
                     <td>@Html.DisplayFor(modelItem => item.ReturnDate)</td>
                     <td>@Html.DisplayFor(modelItem => item.TotalAmount)</td>
