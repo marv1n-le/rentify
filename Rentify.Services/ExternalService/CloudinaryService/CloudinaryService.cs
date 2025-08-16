@@ -35,8 +35,8 @@ public class CloudinaryService : ICloudinaryService
         var uploadParams = new ImageUploadParams
         {
             File = new FileDescription(file.FileName, stream),
-            Folder = "mamafit_photos",
-            PublicId = $"mamafit_{Guid.NewGuid()}",
+            Folder = "rentify_photos",
+            PublicId = $"rentify_{Guid.NewGuid()}",
         };
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CloudinaryDotNet;
+using MamaFit.Services.ExternalService.CloudinaryService;
+using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.Repositories.Implement;
 using Rentify.Repositories.Interface;
@@ -33,6 +35,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IRentalService, RentalService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IItemService, ItemService>();
+        services.AddScoped<ICloudinaryService, CloudinaryService>();
     }
 
     public static IServiceCollection AddGhtkClient(this IServiceCollection services, IConfiguration configuration)

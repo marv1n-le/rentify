@@ -20,4 +20,12 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             .FirstOrDefaultAsync(u => u.Username == userName && u.Password == password && u.IsDeleted == false);
         return userAccount;
     }
+    
+    public async Task<User?> GetUserById(string id)
+    {
+        var user = await _dbSet
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false);
+        return user;
+    }
 }

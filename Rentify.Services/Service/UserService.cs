@@ -22,7 +22,7 @@ public class UserService : IUserService
 
     public async Task<User?> GetUserById(string id)
     {
-        return await _unitOfWork.UserRepository.GetByIdAsync(id);
+        return await _unitOfWork.UserRepository.GetUserById(id);
     }
 
     public async Task<string> CreateUser(UserRegisterDto dto)

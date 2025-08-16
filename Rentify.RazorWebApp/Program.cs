@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Rentify.RazorWebApp.DependencyInjection;
+using Rentify.Repositories.Helper;
 
 namespace Rentify.RazorWebApp;
 
@@ -24,6 +25,8 @@ public class Program
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
 
+        builder.Services.Configure<CloudinarySettings>(
+            builder.Configuration.GetSection("CloudinarySettings"));
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
