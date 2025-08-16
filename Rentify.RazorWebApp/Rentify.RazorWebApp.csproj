@@ -49,6 +49,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="ViewModels\" />
       <Folder Include="Pages\UserPages\" />
     </ItemGroup>
 

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
@@ -87,5 +88,17 @@ public class UserService : IUserService
         await _unitOfWork.UserRepository.SoftDeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
         return true;
+    }
+
+    public string? GetCurrentUserId(ClaimsPrincipal user)
+    {
+        // Use standard claim type for user id
+        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            // Fallback: try custom claim "Id"
+            userId = user.FindFirst("Id")?.Value;
+        }
+        return userId;
     }
 }

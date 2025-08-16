@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Rentify.BusinessObjects.Entities.Comment>
+
+<div class="comment-list mt-2">
+    @if (!Model.Any())
+    {
+        <div class="text-muted small">Chưa có bình luận nào.</div>
+    }
+    else
+    {
+        @foreach (var comment in Model)
+        {
+            <div class="d-flex align-items-start mb-2">
+                <img src="@(comment.User?.ProfilePicture ?? "https://via.placeholder.com/32")"
+                     alt="Avatar" class="rounded-circle me-2" width="32" height="32" />
+                <div>
+                    <div class="fw-bold">@comment.User?.FullName</div>
+                    <div class="text-muted small">@comment.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                    <div>@comment.Content</div>
+                </div>
+            </div>
+        }
+    }
+</div>

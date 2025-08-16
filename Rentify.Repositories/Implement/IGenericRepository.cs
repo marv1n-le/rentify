@@ -29,4 +29,5 @@ public interface IGenericRepository<T> where T : BaseEntity
     Task<IQueryable<T>> GetAllQueryableAsync();
     Task<List<T>> FindListAsync(Expression<Func<T, bool>> predicate);
     Task<bool> IsEntityExistsAsync(Expression<Func<T, bool>> predicate);
+    Task<int> CountAsync(Expression<Func<T, bool>> predicate);
 }

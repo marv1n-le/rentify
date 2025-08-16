@@ -1,27 +1,55 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Rentify.BusinessObjects.DTO.PostDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Services.Interface;
-using Rentify.BusinessObjects.DTO.PostDto;
 
 namespace Rentify.RazorWebApp.Pages.PostPages
 {
     public class IndexModel : PageModel
     {
         private readonly IPostService _postService;
+        private readonly ICommentService _commentService;
+        private readonly IUserService _userService;
 
-        public IndexModel(IPostService postService)
+        public IndexModel(IPostService postService, ICommentService commentService, IUserService userService)
         {
             _postService = postService;
+            _commentService = commentService;
+            _userService = userService;
         }
 
-        public IList<Post> Post { get; set; } = default!;
+        public class PostWithCommentCount
+        {
+            public Post Post { get; set; } = default!;
+            public int CommentCount { get; set; }
+        }
+
+        public IList<PostViewModel> Posts { get; set; } = default!;
 
         public async Task OnGetAsync(int index = 1, int pageSize = 5)
         {
-            Post = await _postService.GetAllPost(index, pageSize);
+            var posts = await _postService.GetAllPost(index, pageSize);
+            Posts = new List<PostViewModel>();
+            foreach (var post in posts)
+            {
+                var count = await _commentService.CountCommentsByPostId(post.Id);
+                Posts.Add(new PostViewModel
+                {
+                    Id = post.Id,
+                    Title = post.Title,
+                    Content = post.Content,
+                    Images = post.Images,
+                    Tags = post.Tags,
+                    CreatedAt = post.CreatedAt,
+                    User = post.User,
+                    CommentCount = count
+                });
+            }
         }
+
 
         public async Task<IActionResult> OnGetMorePostsAsync(int index, int pageSize)
         {
@@ -128,6 +156,32 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                 return new JsonResult(new { success = false, message = ex.Message });
             }
         }
+
+        public async Task<IActionResult> OnGetGetCommentsAsync(string postId)
+        {
+            try
+            {
+                var comments = await _commentService.GetCommentByPostId(postId) ?? new List<Comment>();
+                return Partial("_CommentModalContent", Tuple.Create(postId, comments.AsEnumerable()));
+            }
+            catch (Exception ex)
+            {
+                return Content("Error: " + ex.Message + "<br/>" + ex.StackTrace, "text/html");
+            }
+        }
+
+        public async Task<IActionResult> OnPostAddCommentAsync([FromBody] AddCommentRequest request)
+        {
+            try
+            {
+                await _commentService.CreateCommentAsync(request.PostId, request.Content);
+                return new JsonResult(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
+            }
+        }
     }
 
     // DTO tạm thời để nhận dữ liệu từ form
@@ -159,5 +213,23 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public DateTime CreatedAt { get; set; }
         public string? UserName { get; set; }
         public string? UserProfilePicture { get; set; }
+    }
+
+    public class AddCommentRequest
+    {
+        public string PostId { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+    }
+
+    public class PostViewModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+        public List<string> Images { get; set; } = new();
+        public List<string> Tags { get; set; } = new();
+        public DateTime CreatedAt { get; set; }
+        public User? User { get; set; }
+        public int CommentCount { get; set; }
     }
 }
