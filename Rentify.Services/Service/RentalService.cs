@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Rentify.BusinessObjects.DTO.RentalDTO;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
@@ -12,12 +13,14 @@ namespace Rentify.Services.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IMapper _mapper;
+        private readonly ILogger<RentalService> _logger;
 
-        public RentalService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper)
+        public RentalService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper, ILogger<RentalService> logger)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<string> CreateRental(RentalCreateDTO rental)
@@ -31,8 +34,8 @@ namespace Rentify.Services.Service
             {
                 UserId = userId,
                 User = user,
-                RentalDate = rental.RentalDate,
-                ReturnDate = rental.ReturnDate,
+                RentalDate = rental.RentalDate?.ToUniversalTime(),
+                ReturnDate = rental.ReturnDate?.ToUniversalTime(),
                 TotalAmount = rental.TotalAmount,
                 Status = rental.Status,
                 PaymentStatus = rental.PaymentStatus
@@ -80,7 +83,11 @@ namespace Rentify.Services.Service
             if (rental == null)
                 throw new Exception($"Rental with id: {request.RentalId} has not found");
 
-            _mapper.Map(rental, request);
+            rental.RentalDate = request.RentalDate?.ToUniversalTime();
+            rental.ReturnDate = request.ReturnDate?.ToUniversalTime();
+            rental.TotalAmount = request.TotalAmount;
+            rental.Status = request.Status;
+            rental.PaymentStatus = request.PaymentStatus;
 
             await _unitOfWork.RentalRepository.UpdateAsync(rental);
             await _unitOfWork.SaveChangesAsync();
