@@ -1,0 +1,16 @@
+﻿@model Tuple<string, IEnumerable<Rentify.BusinessObjects.Entities.Comment>>
+
+@{
+    var postId = Model.Item1;
+    var comments = Model.Item2;
+}
+
+<partial name="_CommentList" model="comments" />
+
+<form id="commentForm" class="mt-3">
+    @Html.AntiForgeryToken()
+    <div class="input-group">
+        <input type="text" name="Content" class="form-control" placeholder="Viết bình luận..." required maxlength="250" autocomplete="off" />
+        <button class="btn btn-primary" type="submit">Gửi</button>
+    </div>
+</form>

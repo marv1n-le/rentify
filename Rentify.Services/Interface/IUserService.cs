@@ -1,5 +1,6 @@
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.BusinessObjects.Entities;
+using System.Security.Claims;
 
 namespace Rentify.Services.Interface;
 
@@ -12,4 +13,5 @@ public interface IUserService
     Task<bool> CreateSystemUser(SystemUserCreateDto user);
     Task UpdateUser(User user);
     Task<bool> SoftDeleteUser(string id);
+    string? GetCurrentUserId(ClaimsPrincipal user);
 }
