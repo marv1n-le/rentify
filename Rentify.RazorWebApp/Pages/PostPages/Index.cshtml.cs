@@ -182,6 +182,12 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                 return new JsonResult(new { success = false, message = ex.Message });
             }
         }
+
+        public async Task<IActionResult> OnPostDeleteCommentAsync(string commentId)
+        {
+            var result = await _commentService.SoftDeleteComment(commentId);
+            return new JsonResult(new { success = result });
+        }
     }
 
     // DTO tạm thời để nhận dữ liệu từ form

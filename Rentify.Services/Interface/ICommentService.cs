@@ -10,5 +10,6 @@ namespace Rentify.Services.Interface
         Task AddComment(Comment comment);
         Task CreateCommentAsync(string postId, string content);
         Task<int> CountCommentsByPostId(string postId);
+        Task<bool> SoftDeleteComment(string commentId);
     }
 }
