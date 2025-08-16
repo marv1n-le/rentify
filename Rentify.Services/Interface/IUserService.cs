@@ -12,4 +12,5 @@ public interface IUserService
     Task<bool> CreateSystemUser(SystemUserCreateDto user);
     Task UpdateUser(User user);
     Task<bool> SoftDeleteUser(string id);
+    Task<string?> GetCurrentUserIdAsync();
 }

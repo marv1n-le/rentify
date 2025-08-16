@@ -27,5 +27,19 @@ namespace Rentify.Services.Service
         {
             return await _unitOfWork.CommentRepository.Get5NewestCommentByPostId(postId);
         }
+
+        public async Task AddCommentAsync(Comment comment)
+        {
+            try
+            {
+                await _unitOfWork.CommentRepository.InsertAsync(comment);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving comment: {ex.Message}");
+                throw;
+            }
+        }
     }
 }

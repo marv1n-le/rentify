@@ -47,7 +47,7 @@
 
                 <!-- Danh sách bài viết -->
                 <div id="post-container">
-                    @foreach (var item in Model.Post)
+                    @foreach (var item in Model.Posts)
                     {
                         @Html.Partial("_PostCard", item)
                     }
@@ -148,6 +148,28 @@
             </div>
             <div class="modal-body text-center p-0">
                 <img id="modalImage" src="" alt="Post image" class="img-fluid" style="max-height: 90vh; max-width: 100%; object-fit: contain;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Create Comment -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">Bình luận</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="comments-list" class="overflow-auto" style="max-height: 400px;"></div>
+                <form id="addCommentForm" class="mt-3">
+                    @Html.AntiForgeryToken()
+                    <div class="input-group">
+                        <textarea class="form-control" id="commentContent" name="Content" placeholder="Viết bình luận..." rows="2"></textarea>
+                        <button type="submit" class="btn btn-primary">Gửi</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -273,6 +295,7 @@
     let page = 1;
     let isLoading = false;
     const pageSize = 5;
+    let currentPostId = null;
 
     // Infinite scroll
     window.addEventListener('scroll', () => {
@@ -352,6 +375,57 @@
             btn.innerText = "Thu gọn";
         }
     }
+
+
+    function commentPost(postId) {
+        currentPostId = postId;
+        $('#commentModal').modal('show');
+        loadComments(postId);
+    }
+
+    function loadComments(postId) {
+        fetch(`?handler=Comments&postId=${postId}`)
+            .then(response => response.text())
+            .then(html => {
+                $('#comments-list').html(html);
+            })
+            .catch(error => console.error('Error loading comments:', error));
+    }
+
+    $('#addCommentForm').submit(function(e) {
+        e.preventDefault();
+        const content = $('#commentContent').val().trim();
+        if (!content) return;
+
+        fetch(`?handler=AddComment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ postId: currentPostId, content: content })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                $('#commentContent').val('');
+                loadComments(currentPostId);
+                // Optional: Update comment count on post card
+                const countSpan = document.querySelector(`#post-${currentPostId} .comment-count`);
+                if (countSpan) countSpan.textContent = parseInt(countSpan.textContent) + 1;
+            } else {
+                alert('Thêm bình luận thất bại: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error adding comment:', error));
+    });
+
+    window.addEventListener('click', function(e) {
+
+
+        const commentM = document.getElementById('commentModal');
+        if (e.target === commentM) $('#commentModal').modal('hide');
+    });
 
     // Modal functions
     function openCreateModal() {

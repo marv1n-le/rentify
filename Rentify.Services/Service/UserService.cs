@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
@@ -8,10 +9,12 @@ namespace Rentify.Services.Service;
 public class UserService : IUserService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserService(IUnitOfWork unitOfWork)
+    public UserService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
     {
         _unitOfWork = unitOfWork;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<IEnumerable<User>> GetAllUsers()
@@ -87,5 +90,11 @@ public class UserService : IUserService
         await _unitOfWork.UserRepository.SoftDeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<string?> GetCurrentUserIdAsync()
+    {
+        _httpContextAccessor.HttpContext.Request.Cookies.TryGetValue("userId", out var userId);
+        return userId;
     }
 }

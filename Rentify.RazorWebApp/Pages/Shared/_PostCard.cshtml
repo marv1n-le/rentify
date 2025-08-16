@@ -1,18 +1,18 @@
-﻿@model Rentify.BusinessObjects.Entities.Post
+﻿@model Rentify.BusinessObjects.DTO.PostDto.PostResponseDto
 
-<div id="post-@Model.Id" class="card border-0 shadow-sm mb-4">
+<div id="post-@Model.Id" class="card border-0 shadow-sm mb-4" data-initialized="false">
     <div class="card-body p-0">
         <!-- Header bài viết -->
         <div class="p-3 pb-2">
             <div class="d-flex justify-content-between align-items-start post-menu-wrapper position-relative">
                 <!-- Thông tin người dùng -->
                 <div class="d-flex align-items-center">
-                    <img src="@(Model.User?.ProfilePicture ?? "https://via.placeholder.com/40")"
+                    <img src="@(Model.UserProfilePicture ?? "https://via.placeholder.com/40")"
                          alt="User avatar" class="rounded-circle me-3" width="40" height="40" />
                     <div>
-                        <div class="fw-bold text-dark">@Model.User?.FullName</div>
+                        <div class="fw-bold text-dark">@Model.UserName</div>
                         <div class="text-muted small">
-                            <span class="me-1">@Model.CreatedAt.ToString("dd-08-2025 lúc HH:mm")</span>
+                            <span class="me-1">@Model.CreatedAt.ToString("dd/MM/yyyy lúc HH:mm")</span>
                         </div>
                     </div>
                 </div>
@@ -34,12 +34,10 @@
             {
                 <h6 class="fw-bold mb-2">@Model.Title</h6>
             }
-            
-            <div id="content-@Model.Id" class="post-content mb-2">
+            <div id="content-@Model.Id" class="post-content mb-2 @(Model.Content?.Length > 200 ? "truncated" : "")">
                 @Model.Content
             </div>
-            
-            @if (Model.Content?.Length > 100)
+            @if (Model.Content?.Length > 200)
             {
                 <a href="javascript:void(0)" id="showmore-@Model.Id" class="show-more-link" onclick="toggleContent('@Model.Id')">
                     Hiển thị thêm
@@ -53,21 +51,21 @@
             <div class="px-3 pb-2">
                 @if (Model.Images.Count == 1)
                 {
-                    <img src="@Model.Images.First()" alt="Post image" class="img-fluid rounded clickable-image" 
-                         style="max-height: 400px; width: 100%; object-fit: cover;" 
+                    <img src="@Model.Images.First()" alt="Post image" class="img-fluid rounded clickable-image"
+                         style="max-height: 400px; width: 100%; object-fit: cover;"
                          onclick="openImageModal('@Model.Images.First()')">
                 }
                 else if (Model.Images.Count == 2)
                 {
                     <div class="row g-1">
                         <div class="col-6">
-                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image" 
-                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image"
+                                 style="height: 200px; width: 100%; object-fit: cover;"
                                  onclick="openImageModal('@Model.Images[0]')">
                         </div>
                         <div class="col-6">
-                            <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image" 
-                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                            <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image"
+                                 style="height: 200px; width: 100%; object-fit: cover;"
                                  onclick="openImageModal('@Model.Images[1]')">
                         </div>
                     </div>
@@ -76,20 +74,20 @@
                 {
                     <div class="row g-1">
                         <div class="col-8">
-                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image" 
-                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image"
+                                 style="height: 200px; width: 100%; object-fit: cover;"
                                  onclick="openImageModal('@Model.Images[0]')">
                         </div>
                         <div class="col-4">
                             <div class="d-flex flex-column g-1">
-                                <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image mb-1" 
-                                     style="height: 98px; width: 100%; object-fit: cover;" 
+                                <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image mb-1"
+                                     style="height: 98px; width: 100%; object-fit: cover;"
                                      onclick="openImageModal('@Model.Images[1]')">
                                 @if (Model.Images.Count > 2)
                                 {
                                     <div class="position-relative">
-                                        <img src="@Model.Images[2]" alt="Post image" class="img-fluid rounded clickable-image" 
-                                             style="height: 98px; width: 100%; object-fit: cover;" 
+                                        <img src="@Model.Images[2]" alt="Post image" class="img-fluid rounded clickable-image"
+                                             style="height: 98px; width: 100%; object-fit: cover;"
                                              onclick="openImageModal('@Model.Images[2]')">
                                         @if (Model.Images.Count > 3)
                                         {
@@ -121,7 +119,7 @@
         <div class="px-3 py-2 border-top">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="text-muted small">
-                    <span>0 bình luận</span>
+                    <span class="comment-count">@Model.CommentCount</span> bình luận
                 </div>
             </div>
         </div>
@@ -137,7 +135,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>  
 </div>
 
 <style>
@@ -153,7 +151,11 @@
         align-items: center;
         justify-content: center;
     }
-    .post-menu-btn:hover { background: #f0f2f5; }
+
+        .post-menu-btn:hover {
+            background: #f0f2f5;
+        }
+
     .post-menu {
         position: absolute;
         top: 8px;
@@ -166,10 +168,62 @@
         display: none;
         z-index: 1050;
     }
-    .post-menu.show { display: block; }
-    .post-menu a { display: block; padding: 8px 12px; color: #111; text-decoration: none; }
-    .post-menu a:hover { background: #f2f2f2; }
-    .post-menu a.text-danger { color: #e03131; }
+
+        .post-menu.show {
+            display: block;
+        }
+
+        .post-menu a {
+            display: block;
+            padding: 8px 12px;
+            color: #111;
+            text-decoration: none;
+        }
+
+            .post-menu a:hover {
+                background: #f2f2f2;
+            }
+
+            .post-menu a.text-danger {
+                color: #e03131;
+            }
+
+    .post-content.truncated {
+        max-height: 100px;
+        overflow: hidden;
+        position: relative;
+    }
+
+        .post-content.truncated::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(transparent, white);
+        }
+
+    .post-content.expanded {
+        max-height: none;
+    }
+
+        .post-content.expanded::after {
+            display: none;
+        }
+
+    .show-more-link {
+        color: #1877f2;
+        cursor: pointer;
+    }
+
+    .comment {
+        border-radius: 8px;
+    }
+
+    .clickable-image {
+        cursor: pointer;
+    }
 </style>
 
 <script>
@@ -189,15 +243,19 @@
 
     function deletePost(postId) {
         if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-            fetch(`/PostPages/Delete?id=${postId}`, { 
+            fetch(`?handler=Delete&id=${postId}`, {
                 method: "POST",
-                headers: { 'Content-Type': 'application/json' }
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
             })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     document.getElementById(`post-${postId}`).remove();
                 } else {
-                    alert("Xóa thất bại. Vui lòng thử lại.");
+                    alert("Xóa thất bại: " + (data.message || "Vui lòng thử lại."));
                 }
             })
             .catch(() => alert("Có lỗi xảy ra. Vui lòng thử lại."));

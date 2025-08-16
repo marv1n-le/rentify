@@ -1,0 +1,19 @@
+﻿@model IEnumerable<Rentify.BusinessObjects.DTO.CommentDto.CommentResponseDto>
+
+<div class="comments-list">
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Chưa có bình luận nào.</p>
+    }
+    @foreach (var comment in Model.OrderByDescending(c => c.CreatedAt))
+    {
+        <div class="comment d-flex mb-3">
+            <img src="@(comment.UserProfilePicture ?? "https://via.placeholder.com/32")" alt="Avatar" class="rounded-circle me-2" width="32" height="32">
+            <div class="flex-grow-1 bg-light p-2 rounded">
+                <div class="fw-bold small">@comment.UserName</div>
+                <div>@comment.Content</div>
+                <div class="text-muted small">@comment.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+        </div>
+    }
+</div>
