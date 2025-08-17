@@ -1,0 +1,21 @@
+﻿# ~/rentify/docker-compose.yaml
+version: "3.8"
+
+services:
+  rentify-web:
+    image: ${REGISTRY_NAME}/rentify-web:latest
+    container_name: rentify-web
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # Kế thừa ASPNETCORE_URLS=http://+:8080 từ Dockerfile (base stage)
+    ports:
+      - "8082:8080"   # Host 8082 -> Container 8080 (không đụng 8080/8081 hiện có)
+    networks:
+      - mamafit-network
+    # volumes:
+    #   - /data/compose/rentify-logs:/app/logs  # nếu muốn lưu log ra host
+
+networks:
+  mamafit-network:
+    external: true
