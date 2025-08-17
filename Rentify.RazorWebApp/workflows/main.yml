@@ -112,51 +112,60 @@ jobs:
             docker ps -a | grep rentify-web
 
   notify-success:
-    name: Notify (Success)
+    name: Notify Discord (Success)
     runs-on: ubuntu-latest
     needs: deploy
     if: success()
-    env:
-      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }} 
     steps:
-      - name: Discord Webhook (optional)
-        if: ${{ env.DISCORD_WEBHOOK_URL != '' }}            
+      - name: Send Success Message
         run: |
           TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           curl -H "Content-Type: application/json" -X POST -d "{
             \"embeds\": [{
-              \"title\": \"✅ Rentify Web - Deployment Successful\",
-              \"description\": \"App đã chạy trên VPS (port 8082) hoặc qua Nginx Proxy Manager.\",
+              \"title\": \"🚀 MamaFit API - Deployment Successful\",
+              \"description\": \"✨ App is live at https://api.mamafit.studio/\",
               \"color\": 5763719,
+              \"author\": {
+                \"name\": \"${{ github.actor }}\",
+                \"icon_url\": \"https://github.com/${{ github.actor }}.png\"
+              },
               \"fields\": [
-                { \"name\": \"Image\", \"value\": \"${{ env.IMAGE_NAME }}\" },
-                { \"name\": \"Host Port\", \"value\": \"8082\" }
+                { \"name\": \"Repository\", \"value\": \"[${{ github.repository }}](https://github.com/${{ github.repository }})\", \"inline\": true },
+                { \"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true },
+                { \"name\": \"Commit\", \"value\": \"[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\", \"inline\": true }
               ],
+              \"footer\": { \"text\": \"MamaFit CI/CD • GitHub Actions\" },
               \"timestamp\": \"$TIMESTAMP\"
             }]
-          }" "$DISCORD_WEBHOOK_URL"
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   notify-failure:
-    name: Notify (Failure)
+    name: Notify Discord (Failure)
     runs-on: ubuntu-latest
     needs: [ test, build-and-push, deploy ]
     if: failure()
-    env:
-      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}  
     steps:
-      - name: Discord Webhook (optional)
-        if: ${{ env.DISCORD_WEBHOOK_URL != '' }}          
+      - name: Send Failure Message
         run: |
           TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           curl -H "Content-Type: application/json" -X POST -d "{
+            \"content\": \"<@&1379069130656845824> 🚨 **MamaFit API** deployment failed!\",
             \"embeds\": [{
-              \"title\": \"❌ Rentify Web - Deployment Failed\",
-              \"description\": \"CI/CD lỗi. Kiểm tra logs GitHub Actions.\",
+              \"title\": \"💥 Deployment Failed\",
+              \"description\": \"❌ CI/CD pipeline failed.\",
               \"color\": 15158332,
+              \"author\": {
+                \"name\": \"${{ github.actor }}\",
+                \"icon_url\": \"https://github.com/${{ github.actor }}.png\"
+              },
               \"fields\": [
-                { \"name\": \"Run\", \"value\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\" }
+                { \"name\": \"Repository\", \"value\": \"[${{ github.repository }}](https://github.com/${{ github.repository }})\", \"inline\": true },
+                { \"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true },
+                { \"name\": \"Commit\", \"value\": \"[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\", \"inline\": true },
+                { \"name\": \"Logs\", \"value\": \"[View Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\", \"inline\": true }
               ],
+              \"footer\": { \"text\": \"MamaFit CI/CD • GitHub Actions\" },
               \"timestamp\": \"$TIMESTAMP\"
             }]
-          }" "$DISCORD_WEBHOOK_URL"
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
   
