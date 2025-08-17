@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Rentify.BusinessObjects.DTO.PostDto;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Repositories.Helper;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
 
@@ -52,9 +54,9 @@ namespace Rentify.Services.Service
             await _unitOfWork.PostRepository.SoftDeleteAsync(post);
         }
 
-        public async Task<List<Post>> GetAllPost(int index, int pageSize)
+        public async Task<List<Post>> GetAllPost(SearchFilterPostDto searchFilterPostDto)
         {
-            var postList = await _unitOfWork.PostRepository.GetAllPost(index, pageSize);
+            var postList = await _unitOfWork.PostRepository.GetAllPost(searchFilterPostDto);
 
             if (postList == null)
                 throw new Exception("Has no record for Post");

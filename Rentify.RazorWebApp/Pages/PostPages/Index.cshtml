@@ -5,99 +5,149 @@
     ViewData["Title"] = "Bài viết";
 }
 @* TODO: Cần phải centralize css  *@
-<style>
-    :root {
-        --primary-color: #0d6efd;
-        --border-radius: 0.5rem;
-        --table-border-color: #f0f0f0;
-    }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .card {
-        border: 1px solid var(--table-border-color);
-        border-radius: var(--border-radius);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-        .table th, .table td {
-            padding: 16px 24px;
-            vertical-align: middle;
-            border-top: 1px solid var(--table-border-color);
-            white-space: nowrap;
-        }
-
-        .table thead th {
-            background-color: #fafafa;
-            border-bottom: 1px solid var(--table-border-color);
-            font-weight: 600;
-            color: #000;
-            text-transform: none;
-        }
-
-        .table tbody tr:hover {
-            background-color: #fafafa;
-        }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        border-radius: var(--border-radius);
-        padding: 0.5rem 1rem;
-    }
-
-    .action-links a {
-        color: var(--primary-color);
-        text-decoration: none;
-        margin-right: 16px;
-    }
-
-        .action-links a:hover {
-            text-decoration: underline;
-        }
-
-        .action-links a:last-child {
-            margin-right: 0;
-        }
-</style>
-
-<!-- Thanh tìm kiếm & filter -->
-<div class="card border-0 shadow-sm mb-4 p-3 bg-white">
-    <div class="d-flex flex-wrap align-items-center gap-2">
-        <!-- Ô tìm kiếm -->
-        <div class="flex-grow-1">
-            <div class="input-group">
-                <span class="input-group-text bg-white border-end-0">
-                    <i class="bi bi-search text-primary"></i>
-                </span>
-                <input type="text" id="searchBox" class="form-control border-start-0" placeholder="Tìm kiếm bài viết...">
+<!-- Search + Filter -->
+<form method="get" class="mb-3">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <!-- Search -->
+        <div class="flex-grow-1 flex-shrink-1 min-w-300">
+            <div class="search-box d-flex align-items-center">
+                <i class="bi bi-search text-primary me-2"></i>
+                <input asp-for="SearchFilterPostDto.Keyword"
+                       class="form-control border-0 shadow-none"
+                       placeholder="Tìm kiếm theo từ khóa hoặc status..." />
             </div>
         </div>
 
-        <!-- Filter theo tag -->
-        <select id="tagFilter" class="form-select w-auto rounded-pill">
-            <option value="">Tất cả tags</option>
-            <option value="Tech">#Tech</option>
-            <option value="Education">#Education</option>
-            <option value="Life">#Life</option>
-        </select>
+        <!-- Status Dropdown -->
+        <div class="dropdown" style="flex:0 0 250px;">
+            <button class="btn btn-outline-primary dropdown-toggle rounded-pill w-100" type="button" id="statusDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                Chọn trạng thái
+            </button>
+            <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3" aria-labelledby="statusDropdown"
+                 onclick="event.stopPropagation();" style="min-width: 200px;">
+                <div class="form-check">
+                    <input class="form-check-input status-checkbox" type="checkbox"
+                           value="Pending" id="statusPending"
+                           name="SearchFilterPostDto.Status" data-text="Đang chờ xử lý">
+                    <label class="form-check-label" for="statusPending">Đang chờ xử lý</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input status-checkbox" type="checkbox"
+                           value="Active" id="statusActive"
+                           name="SearchFilterPostDto.Status" data-text="Đang hoạt động">
+                    <label class="form-check-label" for="statusActive">Đang hoạt động</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input status-checkbox" type="checkbox"
+                           value="Completed" id="statusCompleted"
+                           name="SearchFilterPostDto.Status" data-text="Đã hoàn tất">
+                    <label class="form-check-label" for="statusCompleted">Đã hoàn tất</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input status-checkbox" type="checkbox"
+                           value="Cancelled" id="statusCancelled"
+                           name="SearchFilterPostDto.Status" data-text="Đã hủy">
+                    <label class="form-check-label" for="statusCancelled">Đã hủy</label>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill" id="applyStatusBtn">Apply</button>
+                </div>
+            </div>
+        </div>
 
-        <!-- Nút filter nâng cao -->
-        <button class="btn btn-primary rounded-pill px-3" onclick="applyFilters()">
+        <!-- Filter Button -->
+        <button type="submit" class="btn filter-btn">
             <i class="bi bi-funnel-fill me-1"></i> Lọc
         </button>
     </div>
-</div>
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdownBtn = document.getElementById('statusDropdown');
+            const checkboxes = Array.from(document.querySelectorAll('.status-checkbox'));
+            const applyBtn = document.getElementById('applyStatusBtn');
+
+            // map tên trạng thái -> bootstrap badge classes
+            const colorMap = {
+                "Pending": "bg-warning text-dark",
+                "Active": "bg-success",
+                "Completed": "bg-primary",
+                "Cancelled": "bg-danger"
+            };
+
+            function mapColorClass(text) {
+                return colorMap[text] || "bg-secondary text-white";
+            }
+
+            // Apply -> close dropdown
+            applyBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownBtn);
+                bsDropdown.hide();
+            });
+        });
+    </script>
+}
+
+<style>
+    /* Container */
+    .d-flex.align-items-center.gap-2 {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* Search box */
+    .search-box {
+        border: 1px solid #e6e9ef;
+        border-radius: 28px;
+        padding: 0.5rem 0.9rem;
+        background: #fff;
+        min-height: 44px;
+    }
+
+    .search-box input {
+        border: none;
+        outline: none;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    /* Dropdown */
+    .dropdown-menu {
+        border-radius: 12px;
+        border: 1px solid #e9eef7;
+    }
+
+    .dropdown-menu .form-check-label {
+        user-select: none;
+    }
+
+    .dropdown-menu .form-check-input {
+        width: 1.05em;
+        height: 1.05em;
+    }
+
+    /* Filter Button */
+    .filter-btn {
+        border-radius: 28px;
+        padding: .45rem 1rem;
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        border: none;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(13,110,253,0.18);
+        height: 44px;
+        flex: 0 0 auto;
+    }
+
+    .min-w-300 {
+        min-width: 300px;
+    }
+</style>
+
 
 <div class="container">
     <div class="row justify-content-center">
@@ -141,9 +191,16 @@
 
                 <!-- Danh sách bài viết -->
                 <div id="post-container">
-                    @foreach (var item in Model.Posts)
+                    @if (Model.Posts != null && Model.Posts.Any())
                     {
-                        @Html.Partial("_PostCard", item)
+                        foreach (var item in Model.Posts)
+                        {
+                            @Html.Partial("_PostCard", item)
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-center">Không có thông tin bài viết.</p>
                     }
                 </div>
 
@@ -863,31 +920,5 @@
         if (e.target === imageM) closeModal('imageModal');
         if (e.target === commentM) closeModal('commentModal');
     });
-
-    function applyFilters() {
-        const keyword = document.getElementById("searchBox").value.toLowerCase();
-        const tag = document.getElementById("tagFilter").value;
-
-        const posts = document.querySelectorAll("#post-container > div");
-
-        posts.forEach(post => {
-            const title = post.querySelector("h6")?.innerText.toLowerCase() || "";
-            const content = post.querySelector(".post-content")?.innerText.toLowerCase() || "";
-            const tags = Array.from(post.querySelectorAll(".badge"))
-                              .map(el => el.innerText.toLowerCase());
-
-            let show = true;
-
-            if (keyword && !(title.includes(keyword) || content.includes(keyword))) {
-                show = false;
-            }
-
-            if (tag && !tags.includes(`#${tag.toLowerCase()}`)) {
-                show = false;
-            }
-
-            post.style.display = show ? "block" : "none";
-        });
-    }
 
 </script>
