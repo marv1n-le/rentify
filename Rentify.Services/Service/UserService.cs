@@ -27,10 +27,10 @@ public class UserService : IUserService
 
     public async Task<string> CreateUser(UserRegisterDto dto)
     {
-        var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Username == dto.Username);
+        var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Email == dto.Email);
         if (existingUser)
         {
-            throw new Exception($"Username {dto.Username} already exists.");
+            throw new Exception($"Username {dto.Email} already exists.");
         }
 
         var userRole = await _unitOfWork.RoleRepository.FindAsync(r => r.Name == "User");
@@ -39,7 +39,7 @@ public class UserService : IUserService
 
         User newUser = new User
         {
-            Username = dto.Username,
+            Email = dto.Email,
             Password = dto.Password,
             FullName = dto.FullName,
             ProfilePicture = dto.ProfilePicture,
@@ -54,13 +54,13 @@ public class UserService : IUserService
 
     public async Task<bool> CreateSystemUser(SystemUserCreateDto dto)
     {
-        var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Username == dto.Username);
+        var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Email == dto.Email);
         if (existingUser)
-            throw new Exception($"Username {dto.Username} already exists.");
+            throw new Exception($"Username {dto.Email} already exists.");
 
         User newUser = new User
         {
-            Username = dto.Username,
+            Email = dto.Email,
             Password = dto.Password,
             FullName = dto.FullName,
             ProfilePicture = dto.ProfilePicture,
@@ -92,7 +92,6 @@ public class UserService : IUserService
 
     public string? GetCurrentUserId(ClaimsPrincipal user)
     {
-        // Use standard claim type for user id
         var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
         {

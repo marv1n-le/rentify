@@ -1,0 +1,190 @@
+name: Build & Deploy Rentify Web (Prod)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Tránh deploy chồng khi push liên tiếp
+concurrency:
+  group: rentify-web-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY_NAME: ${{ secrets.REGISTRY_NAME }}
+  IMAGE_NAME: ${{ secrets.REGISTRY_NAME }}/rentify-web:latest
+
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+jobs:
+  test:
+    name: Build .NET (no tests yet)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore "Rentify.RazorWebApp/Rentify.RazorWebApp.csproj"
+
+      - name: Build
+        run: dotnet build "Rentify.RazorWebApp/Rentify.RazorWebApp.csproj" -c Release --no-restore
+
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: DockerHub Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_HUB_USERNAME }}
+          password: ${{ env.DOCKER_HUB_TOKEN }}
+
+      - name: Build image
+        run: |
+          echo "Building image: $IMAGE_NAME"
+          docker build -t "$IMAGE_NAME" -f Rentify.RazorWebApp/Dockerfile .
+
+      - name: Push image
+        run: docker push "$IMAGE_NAME"
+
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    timeout-minutes: 30
+    steps:
+      - name: Checkout (for compose generation)
+        uses: actions/checkout@v4
+
+      - name: Create docker-compose.yaml locally
+        run: |
+          mkdir -p composeout
+          cat > composeout/docker-compose.yaml <<'EOF'
+          version: "3.8"
+          services:
+            rentify-web:
+              image: ${REGISTRY_NAME}/rentify-web:latest
+              container_name: rentify-web
+              restart: unless-stopped
+              environment:
+                - ASPNETCORE_ENVIRONMENT=Production
+              ports:
+                - "8082:8080"
+              networks:
+                - mamafit-network
+          networks:
+            mamafit-network:
+              external: true
+          EOF
+
+      - name: Copy docker-compose.yaml to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "composeout/docker-compose.yaml"
+          target: "~/rentify"
+          overwrite: true
+          strip_components: 1
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: REGISTRY_NAME,IMAGE_NAME,DOCKER_HUB_USERNAME,DOCKER_HUB_TOKEN
+          script: |
+            set -e
+            mkdir -p ~/rentify
+            cd ~/rentify
+
+            # tạo .env cho docker compose (đọc bởi compose)
+            echo "REGISTRY_NAME=${REGISTRY_NAME}" > .env
+
+            # network external (nếu chưa có)
+            docker network inspect mamafit-network >/dev/null 2>&1 || docker network create mamafit-network
+
+            # login + pull image
+            echo "${DOCKER_HUB_TOKEN}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
+            docker pull "${IMAGE_NAME}"
+
+            # deploy
+            docker compose up -d --pull always --no-deps --force-recreate rentify-web
+
+            # verify
+            docker ps -a | grep rentify-web || (echo "Container not found!" && exit 1)
+  
+  notify-success:
+    name: Notify Discord (Success)
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: success()
+    steps:
+      - name: Send Success Message (optional)
+        if: ${{ env.DISCORD_WEBHOOK_URL != '' }}
+        run: |
+          TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          curl -H "Content-Type: application/json" -X POST -d "{
+            \"embeds\": [{
+              \"title\": \"🚀 Rentify Web - Deployment Successful\",
+              \"description\": \"✨ App is live on VPS (via Nginx Proxy Manager / port 8082)\",
+              \"color\": 5763719,
+              \"author\": { \"name\": \"${{ github.actor }}\", \"icon_url\": \"https://github.com/${{ github.actor }}.png\" },
+              \"fields\": [
+                { \"name\": \"Image\", \"value\": \"${{ env.IMAGE_NAME }}\", \"inline\": true },
+                { \"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true },
+                { \"name\": \"Run\", \"value\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"inline\": true }
+              ],
+              \"footer\": { \"text\": \"Rentify CI/CD • GitHub Actions\" },
+              \"timestamp\": \"$TIMESTAMP\"
+            }]
+          }" "${{ env.DISCORD_WEBHOOK_URL }}"
+
+  notify-failure:
+    name: Notify Discord (Failure)
+    runs-on: ubuntu-latest
+    needs: [test, build-and-push, deploy]
+    if: failure()
+    steps:
+      - name: Send Failure Message (optional)
+        if: ${{ env.DISCORD_WEBHOOK_URL != '' }}
+        run: |
+          TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          curl -H "Content-Type: application/json" -X POST -d "{
+            \"embeds\": [{
+              \"title\": \"💥 Rentify Web - Deployment Failed\",
+              \"description\": \"❌ CI/CD pipeline failed.\",
+              \"color\": 15158332,
+              \"author\": { \"name\": \"${{ github.actor }}\", \"icon_url\": \"https://github.com/${{ github.actor }}.png\" },
+              \"fields\": [
+                { \"name\": \"Repository\", \"value\": \"[${{ github.repository }}](https://github.com/${{ github.repository }})\", \"inline\": true },
+                { \"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true },
+                { \"name\": \"Logs\", \"value\": \"[View Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\", \"inline\": true }
+              ],
+              \"footer\": { \"text\": \"Rentify CI/CD • GitHub Actions\" },
+              \"timestamp\": \"$TIMESTAMP\"
+            }]
+          }" "${{ env.DISCORD_WEBHOOK_URL }}"

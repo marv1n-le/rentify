@@ -1,0 +1,13 @@
+﻿services:
+  rentify.razorwebapp:
+    image: rentify.razorwebapp
+    build:
+      context: .
+      dockerfile: Rentify.RazorWebApp/Dockerfile
+
+  rentify.razorwebapp-1:
+    image: rentify.razorwebapp-1
+    build:
+      context: .
+      dockerfile: Rentify.RazorWebApp/Dockerfile
+
