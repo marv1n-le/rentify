@@ -119,22 +119,28 @@ jobs:
           host: ${{ env.VPS_HOST }}
           username: ${{ env.VPS_USER }}
           key: ${{ env.VPS_SSH_KEY }}
+          envs: REGISTRY_NAME,IMAGE_NAME,DOCKER_HUB_USERNAME,DOCKER_HUB_TOKEN
           script: |
             set -e
             mkdir -p ~/rentify
             cd ~/rentify
-            # .env cho docker compose
+
+            # tạo .env cho docker compose (đọc bởi compose)
             echo "REGISTRY_NAME=${REGISTRY_NAME}" > .env
-            # Tạo external network nếu chưa có
+
+            # network external (nếu chưa có)
             docker network inspect mamafit-network >/dev/null 2>&1 || docker network create mamafit-network
-            # Login + pull image mới
+
+            # login + pull image
             echo "${DOCKER_HUB_TOKEN}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
             docker pull "${IMAGE_NAME}"
-            # Deploy
-            docker compose up -d --pull always --no-deps --force-recreate rentify-web
-            # Kiểm tra container
-            docker ps -a | grep rentify-web || (echo "Container not found!" && exit 1)
 
+            # deploy
+            docker compose up -d --pull always --no-deps --force-recreate rentify-web
+
+            # verify
+            docker ps -a | grep rentify-web || (echo "Container not found!" && exit 1)
+  
   notify-success:
     name: Notify Discord (Success)
     runs-on: ubuntu-latest
