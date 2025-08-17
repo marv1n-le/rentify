@@ -54,7 +54,7 @@
                             {
                                 <tr>
                                     <td>@user.Id</td>
-                                    <td>@user.Username</td>
+                                    <td>@user.Email</td>
                                     <td>@user.FullName</td>
                                     <td>
                                         <span class="badge bg-@(user.RoleId == "1" ? "primary" : "success")">
@@ -73,7 +73,7 @@
                                             </a>
                                             @if (user.RoleId != "Admin")
                                             {
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete('@user.Id', '@user.Username')">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete('@user.Id', '@user.Email')">
                                                     <i class="fas fa-trash"></i> Delete
                                                 </button>
                                             }
