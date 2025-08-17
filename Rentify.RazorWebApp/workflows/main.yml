@@ -1,13 +1,29 @@
-name: Build & Deploy Rentify Web
+name: Build & Deploy Rentify Web (Prod)
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: rentify-web-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 env:
   REGISTRY_NAME: ${{ secrets.REGISTRY_NAME }}
   IMAGE_NAME: ${{ secrets.REGISTRY_NAME }}/rentify-web:latest
+
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+  VPS_HOST: ${{ secrets.VPS_HOST }}
+  VPS_USER: ${{ secrets.VPS_USER }}
+  VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
 jobs:
   test:
@@ -29,8 +45,6 @@ jobs:
       - name: Build
         run: dotnet build "Rentify.RazorWebApp/Rentify.RazorWebApp.csproj" -c Release --no-restore
 
-      # Nếu bạn thêm unit test sau này, thêm dotnet test tại đây
-
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
@@ -46,13 +60,16 @@ jobs:
       - name: DockerHub Login
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          username: ${{ env.DOCKER_HUB_USERNAME }}
+          password: ${{ env.DOCKER_HUB_TOKEN }}
 
-      - name: Build & Push
+      - name: Build image
         run: |
-          docker build -t $IMAGE_NAME -f Rentify.RazorWebApp/Dockerfile .
-          docker push $IMAGE_NAME
+          echo "Building image: $IMAGE_NAME"
+          docker build -t "$IMAGE_NAME" -f Rentify.RazorWebApp/Dockerfile .
+
+      - name: Push image
+        run: docker push "$IMAGE_NAME"
 
   deploy:
     name: Deploy to VPS
@@ -60,10 +77,10 @@ jobs:
     needs: build-and-push
     timeout-minutes: 30
     steps:
-      - name: Checkout (for compose file inline generation)
+      - name: Checkout (for compose generation)
         uses: actions/checkout@v4
 
-      - name: Create compose locally
+      - name: Create docker-compose.yaml locally
         run: |
           mkdir -p composeout
           cat > composeout/docker-compose.yaml <<'EOF'
@@ -87,9 +104,9 @@ jobs:
       - name: Copy docker-compose.yaml to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ env.VPS_HOST }}
+          username: ${{ env.VPS_USER }}
+          key: ${{ env.VPS_SSH_KEY }}
           source: "composeout/docker-compose.yaml"
           target: "~/rentify"
           overwrite: true
@@ -98,18 +115,24 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ env.VPS_HOST }}
+          username: ${{ env.VPS_USER }}
+          key: ${{ env.VPS_SSH_KEY }}
           script: |
             set -e
             mkdir -p ~/rentify
             cd ~/rentify
-            echo "REGISTRY_NAME=${{ secrets.REGISTRY_NAME }}" > .env
-            echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
-            docker pull ${{ env.IMAGE_NAME }}
+            # .env cho docker compose
+            echo "REGISTRY_NAME=${REGISTRY_NAME}" > .env
+            # Tạo external network nếu chưa có
+            docker network inspect mamafit-network >/dev/null 2>&1 || docker network create mamafit-network
+            # Login + pull image mới
+            echo "${DOCKER_HUB_TOKEN}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
+            docker pull "${IMAGE_NAME}"
+            # Deploy
             docker compose up -d --pull always --no-deps --force-recreate rentify-web
-            docker ps -a | grep rentify-web
+            # Kiểm tra container
+            docker ps -a | grep rentify-web || (echo "Container not found!" && exit 1)
 
   notify-success:
     name: Notify Discord (Success)
@@ -117,55 +140,48 @@ jobs:
     needs: deploy
     if: success()
     steps:
-      - name: Send Success Message
+      - name: Send Success Message (optional)
+        if: ${{ env.DISCORD_WEBHOOK_URL != '' }}
         run: |
           TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           curl -H "Content-Type: application/json" -X POST -d "{
             \"embeds\": [{
-              \"title\": \"🚀 MamaFit API - Deployment Successful\",
-              \"description\": \"✨ App is live at https://api.mamafit.studio/\",
+              \"title\": \"🚀 Rentify Web - Deployment Successful\",
+              \"description\": \"✨ App is live on VPS (via Nginx Proxy Manager / port 8082)\",
               \"color\": 5763719,
-              \"author\": {
-                \"name\": \"${{ github.actor }}\",
-                \"icon_url\": \"https://github.com/${{ github.actor }}.png\"
-              },
+              \"author\": { \"name\": \"${{ github.actor }}\", \"icon_url\": \"https://github.com/${{ github.actor }}.png\" },
               \"fields\": [
-                { \"name\": \"Repository\", \"value\": \"[${{ github.repository }}](https://github.com/${{ github.repository }})\", \"inline\": true },
+                { \"name\": \"Image\", \"value\": \"${{ env.IMAGE_NAME }}\", \"inline\": true },
                 { \"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true },
-                { \"name\": \"Commit\", \"value\": \"[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\", \"inline\": true }
+                { \"name\": \"Run\", \"value\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"inline\": true }
               ],
-              \"footer\": { \"text\": \"MamaFit CI/CD • GitHub Actions\" },
+              \"footer\": { \"text\": \"Rentify CI/CD • GitHub Actions\" },
               \"timestamp\": \"$TIMESTAMP\"
             }]
-          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
+          }" "${{ env.DISCORD_WEBHOOK_URL }}"
 
   notify-failure:
     name: Notify Discord (Failure)
     runs-on: ubuntu-latest
-    needs: [ test, build-and-push, deploy ]
+    needs: [test, build-and-push, deploy]
     if: failure()
     steps:
-      - name: Send Failure Message
+      - name: Send Failure Message (optional)
+        if: ${{ env.DISCORD_WEBHOOK_URL != '' }}
         run: |
           TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           curl -H "Content-Type: application/json" -X POST -d "{
-            \"content\": \"<@&1379069130656845824> 🚨 **MamaFit API** deployment failed!\",
             \"embeds\": [{
-              \"title\": \"💥 Deployment Failed\",
+              \"title\": \"💥 Rentify Web - Deployment Failed\",
               \"description\": \"❌ CI/CD pipeline failed.\",
               \"color\": 15158332,
-              \"author\": {
-                \"name\": \"${{ github.actor }}\",
-                \"icon_url\": \"https://github.com/${{ github.actor }}.png\"
-              },
+              \"author\": { \"name\": \"${{ github.actor }}\", \"icon_url\": \"https://github.com/${{ github.actor }}.png\" },
               \"fields\": [
                 { \"name\": \"Repository\", \"value\": \"[${{ github.repository }}](https://github.com/${{ github.repository }})\", \"inline\": true },
                 { \"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true },
-                { \"name\": \"Commit\", \"value\": \"[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\", \"inline\": true },
                 { \"name\": \"Logs\", \"value\": \"[View Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\", \"inline\": true }
               ],
-              \"footer\": { \"text\": \"MamaFit CI/CD • GitHub Actions\" },
+              \"footer\": { \"text\": \"Rentify CI/CD • GitHub Actions\" },
               \"timestamp\": \"$TIMESTAMP\"
             }]
-          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
-  
+          }" "${{ env.DISCORD_WEBHOOK_URL }}"
