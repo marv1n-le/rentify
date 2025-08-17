@@ -33,7 +33,7 @@ public class Profile : PageModel
             ProfilePicture = user.ProfilePicture,
             BirthDate = user.BirthDate,
             RoleName = user.Role?.Name,
-            Username = user.Username
+            Email = user.Email
         };
 
         return Page();

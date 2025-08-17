@@ -25,7 +25,7 @@ public class RentifyDbContext : DbContext
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Rental> Rentals { get; set; }
     public DbSet<RentalItem> RentalItems { get; set; }
-
+    public DbSet<Inquiry> Inquiries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -40,6 +40,7 @@ public class RentifyDbContext : DbContext
         modelBuilder.Entity<Comment>().ToTable("Comment");
         modelBuilder.Entity<Rental>().ToTable("Rental");
         modelBuilder.Entity<RentalItem>().ToTable("RentalItem");
+        modelBuilder.Entity<Inquiry>().ToTable("Inquiry");
 
         modelBuilder.Entity<RentalItem>(entity =>
         {
@@ -57,6 +58,24 @@ public class RentifyDbContext : DbContext
             options.HasOne(i => i.Post)
                 .WithOne(i => i.Item)
                 .HasForeignKey<Post>(p => p.ItemId);
+        });
+
+        modelBuilder.Entity<Inquiry>(builder =>
+        {
+            builder.HasOne(x => x.Post)
+                .WithMany()
+                .HasForeignKey(x => x.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.User)
+                .WithMany(u => u.Inquiries)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(x => x.Rental)
+                .WithMany() // không khai báo collection trong Rental
+                .HasForeignKey(x => x.RentalId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
     }
 }
