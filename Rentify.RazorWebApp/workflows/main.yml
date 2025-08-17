@@ -5,6 +5,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Tránh deploy chồng khi push liên tiếp
 concurrency:
   group: rentify-web-${{ github.ref }}
   cancel-in-progress: true
