@@ -4,6 +4,100 @@
 @{
     ViewData["Title"] = "Bài viết";
 }
+@* TODO: Cần phải centralize css  *@
+<style>
+    :root {
+        --primary-color: #0d6efd;
+        --border-radius: 0.5rem;
+        --table-border-color: #f0f0f0;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        border: 1px solid var(--table-border-color);
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th, .table td {
+            padding: 16px 24px;
+            vertical-align: middle;
+            border-top: 1px solid var(--table-border-color);
+            white-space: nowrap;
+        }
+
+        .table thead th {
+            background-color: #fafafa;
+            border-bottom: 1px solid var(--table-border-color);
+            font-weight: 600;
+            color: #000;
+            text-transform: none;
+        }
+
+        .table tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: var(--border-radius);
+        padding: 0.5rem 1rem;
+    }
+
+    .action-links a {
+        color: var(--primary-color);
+        text-decoration: none;
+        margin-right: 16px;
+    }
+
+        .action-links a:hover {
+            text-decoration: underline;
+        }
+
+        .action-links a:last-child {
+            margin-right: 0;
+        }
+</style>
+
+<!-- Thanh tìm kiếm & filter -->
+<div class="card border-0 shadow-sm mb-4 p-3 bg-white">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <!-- Ô tìm kiếm -->
+        <div class="flex-grow-1">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-primary"></i>
+                </span>
+                <input type="text" id="searchBox" class="form-control border-start-0" placeholder="Tìm kiếm bài viết...">
+            </div>
+        </div>
+
+        <!-- Filter theo tag -->
+        <select id="tagFilter" class="form-select w-auto rounded-pill">
+            <option value="">Tất cả tags</option>
+            <option value="Tech">#Tech</option>
+            <option value="Education">#Education</option>
+            <option value="Life">#Life</option>
+        </select>
+
+        <!-- Nút filter nâng cao -->
+        <button class="btn btn-primary rounded-pill px-3" onclick="applyFilters()">
+            <i class="bi bi-funnel-fill me-1"></i> Lọc
+        </button>
+    </div>
+</div>
 
 <div class="container">
     <div class="row justify-content-center">
@@ -769,4 +863,31 @@
         if (e.target === imageM) closeModal('imageModal');
         if (e.target === commentM) closeModal('commentModal');
     });
+
+    function applyFilters() {
+        const keyword = document.getElementById("searchBox").value.toLowerCase();
+        const tag = document.getElementById("tagFilter").value;
+
+        const posts = document.querySelectorAll("#post-container > div");
+
+        posts.forEach(post => {
+            const title = post.querySelector("h6")?.innerText.toLowerCase() || "";
+            const content = post.querySelector(".post-content")?.innerText.toLowerCase() || "";
+            const tags = Array.from(post.querySelectorAll(".badge"))
+                              .map(el => el.innerText.toLowerCase());
+
+            let show = true;
+
+            if (keyword && !(title.includes(keyword) || content.includes(keyword))) {
+                show = false;
+            }
+
+            if (tag && !tags.includes(`#${tag.toLowerCase()}`)) {
+                show = false;
+            }
+
+            post.style.display = show ? "block" : "none";
+        });
+    }
+
 </script>
