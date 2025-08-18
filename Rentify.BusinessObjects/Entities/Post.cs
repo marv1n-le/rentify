@@ -1,4 +1,5 @@
 using Rentify.BusinessObjects.Entities.Base;
+using Rentify.BusinessObjects.Enum;
 
 namespace Rentify.BusinessObjects.Entities;
 
@@ -10,6 +11,7 @@ public class Post : BaseEntity
     public string? Content { get; set; }
     public List<string> Images { get; set; } = new List<string>();
     public List<string> Tags { get; set; } = new List<string>();
+    public PostStatus Status { get; set; }
 
     public virtual Item? Item { get; set; }
     public virtual User? User { get; set; }
