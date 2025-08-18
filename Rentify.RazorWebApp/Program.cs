@@ -15,6 +15,7 @@ public class Program
         // Add services to the container.
         builder.Services.AddRazorPages();
         builder.Services.AddScoped<ChatModel>();
+        builder.Services.AddRedisCache(builder.Configuration);
         builder.Services.AddDatabase(builder.Configuration);
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddApplicationServices(builder.Configuration);
@@ -26,6 +27,7 @@ public class Program
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
         });
+        builder.Services.AddHealthChecks();
 
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
@@ -54,6 +56,7 @@ public class Program
 
         app.UseSession();
 
+        app.MapHealthChecks("/health");
         app.UseAuthentication();
         app.UseAuthorization();
 

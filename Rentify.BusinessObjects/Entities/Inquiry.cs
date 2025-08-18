@@ -6,7 +6,6 @@ namespace Rentify.BusinessObjects.Entities;
 public class Inquiry : BaseEntity
 {
     public string PostId { get; set; } = default!;
-    public string? RentalId { get; set; }
     public string UserId { get; set; } = default!;
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }

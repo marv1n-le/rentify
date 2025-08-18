@@ -13,5 +13,6 @@ public class Post : BaseEntity
 
     public virtual Item? Item { get; set; }
     public virtual User? User { get; set; }
+    public virtual ICollection<Inquiry> Inquiries { get; set; } = new List<Inquiry>();
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }
