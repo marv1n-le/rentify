@@ -19,6 +19,7 @@ namespace Rentify.Repositories.Repository
             var query = _dbSet.AsNoTracking()
                 .Include(p => p.User)
                 .ThenInclude(u => u.Role)
+                .Include(r => r.Inquiries)
                 .ApplySearchFilter(searchFilterPostDto);
 
             var resultList = await query

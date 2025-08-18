@@ -25,6 +25,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IItemRepository, ItemRepository>();
+        services.AddScoped<IInquiryRepository, InquiryRepository>();
     }
 
     public static void AddServices(this IServiceCollection services)
@@ -38,6 +39,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<ICloudinaryService, CloudinaryService>();
         services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<IInquiryService, InquiryService>();
         services.AddScoped<IChatService, ChatService>();
     }
 

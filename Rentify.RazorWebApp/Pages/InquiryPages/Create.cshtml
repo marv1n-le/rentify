@@ -1,0 +1,62 @@
+﻿@page
+@model Rentify.RazorWebApp.Pages.InquiryPages.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Inquiry</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Inquiry.UserId" type="hidden" />
+
+            <div class="form-group">
+                <label asp-for="Inquiry.PostId" class="control-label"></label>
+                <select asp-for="Inquiry.PostId" class="form-control" asp-items="Model.PostOptions">
+                    <option value="">-- Chọn bài đăng --</option>
+                </select>
+                <span asp-validation-for="Inquiry.PostId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Inquiry.StartDate" class="control-label"></label>
+                <input asp-for="Inquiry.StartDate" class="form-control" type="date" /> <span asp-validation-for="Inquiry.StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.EndDate" class="control-label"></label>
+                <input asp-for="Inquiry.EndDate" class="form-control" type="date" /> <span asp-validation-for="Inquiry.EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.Quantity" class="control-label"></label>
+                <input asp-for="Inquiry.Quantity" class="form-control" type="number" min="1" /> <span asp-validation-for="Inquiry.Quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.Note" class="control-label"></label>
+                <textarea asp-for="Inquiry.Note" class="form-control"></textarea> <span asp-validation-for="Inquiry.Note" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Inquiry.Status" class="control-label"></label>
+                <select asp-for="Inquiry.Status" class="form-control" asp-items="Model.StatusOptions"></select>
+                <span asp-validation-for="Inquiry.Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

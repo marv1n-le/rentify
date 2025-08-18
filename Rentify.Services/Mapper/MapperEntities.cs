@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Rentify.BusinessObjects.DTO.Inquiry;
 using Rentify.BusinessObjects.DTO.ChatDto;
 using Rentify.BusinessObjects.DTO.PostDto;
 using Rentify.BusinessObjects.Entities;
@@ -80,6 +81,7 @@ namespace Rentify.Services.Mapper
                 .ForMember(d => d.IsActive,         o => o.MapFrom(s => s.IsActive))
                 // Map collection Participants -> ChatParticipantDto (cần Include User khi query)
                 .ForMember(d => d.Participants,     o => o.MapFrom(s => s.Participants));
+            CreateMap<InquiryCreationDto, Inquiry>();
         }
     }
 }
