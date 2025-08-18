@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.Services.Interface;
 using System.ComponentModel.DataAnnotations;
+using MamaFit.Services.ExternalService.CloudinaryService;
 
 namespace Rentify.RazorWebApp.Pages.Account;
 
@@ -11,16 +12,18 @@ namespace Rentify.RazorWebApp.Pages.Account;
 public class Register : PageModel
 {
     private readonly IUserService _userService;
-
-    public Register(IUserService userService)
+    private readonly ICloudinaryService _cloudinary;
+    public Register(IUserService userService,
+        ICloudinaryService cloudinary)
     {
+        _cloudinary = cloudinary;
         _userService = userService;
     }
 
     [BindProperty]
     [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
-    [StringLength(50, ErrorMessage = "Tên đăng nhập không được vượt quá 50 ký tự")]
-    public string Username { get; set; } = string.Empty;
+    [EmailAddress(ErrorMessage = "Địa chỉ email không hợp lệ")]
+    public string Email { get; set; } = string.Empty;
 
     [BindProperty]
     [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
@@ -37,9 +40,11 @@ public class Register : PageModel
     [StringLength(100, ErrorMessage = "Họ và tên không được vượt quá 100 ký tự")]
     public string FullName { get; set; } = string.Empty;
 
-    [BindProperty]
-    public DateTime? BirthDate { get; set; }
+    [BindProperty] public DateTime? BirthDate { get; set; }
 
+    [BindProperty]
+    [Display(Name = "Ảnh đại diện")]
+    public IFormFile? ProfileImage { get; set; }
 
     public void OnGet()
     {
@@ -54,12 +59,40 @@ public class Register : PageModel
 
         try
         {
+            string? profileUrl = null;
+
+            if (ProfileImage != null && ProfileImage.Length > 0)
+            {
+                var allowed = new[] { "image/jpeg", "image/png", "image/webp" };
+                if (!allowed.Contains(ProfileImage.ContentType))
+                {
+                    ModelState.AddModelError(string.Empty, "Vui lòng chọn ảnh .jpg/.png/.webp");
+                    return Page();
+                }
+
+                if (ProfileImage.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(string.Empty, "Ảnh tối đa 5MB.");
+                    return Page();
+                }
+
+                var upload = await _cloudinary.AddPhotoAsync(ProfileImage);
+                if (!upload.IsSuccess || string.IsNullOrEmpty(upload.Url))
+                {
+                    ModelState.AddModelError(string.Empty, $"Upload ảnh thất bại: {upload.ErrorMessage}");
+                    return Page();
+                }
+
+                profileUrl = upload.Url;
+            }
+
             var registerDto = new UserRegisterDto
             {
-                Username = Username,
+                Email = Email,
                 Password = Password,
                 FullName = FullName,
                 BirthDate = BirthDate,
+                ProfilePicture = profileUrl
             };
 
             await _userService.CreateUser(registerDto);

@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.DTO.PostDto;
 using Rentify.BusinessObjects.Entities;
+using Rentify.BusinessObjects.Enum;
+using Rentify.Repositories.Helper;
 using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.PostPages
@@ -27,12 +30,18 @@ namespace Rentify.RazorWebApp.Pages.PostPages
             public int CommentCount { get; set; }
         }
 
+        [BindProperty(SupportsGet = true)]
+        public SearchFilterPostDto SearchFilterPostDto { get; set; } = new();
+        public List<SelectListItem> AvailableStatus { get; set; } = new();
         public IList<PostViewModel> Posts { get; set; } = default!;
-
-        public async Task OnGetAsync(int index = 1, int pageSize = 5)
+        public async Task OnGetAsync()
         {
-            var posts = await _postService.GetAllPost(index, pageSize);
+            if (SearchFilterPostDto.PageIndex < 1)
+                SearchFilterPostDto.PageIndex = 1;
+
+            var posts = await _postService.GetAllPost(SearchFilterPostDto);
             Posts = new List<PostViewModel>();
+
             foreach (var post in posts)
             {
                 var count = await _commentService.CountCommentsByPostId(post.Id);
@@ -48,13 +57,25 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                     CommentCount = count
                 });
             }
+
+            // Load AvailableStatus 
+            AvailableStatus = Enum.GetValues(typeof(RentalStatus))
+                .Cast<RentalStatus>()
+                .Select(s => new SelectListItem
+                {
+                    Text = s.ToString(),  
+                    Value = s.ToString()   
+                })
+                .ToList();
         }
 
-
-        public async Task<IActionResult> OnGetMorePostsAsync(int index, int pageSize)
+        public async Task<IActionResult> OnGetMorePostsAsync(SearchFilterPostDto searchFilterPostDto)
         {
-            if (index < 1) index = 1;
-            var posts = await _postService.GetAllPost(index, pageSize);
+            if (searchFilterPostDto.PageIndex < 1)
+                searchFilterPostDto.PageIndex = 1;
+
+            var posts = await _postService.GetAllPost(searchFilterPostDto);
+
             return Partial("_PostCardList", posts);
         }
 

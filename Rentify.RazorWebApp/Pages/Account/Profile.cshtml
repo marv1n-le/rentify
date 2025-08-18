@@ -1,0 +1,41 @@
+@page
+@model Rentify.RazorWebApp.Pages.Account.Profile
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    var avatar = string.IsNullOrEmpty(Model.Data.ProfilePicture)
+        ? Url.Content("~/images/avatar-placeholder.png")
+        : Model.Data.ProfilePicture;
+}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex">
+                    <img src="@avatar" alt="Avatar" class="rounded-circle me-3"
+                         style="width:96px;height:96px;object-fit:cover;" />
+                    <div>
+                        <h3 class="mb-0">@Model.Data.FullName</h3>
+                        @if (!string.IsNullOrEmpty(Model.Data.RoleName))
+                        { <span class="badge bg-primary mt-2">@Model.Data.RoleName</span> }
+                    </div>
+                </div>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-3">Họ và tên</dt>
+                    <dd class="col-sm-9">@Model.Data.FullName</dd>
+                    <dt class="col-sm-3">Ngày sinh</dt>
+                    <dd class="col-sm-9">@((Model.Data.BirthDate?.ToString("dd/MM/yyyy")) ?? "—")</dd>
+                    <dt class="col-sm-3">Email</dt>
+                    <dd class="col-sm-9">@Model.Data.Email</dd>
+
+                    <dt class="col-sm-3">Vai trò</dt>
+                    <dd class="col-sm-9">@Model.Data.RoleName</dd>
+
+                </dl>
+                <a asp-page="/Account/EditProfile" class="btn btn-outline-primary">
+                    <i class="fas fa-user-edit me-1"></i>Chỉnh sửa hồ sơ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

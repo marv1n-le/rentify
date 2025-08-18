@@ -36,6 +36,18 @@ namespace Rentify.RazorWebApp.Pages.Rentals
             {
                 return NotFound();
             }
+
+            // Map the entity to the DTO and set RentalId
+            Rental = new RentalUpdateDTO
+            {
+                RentalId = rental.Id,
+                RentalDate = rental.RentalDate,
+                ReturnDate = rental.ReturnDate,
+                TotalAmount = rental.TotalAmount,
+                Status = rental.Status,
+                PaymentStatus = rental.PaymentStatus
+            };
+
             return Page();
         }
 

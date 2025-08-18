@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Repositories.Helper;
 using Rentify.Repositories.Implement;
 using Rentify.Repositories.Interface;
 
@@ -13,13 +14,18 @@ namespace Rentify.Repositories.Repository
         {
         }
 
-        public async Task<List<Post>> GetAllPost(int index, int pageSize)
+        public async Task<List<Post>> GetAllPost(SearchFilterPostDto searchFilterPostDto)
         {
-            var resultList = await _dbSet.AsNoTracking()
+            var query = _dbSet.AsNoTracking()
+                .Include(p => p.User)
+                .ThenInclude(u => u.Role)
+                .ApplySearchFilter(searchFilterPostDto);
+
+            var resultList = await query
                 .OrderBy(x => Guid.NewGuid())
                 .Include(p => p.User).ThenInclude(u => u.Role)
-                .Skip((index - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((searchFilterPostDto.PageIndex - 1) * searchFilterPostDto.PageSize)
+                .Take(searchFilterPostDto.PageSize)
                 .ToListAsync();
 
             return resultList;
