@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Rentify.Repositories.Helper;
 
-namespace MamaFit.Services.ExternalService.CloudinaryService;
+namespace Rentify.Services.ExternalService.CloudinaryService;
 
 public class CloudinaryService : ICloudinaryService
 {

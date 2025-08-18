@@ -1,17 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Rentify.BusinessObjects.ApplicationDbContext;
-using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
-using Rentify.Services.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Rentify.RazorWebApp
+namespace Rentify.RazorWebApp.Pages.Admin.Category
 {
     public class DeleteModel : PageModel
     {
@@ -25,7 +17,7 @@ namespace Rentify.RazorWebApp
         }
 
         [BindProperty]
-        public Category Category { get; set; } = default!;
+        public BusinessObjects.Entities.Category Category { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(string id)
         {

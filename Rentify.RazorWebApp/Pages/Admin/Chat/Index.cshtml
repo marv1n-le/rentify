@@ -1,0 +1,592 @@
+@page
+@model Rentify.RazorWebApp.Pages.Admin.Chat.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Chat";
+    Layout = "~/Pages/Admin/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-chat-container">
+    <!-- Header with stats -->
+    <div class="admin-chat-header">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="onlineUsers">@Model.OnlineUsers</h3>
+                        <p>Người dùng online</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="reportedMessages">0</h3>
+                        <p>Tin nhắn báo cáo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main chat management area -->
+    <div class="admin-chat-main">
+        <div class="row h-100">
+            <!-- Left sidebar - Rooms and Users -->
+            <div class="col-md-4">
+                <div class="admin-sidebar">
+                    <!-- Tabs for different views -->
+                    <ul class="nav nav-tabs" id="adminChatTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="rooms-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#rooms" type="button" role="tab">
+                                <i class="fas fa-comments me-1"></i>Phòng chat
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="users-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#users" type="button" role="tab">
+                                <i class="fas fa-users me-1"></i>Người dùng
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="messages-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#messages" type="button" role="tab">
+                                <i class="fas fa-history me-1"></i>Lịch sử
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="adminChatTabContent">
+                        <!-- Rooms Tab -->
+                        <div class="tab-pane fade show active" id="rooms" role="tabpanel">
+                            <div class="search-box">
+                                <input type="text" class="form-control" id="roomSearch" 
+                                       placeholder="Tìm kiếm phòng chat...">
+                            </div>
+                            <div id="roomsList" class="admin-list">
+                                @foreach (var room in Model.AllRooms)
+                                {
+                                    <div class="admin-list-item room-item" data-room-id="@room.Id">
+                                        <div class="item-avatar">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div class="item-info">
+                                            <div class="item-name">@room.Name</div>
+                                            <div class="item-details">
+                                                <small class="text-muted">
+                                                    @room.Participants.Count thành viên • 
+                                                    @(room.LastMessage ?? "Chưa có tin nhắn")
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="item-actions">
+                                            <button class="btn btn-sm btn-outline-primary monitor-room" 
+                                                    data-room-id="@room.Id" title="Theo dõi">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger delete-room" 
+                                                    data-room-id="@room.Id" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Users Tab -->
+                        <div class="tab-pane fade" id="users" role="tabpanel">
+                            <div class="search-box">
+                                <input type="text" class="form-control" id="userSearch" 
+                                       placeholder="Tìm kiếm người dùng...">
+                            </div>
+                        </div>
+
+                        <!-- Messages History Tab -->
+                        <div class="tab-pane fade" id="messages" role="tabpanel">
+                            <div class="search-box">
+                                <input type="text" class="form-control" id="messageSearch" 
+                                       placeholder="Tìm kiếm tin nhắn...">
+                            </div>
+                            <div id="messagesList" class="admin-list">
+                                <!-- Messages will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right side - Chat area -->
+            <div class="col-md-8">
+                <div class="admin-chat-area">
+                    <div id="adminChatPlaceholder" class="admin-chat-placeholder">
+                        <div class="placeholder-content">
+                            <i class="fas fa-shield-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chế độ quản trị Chat</h5>
+                            <p class="text-muted">Chọn một phòng chat để theo dõi hoặc tham gia cuộc trò chuyện</p>
+                        </div>
+                    </div>
+
+                    <div id="adminChatActive" class="admin-chat-active" style="display: none;">
+                        <!-- Chat Header -->
+                        <div class="admin-chat-header-bar">
+                            <div class="chat-info">
+                                <h5 id="currentRoomName" class="mb-0"></h5>
+                                <small id="currentRoomInfo" class="text-muted"></small>
+                            </div>
+                            <div class="chat-controls">
+                                <button class="btn btn-sm btn-outline-warning" id="muteRoomBtn" title="Tắt tiếng phòng">
+                                    <i class="fas fa-volume-mute"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" id="exportChatBtn" title="Xuất lịch sử">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" id="clearChatBtn" title="Xóa lịch sử">
+                                    <i class="fas fa-eraser"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Messages Container -->
+                        <div class="admin-messages-container" id="adminMessagesContainer">
+                            <!-- Messages will be loaded here -->
+                        </div>
+
+                        <!-- Admin Message Input -->
+                        <div class="admin-message-input">
+                            <div class="input-group">
+                                <span class="input-group-text bg-danger text-white">
+                                    <i class="fas fa-shield-alt"></i>
+                                </span>
+                                <input type="text" id="adminMessageInput" class="form-control" 
+                                       placeholder="Gửi tin nhắn với tư cách Admin..." maxlength="1000">
+                                <button id="adminSendBtn" class="btn btn-danger" disabled>
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteConfirmText">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const adminChat = new AdminChatManager();
+            adminChat.init();
+        });
+
+        class AdminChatManager {
+            constructor() {
+                this.connection = null;
+                this.currentRoomId = null;
+            }
+
+            async init() {
+                await this.initSignalR();
+                this.bindEvents();
+                this.loadStats();
+                setInterval(() => this.loadStats(), 30000);
+            }
+
+            async initSignalR() {
+                this.connection = new signalR.HubConnectionBuilder()
+                    .withUrl("/chatHub")
+                    .configureLogging(signalR.LogLevel.Information)
+                    .withAutomaticReconnect()
+                    .build();
+
+                // Các sự kiện SignalR
+                this.connection.on("ReceiveMessage", (senderEmail, senderName, message, timestamp) => {
+                    if (this.currentRoomId) {
+                        this.displayAdminMessage({
+                            userId: senderEmail,
+                            userName: senderName,
+                            message: message,
+                            timestamp: timestamp,
+                            isAdmin: message.startsWith('[ADMIN]')
+                        });
+                    }
+                });
+
+                this.connection.on("UserOnline", (email) => {
+                    this.updateUserStatus(email, true);
+                });
+
+                this.connection.on("UserOffline", (email) => {
+                    this.updateUserStatus(email, false);
+                });
+
+                try {
+                    await this.connection.start();
+                    console.log("SignalR Connected");
+                } catch (err) {
+                    console.error('SignalR connection error:', err);
+                    setTimeout(() => this.initSignalR(), 5000);
+                }
+            }
+
+            // Cập nhật phương thức sendAdminMessage
+            async sendAdminMessage() {
+                const messageText = $('#adminMessageInput').val().trim();
+                if (!messageText || !this.currentRoomId) return;
+
+                try {
+                    const response = await fetch('/Admin/Chat?handler=SendAdminMessage', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        body: JSON.stringify({
+                            RoomId: this.currentRoomId,
+                            Message: messageText
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        $('#adminMessageInput').val('');
+                    } else {
+                        console.error('Error sending message:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // Cập nhật phương thức displayAdminMessage
+            displayAdminMessage(message) {
+                const isCurrentUser = message.userId === this.currentUserEmail;
+                const container = $('#adminMessagesContainer');
+                
+                const messageHtml = `
+                    <div class="admin-message ${isCurrentUser ? 'admin-message-sent' : 'admin-message-received'}">
+                        <div class="message-header">
+                            <span class="message-sender ${message.isAdmin ? 'admin-sender' : ''}">
+                                ${message.isAdmin ? '<i class="fas fa-shield-alt me-1"></i>' : ''}
+                                ${message.userName}
+                            </span>
+                            <span class="message-time">${this.formatTime(message.timestamp)}</span>
+                            ${isCurrentUser ? `
+                            <div class="message-actions">
+                                <button class="btn btn-sm btn-outline-danger delete-message" 
+                                        data-message-id="${message.id}" title="Xóa tin nhắn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>` : ''}
+                        </div>
+                        <div class="message-content">${this.escapeHtml(message.message)}</div>
+                    </div>
+                `;
+                
+                container.append(messageHtml);
+                this.scrollToBottom();
+            }
+
+            // Thêm hàm định dạng thời gian
+            formatTime(timestamp) {
+                const date = new Date(timestamp);
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // ... (các phương thức khác giữ nguyên)
+        }
+    </script>
+}
+<style>
+    .admin-chat-container {
+        height: calc(100vh - 150px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-chat-header {
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid transparent;
+    }
+
+    .stat-card .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .stat-info h3 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .stat-info p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .admin-chat-main {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .admin-sidebar {
+        height: 100%;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid #dee2e6;
+        padding: 0 15px;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #007bff;
+        border-bottom: 2px solid #007bff;
+    }
+
+    .tab-content {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tab-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .search-box {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .admin-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .admin-list-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .admin-list-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .admin-list-item.active {
+        background-color: #e3f2fd;
+        border-left: 4px solid #007bff;
+    }
+
+    .item-avatar {
+        position: relative;
+        margin-right: 12px;
+        font-size: 1.5rem;
+        color: #6c757d;
+    }
+
+    .online-indicator {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background: #28a745;
+        border: 2px solid white;
+        border-radius: 50%;
+    }
+
+    .item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .item-name {
+        font-weight: 600;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-details {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .item-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .admin-chat-area {
+        height: 100%;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-chat-placeholder {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .placeholder-content {
+        text-align: center;
+        max-width: 300px;
+    }
+
+    .admin-chat-active {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-chat-header-bar {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-controls {
+        display: flex;
+        gap: 10px;
+    }
+
+    .admin-messages-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8f9fa;
+    }
+
+    .admin-message {
+        margin-bottom: 15px;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+    }
+
+    .admin-message-sent {
+        border-left-color: #28a745;
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .message-sender {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .admin-sender {
+        color: #dc3545;
+    }
+
+    .message-time {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .message-actions {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .admin-message:hover .message-actions {
+        opacity: 1;
+    }
+
+    .message-content {
+        word-wrap: break-word;
+        line-height: 1.4;
+    }
+
+    .admin-message-input {
+        padding: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .input-group-text {
+        font-weight: 600;
+    }
+    
+</style>

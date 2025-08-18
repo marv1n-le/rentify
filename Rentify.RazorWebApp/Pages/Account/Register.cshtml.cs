@@ -1,10 +1,10 @@
-using MamaFit.Services.ExternalService.CloudinaryService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.Services.Interface;
 using System.ComponentModel.DataAnnotations;
+using Rentify.Services.ExternalService.CloudinaryService;
 
 namespace Rentify.RazorWebApp.Pages.Account;
 

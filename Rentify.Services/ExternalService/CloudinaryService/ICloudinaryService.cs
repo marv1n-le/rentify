@@ -2,7 +2,7 @@ using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Rentify.Repositories.Helper;
 
-namespace MamaFit.Services.ExternalService.CloudinaryService;
+namespace Rentify.Services.ExternalService.CloudinaryService;
 
 public interface ICloudinaryService
 {

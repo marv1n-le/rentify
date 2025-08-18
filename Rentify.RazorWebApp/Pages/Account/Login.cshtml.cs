@@ -38,7 +38,6 @@ public class Login : PageModel
 
         if (account != null)
         {
-            // Đảm bảo Role đã được include; nếu có thể null, thay bằng "User"
             var roleName = account.Role?.Name ?? "User";
 
             var claims = new List<Claim>
@@ -50,18 +49,11 @@ public class Login : PageModel
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity),
-                new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30) // tuỳ chỉnh
-                });
-
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+            
             // Cookies phụ nếu bạn muốn
-            Response.Cookies.Append("Email", account.Email ?? "");
+            Response.Cookies.Append("UserEmail", account.Email!);
+            Response.Cookies.Append("UserName", account.FullName!);
             Response.Cookies.Append("userId", account.Id);
 
             if (roleName == "Admin")

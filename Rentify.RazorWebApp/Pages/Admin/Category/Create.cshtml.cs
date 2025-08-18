@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Rentify.BusinessObjects.ApplicationDbContext;
-using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
 
-namespace Rentify.RazorWebApp
+namespace Rentify.RazorWebApp.Pages.Admin.Category
 {
     public class CreateModel : PageModel
     {
@@ -29,7 +22,7 @@ namespace Rentify.RazorWebApp
         }
 
         [BindProperty]
-        public Category Category { get; set; } = default!;
+        public BusinessObjects.Entities.Category Category { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
