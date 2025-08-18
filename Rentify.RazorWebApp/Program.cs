@@ -12,6 +12,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddRazorPages();
+        builder.Services.AddRedisCache(builder.Configuration);
         builder.Services.AddDatabase(builder.Configuration);
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddApplicationServices(builder.Configuration);
