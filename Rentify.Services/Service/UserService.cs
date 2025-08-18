@@ -1,8 +1,8 @@
-using System.Security.Claims;
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
+using System.Security.Claims;
 
 namespace Rentify.Services.Service;
 
@@ -82,7 +82,7 @@ public class UserService : IUserService
     {
         return await _unitOfWork.UserRepository.GetUserAccount(username, password);
     }
-    
+
     public async Task<bool> SoftDeleteUser(string id)
     {
         await _unitOfWork.UserRepository.SoftDeleteAsync(id);

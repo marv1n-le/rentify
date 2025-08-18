@@ -5,5 +5,5 @@ namespace Rentify.Repositories.Interface;
 
 public interface IItemRepository : IGenericRepository<Item>
 {
-    
+
 }

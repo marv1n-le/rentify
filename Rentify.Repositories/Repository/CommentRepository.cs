@@ -17,6 +17,7 @@ namespace Rentify.Repositories.Repository
         public async Task<List<Comment>> GetCommentByUserId(string userId)
         {
             return await _dbSet
+                .Include(c => c.User)
                 .Where(c => c.UserId == userId)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
@@ -25,6 +26,7 @@ namespace Rentify.Repositories.Repository
         public async Task<List<Comment>> GetCommentByPostId(string postId)
         {
             return await _dbSet
+                .Include(c => c.User)
                 .Where(c => c.PostId == postId)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();

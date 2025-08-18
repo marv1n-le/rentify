@@ -43,7 +43,7 @@ public class Login : PageModel
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, account.Id),      
+                new Claim(ClaimTypes.NameIdentifier, account.Id),
                 new Claim(ClaimTypes.Name, account.Email ?? string.Empty),
                 new Claim(ClaimTypes.Email, account.Email ?? string.Empty),
                 new Claim(ClaimTypes.Role, roleName),

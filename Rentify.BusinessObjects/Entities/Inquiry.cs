@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Rentify.BusinessObjects.Entities.Base;
 using Rentify.BusinessObjects.Enum;
 
@@ -14,7 +13,7 @@ public class Inquiry : BaseEntity
     public int Quantity { get; set; }
     public string? Note { get; set; }
     public InquiryStatus Status { get; set; } = InquiryStatus.Open;
-    
+
     // Navigation properties
     public virtual Rental? Rental { get; set; }
     public virtual Post Post { get; set; } = default!;

@@ -892,6 +892,26 @@
         }
     }
 
+    function deleteComment(commentId) {
+    if (!confirm("Are you sure to delete this comment?")) return;
+    fetch(`?handler=DeleteComment`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+        },
+        body: JSON.stringify({ commentId: commentId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`comment-${commentId}`).remove();
+        } else {
+            alert("Delete fail.");
+        }
+    });
+}
+
     // Close tất cả menu khi click bên ngoài
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.post-menu') && !e.target.closest('.post-menu-btn')) {
@@ -921,4 +941,20 @@
         if (e.target === commentM) closeModal('commentModal');
     });
 
+</script>
+
+<script>
+    function toggleCommentMenu(commentId) {
+        closeAllCommentMenus();
+        const menu = document.getElementById('comment-menu-' + commentId);
+        if (menu) { menu.classList.toggle('show'); }
+    }
+    function closeAllCommentMenus() {
+        document.querySelectorAll('.comment-menu').forEach(m => m.classList.remove('show'));
+    }
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.comment-menu') && !e.target.closest('.comment-menu-btn')) {
+            closeAllCommentMenus();
+        }
+    });
 </script>

@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.DTO.PostDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.BusinessObjects.Enum;
@@ -63,8 +61,8 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                 .Cast<RentalStatus>()
                 .Select(s => new SelectListItem
                 {
-                    Text = s.ToString(),  
-                    Value = s.ToString()   
+                    Text = s.ToString(),
+                    Value = s.ToString()
                 })
                 .ToList();
         }
@@ -106,17 +104,17 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                 {
                     Title = request.Title,
                     Content = request.Content,
-                    Tags = !string.IsNullOrEmpty(request.TagsString) 
-                        ? request.TagsString.Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrEmpty(t)).ToList() 
+                    Tags = !string.IsNullOrEmpty(request.TagsString)
+                        ? request.TagsString.Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrEmpty(t)).ToList()
                         : new List<string>(),
-                    Images = !string.IsNullOrEmpty(request.ImagesString) 
-                        ? request.ImagesString.Split(',').Select(i => i.Trim()).Where(i => !string.IsNullOrEmpty(i)).ToList() 
+                    Images = !string.IsNullOrEmpty(request.ImagesString)
+                        ? request.ImagesString.Split(',').Select(i => i.Trim()).Where(i => !string.IsNullOrEmpty(i)).ToList()
                         : new List<string>()
                 };
 
                 var postId = await _postService.CreatePost(postDto);
                 var createdPost = await _postService.GetPostById(postId);
-                
+
                 // Tạo response DTO đơn giản để tránh circular reference
                 var responsePost = new PostResponseDto
                 {
@@ -129,7 +127,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                     UserName = createdPost.User?.FullName,
                     UserProfilePicture = createdPost.User?.ProfilePicture
                 };
-                
+
                 return new JsonResult(new { success = true, post = responsePost });
             }
             catch (Exception ex)
@@ -147,16 +145,16 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                     PostId = request.PostId,
                     Title = request.Title,
                     Content = request.Content,
-                    Tags = !string.IsNullOrEmpty(request.TagsString) 
-                        ? request.TagsString.Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrEmpty(t)).ToList() 
+                    Tags = !string.IsNullOrEmpty(request.TagsString)
+                        ? request.TagsString.Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrEmpty(t)).ToList()
                         : new List<string>(),
-                    Images = !string.IsNullOrEmpty(request.ImagesString) 
-                        ? request.ImagesString.Split(',').Select(i => i.Trim()).Where(i => !string.IsNullOrEmpty(i)).ToList() 
+                    Images = !string.IsNullOrEmpty(request.ImagesString)
+                        ? request.ImagesString.Split(',').Select(i => i.Trim()).Where(i => !string.IsNullOrEmpty(i)).ToList()
                         : new List<string>()
                 };
 
                 await _postService.UpdatePost(postDto);
-                
+
                 // Tạo response DTO với dữ liệu từ form update, không phải từ database
                 var responsePost = new PostResponseDto
                 {
@@ -169,7 +167,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                     UserName = "Current User", // Có thể lấy từ User context
                     UserProfilePicture = null
                 };
-                
+
                 return new JsonResult(new { success = true, post = responsePost });
             }
             catch (Exception ex)
@@ -202,6 +200,17 @@ namespace Rentify.RazorWebApp.Pages.PostPages
             {
                 return new JsonResult(new { success = false, message = ex.Message });
             }
+        }
+
+        public class DeleteCommentRequest
+        {
+            public string CommentId { get; set; } = string.Empty;
+        }
+
+        public async Task<IActionResult> OnPostDeleteCommentAsync([FromBody] DeleteCommentRequest request)
+        {
+            var result = await _commentService.SoftDeleteComment(request.CommentId);
+            return new JsonResult(new { success = result });
         }
     }
 

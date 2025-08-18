@@ -9,7 +9,7 @@ namespace MamaFit.Services.ExternalService.CloudinaryService;
 public class CloudinaryService : ICloudinaryService
 {
     private readonly Cloudinary _cloudinary;
-    
+
     public CloudinaryService(IOptions<CloudinarySettings> config)
     {
         var account = new Account(
@@ -19,7 +19,7 @@ public class CloudinaryService : ICloudinaryService
             );
         _cloudinary = new Cloudinary(account);
     }
-    
+
     public async Task<PhotoUploadResult> AddPhotoAsync(IFormFile file)
     {
         var result = new PhotoUploadResult();
@@ -63,7 +63,7 @@ public class CloudinaryService : ICloudinaryService
         var result = await _cloudinary.DestroyAsync(deleteParams);
         return result;
     }
-    
+
     public string GetCloudinaryPublicIdFromUrl(string imageUrl)
     {
         if (string.IsNullOrEmpty(imageUrl)) return null;
@@ -75,7 +75,7 @@ public class CloudinaryService : ICloudinaryService
 
         var publicIdSegments = segments.Skip(uploadIndex + 1).ToArray();
         var publicIdWithExt = string.Join("", publicIdSegments);
-        
+
         var dotIndex = publicIdWithExt.LastIndexOf('.');
         if (dotIndex > 0)
             return publicIdWithExt.Substring(0, dotIndex);

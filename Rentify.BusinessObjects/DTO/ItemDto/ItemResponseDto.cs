@@ -15,7 +15,7 @@ public class ItemResponseDto
     public ItemStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    
+
     // Navigation properties for display
     public string? CategoryName { get; set; }
     public string? UserName { get; set; }
