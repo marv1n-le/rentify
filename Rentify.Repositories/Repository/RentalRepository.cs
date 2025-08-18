@@ -4,6 +4,7 @@ using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
 using Rentify.Repositories.Interface;
+using System.Linq.Expressions;
 
 namespace Rentify.Repositories.Repository
 {
@@ -17,15 +18,25 @@ namespace Rentify.Repositories.Repository
         {
             var resultList = await _dbSet.AsNoTracking()
                 .Include(p => p.User).ThenInclude(u => u.Role)
+                .Include(p => p.RentalItems).ThenInclude(ri => ri.Item)
                 .ToListAsync();
 
             return resultList;
+        }
+
+        public async Task<List<Rental>> GetAllAsync(Expression<Func<Rental, bool>> predicate)
+        {
+            return await _dbSet
+                .Include(r => r.RentalItems)
+                .Where(predicate)
+                .ToListAsync();
         }
 
         public async Task<Rental> GetById(string postId)
         {
             var result = await _dbSet
                 .Include(p => p.User).ThenInclude(u => u.Role)
+                .Include(p => p.RentalItems).ThenInclude(ri => ri.Item)
                 .FirstOrDefaultAsync(p => p.Id == postId);
 
             return result;

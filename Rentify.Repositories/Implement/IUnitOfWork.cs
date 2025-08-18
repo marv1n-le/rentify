@@ -9,6 +9,7 @@ public interface IUnitOfWork
     IPostRepository PostRepository { get; }
     ICommentRepository CommentRepository { get; }
     IRentalRepository RentalRepository { get; }
+    IRentalItemRepository RentalItemRepository { get; }
     ICategoryRepository CategoryRepository { get; }
     IItemRepository ItemRepository { get; }
 
