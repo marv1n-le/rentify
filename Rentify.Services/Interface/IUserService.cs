@@ -12,6 +12,7 @@ public interface IUserService
     Task<string> CreateUser(UserRegisterDto user);
     Task<bool> CreateSystemUser(SystemUserCreateDto user);
     Task UpdateUser(User user);
+    Task<List<User>> GetAllUsersExceptCurrent();
     Task<bool> SoftDeleteUser(string id);
-    string? GetCurrentUserId(ClaimsPrincipal user);
+    string GetCurrentUserId();
 }

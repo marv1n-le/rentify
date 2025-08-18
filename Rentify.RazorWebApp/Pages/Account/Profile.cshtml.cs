@@ -20,7 +20,7 @@ public class Profile : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        var userId = _userService.GetCurrentUserId(User);
+        var userId = _userService.GetCurrentUserId();
         if (string.IsNullOrEmpty(userId))
             return RedirectToPage("/Account/Login"); // Khi đã fix claim, sẽ không vào nhánh này nữa
 

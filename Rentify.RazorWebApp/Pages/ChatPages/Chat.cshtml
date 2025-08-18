@@ -1,0 +1,338 @@
+@page
+@model Rentify.RazorWebApp.Pages.ChatPages.ChatModel
+@using Microsoft.AspNetCore.SignalR
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Chat";
+}
+
+<div class="chat-container">
+    <div class="user-list">
+        <h3>Online Users</h3>
+        <div class="list-group">
+            <div id="onlineUsersList"></div>
+        </div>
+    </div>
+
+    <div class="chat-area">
+        <div id="currentRoomInfo" style="display: none;">
+            <div class="chat-header">
+                <h4 id="currentRoomName"></h4>
+            </div>
+            <div class="message-container" id="messageContainer"></div>
+            <div class="message-input">
+                <input type="text" id="newMessage" placeholder="Type your message..." />
+                <button id="sendButton" disabled>Send</button>
+            </div>
+        </div>
+        <div id="chatPlaceholder" class="chat-placeholder">
+            <p>Select a user to start chatting</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize variables
+            let currentRoomId = null;
+            const userId = '@Model.UserId';
+            const userName = '@Model.UserName';
+
+            // Initialize SignalR connection
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatHub")
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            // Load all users when page loads
+            loadAllUsers();
+
+            // Start SignalR connection
+            startSignalRConnection();
+
+            // Function to load all users except current
+            async function loadAllUsers() {
+                try {
+                    const response = await fetch('/ChatPages/Chat?handler=GetAllUsersExceptCurrent');
+                    if (response.ok) {
+                        const users = await response.json();
+                        renderUserList(users);
+                    }
+                } catch (error) {
+                    console.error('Error loading users:', error);
+                }
+            }
+
+            // Function to render user list
+            function renderUserList(users) {
+                const userList = $('#onlineUsersList');
+                userList.empty();
+
+                users.forEach(user => {
+                    userList.append(`
+                        <button class="list-group-item list-group-item-action user-item"
+                                data-userid="${user.id}">
+                            ${user.fullName}
+                        </button>
+                    `);
+                });
+            }
+
+            // Function to start SignalR connection
+            async function startSignalRConnection() {
+                try {
+                    await connection.start();
+                    console.log("SignalR Connected.");
+
+                    // Register current user
+                    await connection.invoke("RegisterUser", userId, userName);
+
+                    // Setup message handler
+                    connection.on("ReceiveMessage", (message) => {
+                        renderMessage(message);
+                        scrollToBottom();
+                    });
+
+                } catch (err) {
+                    console.log(err);
+                    setTimeout(startSignalRConnection, 5000);
+                }
+            }
+
+            // Handle click on user item
+            $(document).on('click', '.user-item', async function() {
+                const otherUserId = $(this).data('userid');
+                const otherUserName = $(this).text().trim();
+                await startChat(otherUserId, otherUserName);
+            });
+
+            // Function to start chat with a user
+            async function startChat(otherUserId, otherUserName) {
+                try {
+                    // Create or get chat room
+                    const response = await fetch('/ChatPages/Chat?handler=CreateRoom', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        body: JSON.stringify({ othersUserId: otherUserId })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        currentRoomId = data.roomId;
+
+                        // Join SignalR room
+                        await connection.invoke("JoinRoom", currentRoomId);
+
+                        // Show chat UI
+                        showChatUI(otherUserName);
+
+                        // Load previous messages
+                        await loadMessages(currentRoomId);
+                    }
+                } catch (error) {
+                    console.error('Error starting chat:', error);
+                }
+            }
+
+            // Function to show chat UI
+            function showChatUI(userName) {
+                $('#currentRoomName').text(userName);
+                $('#currentRoomInfo').show();
+                $('#chatPlaceholder').hide();
+                $('#newMessage').focus();
+            }
+
+            // Function to load messages
+            async function loadMessages(roomId) {
+                try {
+                    const response = await fetch(`/ChatPages/Chat?handler=GetRoomMessages&roomId=${roomId}`);
+                    if (response.ok) {
+                        const messages = await response.json();
+                        renderMessages(messages);
+                    }
+                } catch (error) {
+                    console.error('Error loading messages:', error);
+                }
+            }
+
+            // Function to render messages
+            function renderMessages(messages) {
+                $('#messageContainer').empty();
+                messages.forEach(message => {
+                    renderMessage(message);
+                });
+                scrollToBottom();
+            }
+
+            // Function to render a single message
+            function renderMessage(message) {
+                const messageClass = message.userId === userId ? 'sent' : 'received';
+                $('#messageContainer').append(`
+                    <div class="message ${messageClass}">
+                        <div class="message-sender">${message.userName}</div>
+                        <div class="message-content">${message.message}</div>
+                        <div class="message-time">${message.timestamp}</div>
+                    </div>
+                `);
+            }
+
+            // Function to send message
+            async function sendMessage() {
+                const messageText = $('#newMessage').val().trim();
+                if (messageText && currentRoomId) {
+                    try {
+                        await connection.invoke("SendMessage", currentRoomId, messageText);
+                        $('#newMessage').val('');
+                    } catch (error) {
+                        console.error('Error sending message:', error);
+                    }
+                }
+            }
+
+            // Send message on button click
+            $('#sendButton').click(async function() {
+                await sendMessage();
+            });
+
+            // Send message on Enter key
+            $('#newMessage').keypress(function(e) {
+                if (e.which === 13) { // Enter key
+                    sendMessage();
+                }
+            });
+
+            // Enable/disable send button based on input
+            $('#newMessage').on('input', function() {
+                $('#sendButton').prop('disabled', $(this).val().trim() === '');
+            });
+
+            // Function to scroll to bottom of messages
+            function scrollToBottom() {
+                const container = $('#messageContainer');
+                container.scrollTop(container[0].scrollHeight);
+            }
+
+            // Reconnect if connection is lost
+            connection.onclose(async () => {
+                await startSignalRConnection();
+            });
+        });
+    </script>
+}
+
+<style>
+    .chat-container {
+        display: flex;
+        height: 80vh;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: white;
+    }
+
+    .user-list {
+        width: 250px;
+        border-right: 1px solid #ddd;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+    }
+
+    .chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-header {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        background-color: #f1f1f1;
+    }
+
+    .message-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: white;
+    }
+
+    .message {
+        margin: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 70%;
+        word-wrap: break-word;
+    }
+
+        .message.sent {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.received {
+            background-color: #e9ecef;
+            margin-right: auto;
+        }
+
+    .message-sender {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .message-time {
+        font-size: 0.8em;
+        opacity: 0.7;
+        margin-top: 5px;
+    }
+
+    .message-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        background-color: #f8f9fa;
+    }
+
+        .message-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .message-input button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            .message-input button:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+
+    .chat-placeholder {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        color: #6c757d;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .list-group-item:hover {
+            background-color: #e9ecef;
+        }
+</style>
