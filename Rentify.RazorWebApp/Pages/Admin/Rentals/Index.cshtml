@@ -1,0 +1,79 @@
+﻿@page
+@using Rentify.BusinessObjects.Enum
+@model Rentify.RazorWebApp.Pages.Rentals.IndexModel
+
+@{
+    ViewData["Title"] = "Rentals";
+}
+
+<h1>Rentals</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>User</th>
+                <th>Rental Date</th>
+                <th>Return Date</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Payment Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Rental)
+            {
+                <tr>
+                    <td>@(item.User?.FullName ?? "Unknown")</td>
+                    <td>@Html.DisplayFor(modelItem => item.RentalDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ReturnDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.TotalAmount)</td>
+                    <td>
+                        <span class="badge @GetStatusBadgeClass(item.Status)">
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge @GetPaymentStatusBadgeClass(item.PaymentStatus)">
+                            @Html.DisplayFor(modelItem => item.PaymentStatus)
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                        <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@functions {
+    string GetStatusBadgeClass(RentalStatus status)
+    {
+        return status switch
+        {
+            RentalStatus.Active => "bg-success",
+            RentalStatus.Completed => "bg-primary",
+            RentalStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+
+    string GetPaymentStatusBadgeClass(PaymentStatus status)
+    {
+        return status switch
+        {
+            PaymentStatus.Paid => "bg-success",
+            PaymentStatus.Pending => "bg-warning",
+            PaymentStatus.Failed => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

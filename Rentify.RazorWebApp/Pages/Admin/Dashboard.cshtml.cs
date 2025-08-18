@@ -26,7 +26,7 @@ public class Dashboard : PageModel
     {
         var users = await _userService.GetAllUsers();
         TotalUsers = users.Count();
-        
+
         // TODO: Thêm logic lấy thống kê cho Items, Rentals khi có service
         // TotalItems = await _itemService.GetTotalCount();
         // ActiveRentals = await _rentalService.GetActiveRentalsCount();

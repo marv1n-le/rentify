@@ -1,0 +1,65 @@
+﻿@page "{id}"
+@using Rentify.BusinessObjects.Enum
+@model Rentify.RazorWebApp.Pages.Rentals.EditModel
+
+@{
+    ViewData["Title"] = "Edit Rental";
+}
+
+<h1>Edit Rental</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <input type="hidden" asp-for="Rental.RentalId" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Rental.RentalDate" class="control-label"></label>
+                <input asp-for="Rental.RentalDate" class="form-control" />
+                <span asp-validation-for="Rental.RentalDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Rental.ReturnDate" class="control-label"></label>
+                <input asp-for="Rental.ReturnDate" class="form-control" />
+                <span asp-validation-for="Rental.ReturnDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Rental.TotalAmount" class="control-label"></label>
+                <input asp-for="Rental.TotalAmount" class="form-control" />
+                <span asp-validation-for="Rental.TotalAmount" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Rental.Status" class="control-label"></label>
+                <select asp-for="Rental.Status" class="form-control"
+                        asp-items="Html.GetEnumSelectList<RentalStatus>()"></select>
+                <span asp-validation-for="Rental.Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Rental.PaymentStatus" class="control-label"></label>
+                <select asp-for="Rental.PaymentStatus" class="form-control"
+                        asp-items="Html.GetEnumSelectList<PaymentStatus>()"></select>
+                <span asp-validation-for="Rental.PaymentStatus" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

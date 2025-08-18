@@ -47,7 +47,7 @@
 
                 <!-- Danh sách bài viết -->
                 <div id="post-container">
-                    @foreach (var item in Model.Post)
+                    @foreach (var item in Model.Posts)
                     {
                         @Html.Partial("_PostCard", item)
                     }
@@ -148,6 +148,23 @@
             </div>
             <div class="modal-body text-center p-0">
                 <img id="modalImage" src="" alt="Post image" class="img-fluid" style="max-height: 90vh; max-width: 100%; object-fit: contain;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal bình luận -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">Bình luận bài viết</h5>
+                <button type="button" class="btn-close" onclick="closeModal('commentModal')" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="commentModalContent">
+                    <!-- Comments and form will be loaded here -->
+                </div>
             </div>
         </div>
     </div>
@@ -380,6 +397,48 @@
         document.getElementById('imageModal').style.display = 'block';
         document.body.classList.add('modal-open');
         addBackdrop();
+    }
+
+    function openCommentModal(postId) {
+        document.getElementById('commentModal').classList.add('show');
+        document.getElementById('commentModal').style.display = 'block';
+        document.body.classList.add('modal-open');
+        addBackdrop();
+
+        fetch(`?handler=GetComments&postId=${postId}`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('commentModalContent').innerHTML = html;
+                const form = document.getElementById('commentForm');
+                if (form) {
+                    form.onsubmit = function (e) {
+                        e.preventDefault();
+                        submitComment(postId, form);
+                    };
+                }
+            });
+    }
+
+    function submitComment(postId, form) {
+        const content = form.Content.value.trim();
+        if (!content) return;
+
+        fetch(`?handler=AddComment`, {
+                method: "POST",
+                headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('#commentForm input[name="__RequestVerificationToken"]')?.value || ''
+        },
+        body: JSON.stringify({ PostId: postId, Content: content })
+            })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                openCommentModal(postId); // Reload comments
+            } else {
+                alert("Bình luận thất bại: " + (data.message || "Vui lòng thử lại."));
+            }
+        });
     }
 
     function closeImageModal() {
@@ -695,6 +754,7 @@
             if (document.getElementById('editPostModal').classList.contains('show')) closeModal('editPostModal');
             if (document.getElementById('createPostModal').classList.contains('show')) closeModal('createPostModal');
             if (document.getElementById('imageModal').classList.contains('show')) closeModal('imageModal');
+            if (document.getElementById('commentModal').classList.contains('show')) closeModal('commentModal');
         }
     });
 
@@ -703,8 +763,10 @@
         const createM = document.getElementById('createPostModal');
         const editM = document.getElementById('editPostModal');
         const imageM = document.getElementById('imageModal');
+        const commentM = document.getElementById('commentModal');
         if (e.target === createM) closeModal('createPostModal');
         if (e.target === editM) closeModal('editPostModal');
         if (e.target === imageM) closeModal('imageModal');
+        if (e.target === commentM) closeModal('commentModal');
     });
 </script>

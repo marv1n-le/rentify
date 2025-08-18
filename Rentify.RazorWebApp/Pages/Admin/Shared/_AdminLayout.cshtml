@@ -11,106 +11,106 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
-<div class="d-flex">
-    <!-- Sidebar navigation -->
-    <nav class="admin-sidebar text-white">
-        <a href="/Admin/Dashboard" class="sidebar-brand text-decoration-none">
-            <i class="fas fa-crown me-2"></i>
-            Admin Panel
-        </a>
-
-        <div class="p-3">
-            <ul class="nav flex-column sidebar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/Admin/Dashboard">
-                        <i class="fas fa-tachometer-alt me-3"></i>Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/Admin/Users/Index">
-                        <i class="fas fa-users me-3"></i>Quản lý User
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/Admin/Roles/Index">
-                        <i class="fas fa-user-tag me-3"></i>Quản lý Role
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/Admin/Items/Index">
-                        <i class="fas fa-box me-3"></i>Quản lý Items
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/Admin/Rentals/Index">
-                        <i class="fas fa-handshake me-3"></i>Quản lý Rentals
-                    </a>
-                </li>
-            </ul>
-
-            <!-- User info và logout ở sidebar -->
-            <div class="mt-5 pt-4 border-top border-light border-opacity-25">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                        <i class="fas fa-user text-white"></i>
-                    </div>
-                    <div>
-                        <div class="fw-semibold">@(Context.Request.Cookies["UserName"] ?? User.Identity.Name)</div>
-                        <small class="text-white-50">Administrator</small>
-                    </div>
-                </div>
-                <a class="btn btn-outline-light btn-sm w-100" asp-page="/Account/Logout">
-                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main content -->
-    <div class="admin-content flex-grow-1">
-        <!-- Top bar -->
-        <header class="admin-topbar d-flex justify-content-between align-items-center">
-            <div>
-                <h4 class="mb-0 text-dark">@ViewData["Title"]</h4>
-                <small class="text-muted">Quản lý hệ thống Rentify</small>
-            </div>
-
-            <!-- User dropdown menu ở header -->
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-user-circle me-2"></i>
-                    @(Context.Request.Cookies["UserName"] ?? User.Identity.Name)
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                        <a class="dropdown-item" asp-page="/">
-                            <i class="fas fa-home me-2"></i>Về trang chủ
+    <div class="d-flex">
+        <!-- Sidebar navigation -->
+        <nav class="admin-sidebar text-white">
+            <a href="/Admin/Dashboard" class="sidebar-brand text-decoration-none">
+                <i class="fas fa-crown me-2"></i>
+                Admin Panel
+            </a>
+            
+            <div class="p-3">
+                <ul class="nav flex-column sidebar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Dashboard">
+                            <i class="fas fa-tachometer-alt me-3"></i>Dashboard
                         </a>
                     </li>
-                    <li>
-                        <a class="dropdown-item" asp-page="/Account/Profile">
-                            <i class="fas fa-user me-2"></i>Hồ sơ cá nhân
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Users/Index">
+                            <i class="fas fa-users me-3"></i>Quản lý User
                         </a>
                     </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item text-danger" asp-page="/Account/Logout">
-                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Roles/Index">
+                            <i class="fas fa-user-tag me-3"></i>Quản lý Role
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Items/Index">
+                            <i class="fas fa-box me-3"></i>Quản lý Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Rentals/Index">
+                            <i class="fas fa-handshake me-3"></i>Quản lý Rentals
                         </a>
                     </li>
                 </ul>
+                
+                <!-- User info và logout ở sidebar -->
+                <div class="mt-5 pt-4 border-top border-light border-opacity-25">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">@(Context.Request.Cookies["UserName"] ?? User.Identity.Name)</div>
+                            <small class="text-white-50">Administrator</small>
+                        </div>
+                    </div>
+                    <a class="btn btn-outline-light btn-sm w-100" asp-page="/Account/Logout">
+                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                    </a>
+                </div>
             </div>
-        </header>
+        </nav>
 
-        <!-- Page content -->
-        <main class="p-4">
-            @RenderBody()
-        </main>
+        <!-- Main content -->
+        <div class="admin-content flex-grow-1">
+            <!-- Top bar -->
+            <header class="admin-topbar d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0 text-dark">@ViewData["Title"]</h4>
+                    <small class="text-muted">Quản lý hệ thống Rentify</small>
+                </div>
+                
+                <!-- User dropdown menu ở header -->
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2"></i>
+                        @(Context.Request.Cookies["UserName"] ?? User.Identity.Name)
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" asp-page="/">
+                                <i class="fas fa-home me-2"></i>Về trang chủ
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-page="/Account/Profile">
+                                <i class="fas fa-user me-2"></i>Hồ sơ cá nhân
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" asp-page="/Account/Logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </header>
+
+            <!-- Page content -->
+            <main class="p-4">
+                @RenderBody()
+            </main>
+        </div>
     </div>
-</div>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-@await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

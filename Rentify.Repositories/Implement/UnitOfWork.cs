@@ -8,20 +8,31 @@ public class UnitOfWork : IUnitOfWork
     private readonly RentifyDbContext _context;
     private bool _disposed;
     public IUserRepository UserRepository { get; }
+    public ICategoryRepository CategoryRepository { get; }
     public IRoleRepository RoleRepository { get; }
     public IPostRepository PostRepository { get; }
+    public ICommentRepository CommentRepository { get; }
+    public IRentalRepository RentalRepository { get; }
+    public IItemRepository ItemRepository { get; }
 
     public UnitOfWork(RentifyDbContext context,
-        IUserRepository userRepository,
+        IUserRepository userRepository, ICategoryRepository categoryRepository,
         IRoleRepository roleRepository,
-        IPostRepository postRepository)
+        IPostRepository postRepository,
+        ICommentRepository commentRepository,
+        IRentalRepository rentalRepository,
+        IItemRepository itemRepository)
 
     {
         _context = context;
         _disposed = false;
         UserRepository = userRepository;
+        CategoryRepository = categoryRepository;
         PostRepository = postRepository;
         RoleRepository = roleRepository;
+        CommentRepository = commentRepository;
+        RentalRepository = rentalRepository;
+        ItemRepository = itemRepository;
     }
 
     public int SaveChanges()

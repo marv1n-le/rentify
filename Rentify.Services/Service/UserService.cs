@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
@@ -21,7 +22,7 @@ public class UserService : IUserService
 
     public async Task<User?> GetUserById(string id)
     {
-        return await _unitOfWork.UserRepository.GetByIdAsync(id);
+        return await _unitOfWork.UserRepository.GetUserById(id);
     }
 
     public async Task<string> CreateUser(UserRegisterDto dto)
@@ -35,7 +36,7 @@ public class UserService : IUserService
         var userRole = await _unitOfWork.RoleRepository.FindAsync(r => r.Name == "User");
         if (userRole == null)
             throw new Exception("User role not found");
-        
+
         User newUser = new User
         {
             Username = dto.Username,
@@ -51,12 +52,12 @@ public class UserService : IUserService
         return newUser.Id;
     }
 
-    public async Task<string> CreateSystemUser(SystemUserCreateDto dto)
+    public async Task<bool> CreateSystemUser(SystemUserCreateDto dto)
     {
         var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Username == dto.Username);
         if (existingUser)
             throw new Exception($"Username {dto.Username} already exists.");
-        
+
         User newUser = new User
         {
             Username = dto.Username,
@@ -65,10 +66,10 @@ public class UserService : IUserService
             ProfilePicture = dto.ProfilePicture,
             RoleId = dto.RoleId
         };
-        
+
         await _unitOfWork.UserRepository.InsertAsync(newUser);
         await _unitOfWork.SaveChangesAsync();
-        return newUser.Id;
+        return true;
     }
 
     public async Task UpdateUser(User user)
@@ -80,5 +81,24 @@ public class UserService : IUserService
     public async Task<User?> GetUserAccount(string username, string password)
     {
         return await _unitOfWork.UserRepository.GetUserAccount(username, password);
+    }
+    
+    public async Task<bool> SoftDeleteUser(string id)
+    {
+        await _unitOfWork.UserRepository.SoftDeleteAsync(id);
+        await _unitOfWork.SaveChangesAsync();
+        return true;
+    }
+
+    public string? GetCurrentUserId(ClaimsPrincipal user)
+    {
+        // Use standard claim type for user id
+        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            // Fallback: try custom claim "Id"
+            userId = user.FindFirst("Id")?.Value;
+        }
+        return userId;
     }
 }

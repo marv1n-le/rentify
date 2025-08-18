@@ -7,26 +7,29 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Repositories.Implement;
+using Rentify.Services.Interface;
 
-namespace Rentify.RazorWebApp.Pages.RentalPages
+namespace Rentify.RazorWebApp
 {
     public class CreateModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext _context;
+        private readonly ICategoryService _categoryService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateModel(Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext context)
+        public CreateModel(ICategoryService categoryService, IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _categoryService = categoryService;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult OnGet()
         {
-        ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return Page();
         }
 
         [BindProperty]
-        public Rental Rental { get; set; } = default!;
+        public Category Category { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -36,8 +39,7 @@ namespace Rentify.RazorWebApp.Pages.RentalPages
                 return Page();
             }
 
-            _context.Rentals.Add(Rental);
-            await _context.SaveChangesAsync();
+            await _categoryService.CreateCategory(Category);
 
             return RedirectToPage("./Index");
         }
