@@ -1,0 +1,295 @@
+﻿@page
+@model Rentify.RazorWebApp.Pages.ChatPages.IndexModel
+@{
+    ViewData["Title"] = "Chat";
+    // This is optional. Use if you have a common layout.
+    // Layout = "_Layout";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <!-- Use Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Bootstrap Icons for chat icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- SignalR Client library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <style>
+        /* Custom CSS for a better chat feel, using Tailwind utilities where possible */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        /* Basic container styling, rounded corners, and shadow */
+        .chat-container {
+            height: 90vh;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        /* Scrollbar styling for chat areas */
+        .chat-list, .chat-messages {
+            overflow-y: auto;
+            scrollbar-width: thin; /* For Firefox */
+            scrollbar-color: #d1d5db #f3f4f6; /* For Firefox */
+        }
+
+            .chat-list::-webkit-scrollbar,
+            .chat-messages::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .chat-list::-webkit-scrollbar-thumb,
+            .chat-messages::-webkit-scrollbar-thumb {
+                background-color: #d1d5db;
+                border-radius: 4px;
+            }
+
+                .chat-list::-webkit-scrollbar-thumb:hover,
+                .chat-messages::-webkit-scrollbar-thumb:hover {
+                    background-color: #9ca3af;
+                }
+
+        /* Message bubble styling */
+        .message-bubble.sent {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message-bubble.received {
+            background-color: #e4e6eb;
+            color: #333;
+            margin-right: auto;
+        }
+
+        /* Class for active room item */
+        .room-item.active {
+            background-color: #e0e0e0;
+        }
+
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="container mx-auto h-full flex items-center justify-center">
+        <div class="chat-container flex w-full max-w-7xl">
+            <!-- Part 1: Chat Rooms List (List Room) -->
+            <div class="chat-list w-[350px] border-r border-gray-200 bg-gray-100 flex-shrink-0">
+                <div class="px-5 py-4 font-bold text-xl border-b border-gray-200">
+                    Chats
+                </div>
+                <!-- Vòng lặp để hiển thị danh sách người dùng -->
+                @if (Model.UserList != null && Model.UserList.Any())
+                {
+                    @foreach (var user in Model.UserList)
+                    {
+                        <div class="room-item flex items-center p-4 cursor-pointer border-b border-gray-200 transition-colors hover:bg-gray-200" data-user-id="@user.Id">
+                            <img src="@user.ProfilePicture" onerror="this.src='https://placehold.co/50x50/cccccc/333333?text=N/A'" alt="Avatar" class="w-12 h-12 rounded-full mr-4 object-cover">
+                            <div>
+                                <div class="font-bold">@user.Username</div>
+                                <small class="text-gray-500">Bắt đầu cuộc trò chuyện mới</small>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="p-4 text-center text-gray-500">Không có người dùng nào để hiển thị.</p>
+                }
+            </div>
+
+            <!-- Part 2: Main Chat Frame -->
+            <div class="chat-main flex-1 flex flex-col">
+                <!-- Chat Header -->
+                <div class="chat-header px-5 py-4 flex items-center border-b border-gray-200 bg-white">
+                    <img id="room-avatar" src="https://placehold.co/50x50/3498db/ffffff?text=N/A" alt="Avatar" class="w-12 h-12 rounded-full mr-4 object-cover">
+                    <div id="room-name" class="font-bold text-lg">Chọn một người dùng để bắt đầu chat</div>
+                </div>
+
+                <!-- Message Display Area -->
+                <div class="chat-messages flex-1 overflow-y-auto p-5 bg-gray-100 flex flex-col space-y-2">
+                    <!-- Messages will be injected here by JavaScript -->
+                    <p class="text-center text-gray-500 mt-10">Select a user to view messages.</p>
+                </div>
+
+                <!-- Message Input Area -->
+                <div class="chat-input flex p-4 border-t border-gray-200 bg-white items-center">
+                    <input id="message-input" type="text" class="flex-1 rounded-full px-5 py-3 border border-gray-300 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập tin nhắn...">
+                    <button id="send-button" class="ml-3 w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            // Get current user ID from the backend model
+            const currentUserId = "@Model.CurrentUser.Id";
+            let currentRoomId = null;
+            const chatMessagesContainer = document.querySelector('.chat-messages');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+
+            // SignalR connection setup
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("@Model.BaseUrl/chatHub")
+                .withAutomaticReconnect()
+                .build();
+
+            // This function creates and appends a new message bubble to the chat container.
+            function appendMessage(message, senderId) {
+                const isSent = senderId === currentUserId;
+                const messageClass = isSent ? 'sent' : 'received';
+
+                const messageBubble = document.createElement('div');
+                messageBubble.className = `message-bubble p-3 rounded-lg max-w-[70%] mb-2 break-words ${messageClass}`;
+                messageBubble.textContent = message;
+
+                chatMessagesContainer.appendChild(messageBubble);
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            }
+
+            // Set up listener for incoming messages from the hub
+            connection.on("ReceiveMessage", function(messageDto) {
+                // The backend sends a DTO, so we need to extract the message and senderId
+                appendMessage(messageDto.message, messageDto.senderId);
+            });
+
+            // Start the SignalR connection
+            async function startSignalRConnection() {
+                try {
+                    await connection.start();
+                    console.log("SignalR Connected.");
+                } catch (err) {
+                    console.error("SignalR Connection Error: ", err);
+                    setTimeout(startSignalRConnection, 5000);
+                }
+            }
+
+            // Function to send a message via SignalR
+            async function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message && currentRoomId) {
+                    try {
+                        const messageDto = {
+                            chatRoomId: currentRoomId,
+                            senderId: currentUserId,
+                            message: message
+                        };
+
+                        // Send the DTO object to the hub, matching the backend method signature
+                        await connection.invoke("SendMessage", messageDto);
+                        messageInput.value = ""; // Clear the input after sending
+                    } catch (err) {
+                        console.error("Failed to send message: ", err);
+                    }
+                }
+            }
+
+            async function fetchChatHistory(roomId) {
+                chatMessagesContainer.innerHTML = '<p class="text-center text-gray-500 mt-10">Đang tải tin nhắn...</p>';
+
+                const apiUrl = `?handler=ChatHistory&roomId=${roomId}`;
+
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const messages = result.chatMessageList;
+                        chatMessagesContainer.innerHTML = '';
+
+                        if (messages.length === 0) {
+                            chatMessagesContainer.innerHTML = '<p class="text-center text-gray-500 mt-10">Hãy bắt đầu cuộc trò chuyện!</p>';
+                        } else {
+                            messages.sort((a, b) => new Date(a.messageTimestamp) - new Date(b.messageTimestamp));
+                            messages.forEach(message => appendMessage(message.message, message.senderId));
+                        }
+                    } else {
+                        chatMessagesContainer.innerHTML = `<p class="text-center text-red-500 mt-10">Lỗi từ máy chủ: ${result.message || 'Không xác định'}</p>`;
+                    }
+
+                } catch (error) {
+                    console.error('Lỗi khi tải tin nhắn:', error);
+                    chatMessagesContainer.innerHTML = '<p class="text-center text-red-500 mt-10">Không thể tải tin nhắn. Vui lòng thử lại.</p>';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Start the SignalR connection on page load
+                startSignalRConnection();
+
+                const userItems = document.querySelectorAll('.room-item');
+                userItems.forEach(item => {
+                    item.addEventListener('click', async function() {
+                        const userId = this.dataset.userId;
+
+                        document.querySelector('.room-item.active')?.classList.remove('active');
+                        this.classList.add('active');
+
+                        const username = this.querySelector('.font-bold').textContent;
+                        const avatar = this.querySelector('img').src;
+                        document.getElementById('room-name').textContent = username;
+                        document.getElementById('room-avatar').src = avatar;
+
+                        const form = new FormData();
+                        form.append('userId', userId);
+
+                        try {
+                            const response = await fetch('?handler=CreateChatRoom', {
+                                method: 'POST',
+                                body: form,
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Failed to create chat room.');
+                            }
+
+                            const result = await response.json();
+
+                            if (result.success && result.roomId) {
+                                console.log(`Chat room created/retrieved with ID: ${result.roomId}`);
+                                // Set the global current room ID
+                                currentRoomId = result.roomId;
+                                // Now, load the message history for this room
+                                fetchChatHistory(currentRoomId);
+
+                                // Join the new room group in SignalR
+                                await connection.invoke("JoinRoom", currentRoomId);
+                            } else {
+                                console.error('Error creating chat room: No room ID returned.');
+                            }
+
+                        } catch (error) {
+                            console.error('Error creating chat room:', error);
+                            chatMessagesContainer.innerHTML = '<p class="text-center text-red-500 mt-10">Không thể tạo phòng chat. Vui lòng thử lại.</p>';
+                        }
+                    });
+                });
+
+                // Add event listener for sending messages
+                sendButton.addEventListener('click', sendMessage);
+                messageInput.addEventListener('keyup', (event) => {
+                    if (event.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            });
+        </script>
+    }
+
+</body>
+</html>

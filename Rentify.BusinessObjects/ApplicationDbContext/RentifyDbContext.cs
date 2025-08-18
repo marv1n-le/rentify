@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.Entities;
 
 namespace Rentify.BusinessObjects.ApplicationDbContext;
@@ -40,6 +40,55 @@ public class RentifyDbContext : DbContext
         modelBuilder.Entity<Comment>().ToTable("Comment");
         modelBuilder.Entity<Rental>().ToTable("Rental");
         modelBuilder.Entity<RentalItem>().ToTable("RentalItem");
+
+        #region Seed User
+
+        modelBuilder.Entity<Role>(options =>
+        {
+            options.HasData(
+                new Role
+                {
+                    Id = "b8d237b8b6f849988d60c6c3c1d0a943",
+                    Name = "User"
+                },
+                new Role
+                {
+                    Id = "2e7b5a97e42e4e84a08ffbe0bc05d2ea",
+                    Name = "Admin"
+                }
+            );
+        });
+
+        modelBuilder.Entity<User>(options =>
+        {
+            options.HasData(
+                new User
+                {
+                    Id = "f49aa51bbd304e77933e24bbed65b165",
+                    Username = "user",
+                    Password = "123",
+                    FullName = "Người dùng 1",
+                    RoleId = "b8d237b8b6f849988d60c6c3c1d0a943",
+                },
+                new User
+                {
+                    Id = "1a3bcd12345678901234567890123456",
+                    Username = "admin",
+                    Password = "123",
+                    FullName = "Admin",
+                    RoleId = "2e7b5a97e42e4e84a08ffbe0bc05d2ea"
+                },
+                new User
+                {
+                    Id = "29d72211a9f7480c9812d61ee17c92b9",
+                    Username = "user2",
+                    Password = "123",
+                    FullName = "Người dùng 2",
+                    RoleId = "b8d237b8b6f849988d60c6c3c1d0a943"
+                }
+            );
+        });
+        #endregion
 
         modelBuilder.Entity<RentalItem>(entity =>
         {
