@@ -1,23 +1,23 @@
-﻿@model Rentify.RazorWebApp.Pages.PostPages.PostViewModel
+﻿@using Rentify.BusinessObjects.Enum
+@model Rentify.RazorWebApp.Pages.PostPages.PostViewModel
 
 <div id="post-@Model.Id" class="card border-0 shadow-sm mb-4">
     <div class="card-body p-0">
-        <!-- Header bài viết -->
         <div class="p-3 pb-2">
             <div class="d-flex justify-content-between align-items-start post-menu-wrapper position-relative">
-                <!-- Thông tin người dùng -->
                 <div class="d-flex align-items-center">
                     <img src="@(Model.User?.ProfilePicture ?? "https://via.placeholder.com/40")"
                          alt="User avatar" class="rounded-circle me-3" width="40" height="40" />
                     <div>
                         <div class="fw-bold text-dark">@Model.User?.FullName</div>
-                        <div class="text-muted small">
-                            <span class="me-1">@Model.CreatedAt.ToString("dd-08-2025 lúc HH:mm")</span>
+                        <div class="text-muted small d-flex align-items-center">
+                            <span class="me-2">@Model.CreatedAt.ToString("dd-MM-yyyy 'lúc' HH:mm")</span>
+
+                            @* <span class="badge @statusClass">@statusText</span> *@
                         </div>
                     </div>
                 </div>
 
-                <!-- Nút 3 chấm + Menu custom -->
                 <button class="post-menu-btn" type="button" aria-label="Mở menu" onclick="togglePostMenu('@Model.Id')">⋯</button>
                 <div id="menu-@Model.Id" class="post-menu">
                     <a href="javascript:void(0)" onclick="openEditModal('@Model.Id', '@Html.Raw((Model.Title ?? "").Replace("'", "\\'"))', '@Html.Raw((Model.Content ?? "").Replace("'", "\\'"))', '@string.Join(",", Model.Tags ?? new List<string>())', '@string.Join(",", Model.Images ?? new List<string>())')">
@@ -28,17 +28,16 @@
             </div>
         </div>
 
-        <!-- Nội dung bài viết -->
         <div class="px-3 pb-2">
             @if (!string.IsNullOrEmpty(Model.Title))
             {
                 <h6 class="fw-bold mb-2">@Model.Title</h6>
             }
-            
+
             <div id="content-@Model.Id" class="post-content mb-2">
                 @Model.Content
             </div>
-            
+
             @if (Model.Content?.Length > 100)
             {
                 <a href="javascript:void(0)" id="showmore-@Model.Id" class="show-more-link" onclick="toggleContent('@Model.Id')">
@@ -47,27 +46,26 @@
             }
         </div>
 
-        <!-- Hình ảnh -->
         @if (Model.Images != null && Model.Images.Any())
         {
             <div class="px-3 pb-2">
                 @if (Model.Images.Count == 1)
                 {
-                    <img src="@Model.Images.First()" alt="Post image" class="img-fluid rounded clickable-image" 
-                         style="max-height: 400px; width: 100%; object-fit: cover;" 
+                    <img src="@Model.Images.First()" alt="Post image" class="img-fluid rounded clickable-image"
+                         style="max-height: 400px; width: 100%; object-fit: cover;"
                          onclick="openImageModal('@Model.Images.First()')">
                 }
                 else if (Model.Images.Count == 2)
                 {
                     <div class="row g-1">
                         <div class="col-6">
-                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image" 
-                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image"
+                                 style="height: 200px; width: 100%; object-fit: cover;"
                                  onclick="openImageModal('@Model.Images[0]')">
                         </div>
                         <div class="col-6">
-                            <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image" 
-                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                            <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image"
+                                 style="height: 200px; width: 100%; object-fit: cover;"
                                  onclick="openImageModal('@Model.Images[1]')">
                         </div>
                     </div>
@@ -76,20 +74,20 @@
                 {
                     <div class="row g-1">
                         <div class="col-8">
-                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image" 
-                                 style="height: 200px; width: 100%; object-fit: cover;" 
+                            <img src="@Model.Images[0]" alt="Post image" class="img-fluid rounded clickable-image"
+                                 style="height: 200px; width: 100%; object-fit: cover;"
                                  onclick="openImageModal('@Model.Images[0]')">
                         </div>
                         <div class="col-4">
                             <div class="d-flex flex-column g-1">
-                                <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image mb-1" 
-                                     style="height: 98px; width: 100%; object-fit: cover;" 
+                                <img src="@Model.Images[1]" alt="Post image" class="img-fluid rounded clickable-image mb-1"
+                                     style="height: 98px; width: 100%; object-fit: cover;"
                                      onclick="openImageModal('@Model.Images[1]')">
                                 @if (Model.Images.Count > 2)
                                 {
                                     <div class="position-relative">
-                                        <img src="@Model.Images[2]" alt="Post image" class="img-fluid rounded clickable-image" 
-                                             style="height: 98px; width: 100%; object-fit: cover;" 
+                                        <img src="@Model.Images[2]" alt="Post image" class="img-fluid rounded clickable-image"
+                                             style="height: 98px; width: 100%; object-fit: cover;"
                                              onclick="openImageModal('@Model.Images[2]')">
                                         @if (Model.Images.Count > 3)
                                         {
@@ -106,7 +104,6 @@
             </div>
         }
 
-        <!-- Tags -->
         @if (Model.Tags != null && Model.Tags.Any())
         {
             <div class="px-3 pb-2">
@@ -117,16 +114,38 @@
             </div>
         }
 
-        <!-- Thống kê tương tác -->
         <div class="px-3 py-2 border-top">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="text-muted small">
-                    <span>@Model.CommentCount bình luận</span>
+                    <span class="me-3">@Model.CommentCount bình luận</span>
+                    <span>@Model.Status</span>
                 </div>
             </div>
         </div>
 
-        <!-- Nút bình luận -->
+        @if (Model.Inquiries != null && Model.Inquiries.Any())
+        {
+            <div class="px-3 py-2 border-top">
+                <a class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" href="#inquiries-@Model.Id" role="button" aria-expanded="false" aria-controls="inquiries-@Model.Id">
+                    Xem danh sách @Model.Inquiries.Count() yêu cầu
+                </a>
+                <div class="collapse mt-2" id="inquiries-@Model.Id">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var inquiry in Model.Inquiries)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">@(inquiry.User?.FullName ?? "Người dùng ẩn")</div>
+                                    <small>@inquiry.Status</small>
+                                </div>
+                                <span class="badge bg-light text-dark rounded-pill">@inquiry.CreatedAt.ToString("dd/MM HH:mm")</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
         <div class="px-3 py-2 border-top">
             <div class="row text-center">
                 <div class="col-12">
@@ -154,7 +173,11 @@
         align-items: center;
         justify-content: center;
     }
-    .post-menu-btn:hover { background: #f0f2f5; }
+
+        .post-menu-btn:hover {
+            background: #f0f2f5;
+        }
+
     .post-menu {
         position: absolute;
         top: 8px;
@@ -167,10 +190,25 @@
         display: none;
         z-index: 1050;
     }
-    .post-menu.show { display: block; }
-    .post-menu a { display: block; padding: 8px 12px; color: #111; text-decoration: none; }
-    .post-menu a:hover { background: #f2f2f2; }
-    .post-menu a.text-danger { color: #e03131; }
+
+        .post-menu.show {
+            display: block;
+        }
+
+        .post-menu a {
+            display: block;
+            padding: 8px 12px;
+            color: #111;
+            text-decoration: none;
+        }
+
+            .post-menu a:hover {
+                background: #f2f2f2;
+            }
+
+            .post-menu a.text-danger {
+                color: #e03131;
+            }
 </style>
 
 <script>
@@ -190,7 +228,7 @@
 
     function deletePost(postId) {
         if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-            fetch(`/PostPages/Delete?id=${postId}`, { 
+            fetch(`/PostPages/Delete?id=${postId}`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' }
             })

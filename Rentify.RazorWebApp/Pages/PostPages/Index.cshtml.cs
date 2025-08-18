@@ -63,7 +63,9 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                     Tags = post.Tags,
                     CreatedAt = post.CreatedAt,
                     User = post.User,
-                    CommentCount = count
+                    CommentCount = count,
+                    Status = (RentalStatus)post.Status,
+                    Inquiries = post.Inquiries
                 });
             }
 
@@ -272,5 +274,8 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public DateTime CreatedAt { get; set; }
         public User? User { get; set; }
         public int CommentCount { get; set; }
+        public RentalStatus Status { get; set; }
+        public ICollection<Inquiry> Inquiries { get; set; } = new List<Inquiry>();
+
     }
 }

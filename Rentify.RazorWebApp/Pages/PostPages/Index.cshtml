@@ -1001,4 +1001,74 @@
             closeAllCommentMenus();
         }
     });
+
+    function openInquiryModal(postId) {
+        const postElement = document.getElementById(`post-${postId}`);
+        const modalContent = document.getElementById('inquiryModalContent');
+
+        if (!postElement) {
+            console.error(`Post element with id 'post-${postId}' not found.`);
+            return;
+        }
+
+        const inquiries = JSON.parse(postElement.dataset.inquiries || '[]');
+        let contentHtml = '';
+
+        if (inquiries && inquiries.length > 0) {
+            // Ánh xạ InquiryStatus (số) sang text và màu sắc badge
+            const statusMap = {
+                0: { text: "Open", class: "bg-primary" },
+                1: { text: "Quoted", class: "bg-info text-dark" },
+                2: { text: "Accepted", class: "bg-success" },
+                3: { text: "Rejected", class: "bg-danger" },
+                4: { text: "Duplicate", class: "bg-secondary" }
+            };
+
+            let inquiryItemsHtml = inquiries.map(inquiry => {
+                // Lấy thông tin trạng thái từ map
+                const statusInfo = statusMap[inquiry.Status] || { text: "Unknown", class: "bg-dark" };
+                const userAvatar = inquiry.User?.ProfilePicture ?? 'https://via.placeholder.com/40';
+                const userName = inquiry.User?.FullName ?? 'Người dùng ẩn danh';
+                const inquiryDate = new Date(inquiry.CreatedAt).toLocaleString('vi-VN');
+
+                // Nút hành động chỉ active khi status là 'Open' (giá trị 0)
+                const areActionsDisabled = inquiry.Status !== 0;
+                const disabledAttr = areActionsDisabled ? 'disabled' : '';
+
+                return `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="${userAvatar}" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
+                            <div>
+                                <h6 class="mb-0">${userName}</h6>
+                                <small class="text-muted">Gửi lúc: ${inquiryDate}</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+
+                            <span class="badge ${statusInfo.class} me-3">${statusInfo.text}</span>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-success" ${disabledAttr}>Chấp nhận</button>
+                                <button class="btn btn-sm btn-outline-danger" ${disabledAttr}>Từ chối</button>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            }).join('');
+
+            contentHtml = `<ul class="list-group list-group-flush">${inquiryItemsHtml}</ul>`;
+
+        } else {
+            contentHtml = `
+                <div class="text-center p-4">
+                    <p class="text-muted mb-0">Chưa có yêu cầu nào cho bài viết này.</p>
+                </div>
+            `;
+        }
+
+        // Đưa HTML vào modal và hiển thị
+        modalContent.innerHTML = contentHtml;
+        const inquiryModal = new bootstrap.Modal(document.getElementById('inquiryModal'));
+        inquiryModal.show();
+    }
 </script>
