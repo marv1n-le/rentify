@@ -62,11 +62,6 @@ namespace Rentify.RazorWebApp.Pages.InquiryPages
         public async Task<IActionResult> OnPostAsync()
         {
             await LoadOptions();
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
             await _inquiryService.CreateInquiry(Inquiry);
 
             return RedirectToPage("./Index");

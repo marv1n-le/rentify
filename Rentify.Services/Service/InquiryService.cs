@@ -34,7 +34,6 @@ public class InquiryService : IInquiryService
 
     public async Task<string> CreateInquiry(InquiryCreationDto inquiryCreationDto)
     {
-        Console.WriteLine("HERE");
         var userId = _contextAccessor.GetCurrentUserId();
         if (string.IsNullOrEmpty(userId))
             throw new Exception("User not authenticated.");
@@ -44,6 +43,9 @@ public class InquiryService : IInquiryService
             throw new Exception($"Please log in first");
 
         inquiryCreationDto.UserId = userId;
+        inquiryCreationDto.StartDate = DateTime.SpecifyKind(inquiryCreationDto.StartDate, DateTimeKind.Utc);
+        inquiryCreationDto.EndDate = DateTime.SpecifyKind(inquiryCreationDto.EndDate, DateTimeKind.Utc);
+
         var inquiry = _mapper.Map<Inquiry>(inquiryCreationDto);
 
         await _unitOfWork.InquiryRepository.InsertAsync(inquiry);

@@ -11,8 +11,8 @@ public class InquiryCreationDto
 {
     public string PostId { get; set; } = default!;
     public string UserId { get; set; } = default!;
-    public DateTime? StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
     public int Quantity { get; set; }
     public string? Note { get; set; }
     public InquiryStatus Status { get; set; } = InquiryStatus.Open;
