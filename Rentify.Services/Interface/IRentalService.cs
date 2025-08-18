@@ -1,8 +1,5 @@
-﻿using Rentify.BusinessObjects.DTO.PostDto;
-using Rentify.BusinessObjects.DTO.RentalDTO;
+﻿using Rentify.BusinessObjects.DTO.RentalDTO;
 using Rentify.BusinessObjects.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Rentify.Services.Interface
 {

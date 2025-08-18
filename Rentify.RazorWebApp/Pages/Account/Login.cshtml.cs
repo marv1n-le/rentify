@@ -22,7 +22,7 @@ public class Login : PageModel
     }
 
     [BindProperty]
-    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 
     [BindProperty]
     public string Password { get; set; } = string.Empty;
@@ -34,7 +34,7 @@ public class Login : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        var account = await _service.GetUserAccount(Username, Password);
+        var account = await _service.GetUserAccount(Email, Password);
 
         if (account != null)
         {
@@ -43,9 +43,9 @@ public class Login : PageModel
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, account.Id),          // QUAN TRỌNG!
-                new Claim(ClaimTypes.Name, account.Username ?? string.Empty),
-                new Claim(ClaimTypes.Email, account.Username ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, account.Id),
+                new Claim(ClaimTypes.Name, account.Email ?? string.Empty),
+                new Claim(ClaimTypes.Email, account.Email ?? string.Empty),
                 new Claim(ClaimTypes.Role, roleName),
             };
 
@@ -61,7 +61,7 @@ public class Login : PageModel
                 });
 
             // Cookies phụ nếu bạn muốn
-            Response.Cookies.Append("UserName", account.Username ?? "");
+            Response.Cookies.Append("Email", account.Email ?? "");
             Response.Cookies.Append("userId", account.Id);
 
             if (roleName == "Admin")

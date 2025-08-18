@@ -1,5 +1,4 @@
-﻿using CloudinaryDotNet;
-using MamaFit.Services.ExternalService.CloudinaryService;
+﻿using MamaFit.Services.ExternalService.CloudinaryService;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.Repositories.Implement;

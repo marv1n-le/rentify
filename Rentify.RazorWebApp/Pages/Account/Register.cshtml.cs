@@ -1,10 +1,10 @@
+using MamaFit.Services.ExternalService.CloudinaryService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.Services.Interface;
 using System.ComponentModel.DataAnnotations;
-using MamaFit.Services.ExternalService.CloudinaryService;
 
 namespace Rentify.RazorWebApp.Pages.Account;
 
@@ -22,8 +22,8 @@ public class Register : PageModel
 
     [BindProperty]
     [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
-    [StringLength(50, ErrorMessage = "Tên đăng nhập không được vượt quá 50 ký tự")]
-    public string Username { get; set; } = string.Empty;
+    [EmailAddress(ErrorMessage = "Địa chỉ email không hợp lệ")]
+    public string Email { get; set; } = string.Empty;
 
     [BindProperty]
     [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
@@ -88,7 +88,7 @@ public class Register : PageModel
 
             var registerDto = new UserRegisterDto
             {
-                Username = Username,
+                Email = Email,
                 Password = Password,
                 FullName = FullName,
                 BirthDate = BirthDate,

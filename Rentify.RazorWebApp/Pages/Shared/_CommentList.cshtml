@@ -1,4 +1,11 @@
 ﻿@model IEnumerable<Rentify.BusinessObjects.Entities.Comment>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var currentUserId = HttpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var isAdmin = HttpContextAccessor.HttpContext?.User?.IsInRole("Admin") ?? false;
+}
 
 <div class="comment-list mt-2">
     @if (!Model.Any())
@@ -7,9 +14,9 @@
     }
     else
     {
-        @foreach (var comment in Model)
+        @foreach (var comment in Model.Where(c => !c.IsDeleted))
         {
-            <div class="d-flex align-items-start mb-2">
+            <div class="d-flex align-items-start mb-2 comment-item position-relative" id="comment-@comment.Id">
                 <img src="@(comment.User?.ProfilePicture ?? "https://via.placeholder.com/32")"
                      alt="Avatar" class="rounded-circle me-2" width="32" height="32" />
                 <div>
@@ -17,7 +24,62 @@
                     <div class="text-muted small">@comment.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
                     <div>@comment.Content</div>
                 </div>
+                @if (isAdmin || currentUserId == comment.UserId)
+                {
+                    <button class="comment-menu-btn ms-2" type="button" aria-label="Mở menu" onclick="toggleCommentMenu('@comment.Id')">⋯</button>
+                    <div id="comment-menu-@comment.Id" class="comment-menu">
+                        <a class="text-danger" href="javascript:void(0)" onclick="deleteComment('@comment.Id')">Xóa</a>
+                    </div>
+                }
             </div>
         }
     }
 </div>
+
+<style>
+    .comment-menu-btn {
+        background: transparent;
+        border: none;
+        color: #65676b;
+        font-size: 18px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .comment-menu-btn:hover { background: #f0f2f5; }
+    .comment-menu {
+        position: absolute;
+        top: 8px;
+        right: 0;
+        background: #fff;
+        border: 1px solid #e4e6eb;
+        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        border-radius: 8px;
+        min-width: 100px;
+        display: none;
+        z-index: 1050;
+    }
+    .comment-menu.show { display: block; }
+    .comment-menu a { display: block; padding: 8px 12px; color: #111; text-decoration: none; }
+    .comment-menu a:hover { background: #f2f2f2; }
+    .comment-menu a.text-danger { color: #e03131; }
+</style>
+
+<script>
+    function toggleCommentMenu(commentId) {
+        closeAllCommentMenus();
+        const menu = document.getElementById('comment-menu-' + commentId);
+        if (menu) { menu.classList.toggle('show'); }
+    }
+    function closeAllCommentMenus() {
+        document.querySelectorAll('.comment-menu').forEach(m => m.classList.remove('show'));
+    }
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.comment-menu') && !e.target.closest('.comment-menu-btn')) {
+            closeAllCommentMenus();
+        }
+    });
+</script>

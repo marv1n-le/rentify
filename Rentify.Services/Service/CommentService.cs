@@ -60,10 +60,37 @@ namespace Rentify.Services.Service
             return await _unitOfWork.CommentRepository.CountAsync(c => c.PostId == postId && !c.IsDeleted);
         }
 
+        public async Task<bool> SoftDeleteComment(string commentId)
+        {
+            var comment = await _unitOfWork.CommentRepository.GetByIdAsync(commentId);
+            if (comment == null) return false;
+
+            var userId = GetCurrentUserId();
+            var httpContext = _contextAccessor.HttpContext;
+            var isAdmin = httpContext?.User?.IsInRole("Admin") ?? false;
+
+            // Only allow Admin or comment owner
+            if (!isAdmin && userId != comment.UserId)
+                return false;
+
+            comment.IsDeleted = true;
+            await _unitOfWork.CommentRepository.UpdateAsync(comment);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
         private string? GetCurrentUserId()
         {
-            var userId = _contextAccessor.HttpContext?.Request.Cookies.TryGetValue("userId", out var value) == true ? value : null;
-            return userId;
+            var httpContext = _contextAccessor.HttpContext;
+            if (httpContext == null)
+                return null;
+
+            // Try cookie first
+            if (httpContext.Request?.Cookies.TryGetValue("userId", out var value) == true && !string.IsNullOrEmpty(value))
+                return value;
+
+            // Fallback to claims (works with auto-login)
+            return httpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }
