@@ -17,6 +17,8 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="15.0.1" />
       <PackageReference Include="CloudinaryDotNet" Version="1.27.6" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.15" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
     </ItemGroup>
 
 </Project>

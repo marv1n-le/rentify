@@ -66,7 +66,7 @@ public class RentifyDbContext : DbContext
                 new User
                 {
                     Id = "f49aa51bbd304e77933e24bbed65b165",
-                    Username = "user",
+                    Email = "user@gmail.com",
                     Password = "123",
                     FullName = "Người dùng 1",
                     RoleId = "b8d237b8b6f849988d60c6c3c1d0a943",
@@ -74,7 +74,7 @@ public class RentifyDbContext : DbContext
                 new User
                 {
                     Id = "1a3bcd12345678901234567890123456",
-                    Username = "admin",
+                    Email = "admin@gmail.com",
                     Password = "123",
                     FullName = "Admin",
                     RoleId = "2e7b5a97e42e4e84a08ffbe0bc05d2ea"
@@ -82,7 +82,7 @@ public class RentifyDbContext : DbContext
                 new User
                 {
                     Id = "29d72211a9f7480c9812d61ee17c92b9",
-                    Username = "user2",
+                    Email = "user2@gmail.com",
                     Password = "123",
                     FullName = "Người dùng 2",
                     RoleId = "b8d237b8b6f849988d60c6c3c1d0a943"
