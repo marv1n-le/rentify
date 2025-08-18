@@ -1,9 +1,4 @@
 ﻿using Rentify.BusinessObjects.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rentify.Repositories.Helper;
 
@@ -41,9 +36,9 @@ public static class PostHelper
 
 public class SearchFilterPostDto
 {
-    public string? Keyword { get; set; }     
-    public List<string>? Tags { get; set; }        
-    public string? Status { get; set; }      
+    public string? Keyword { get; set; }
+    public List<string>? Tags { get; set; }
+    public string? Status { get; set; }
     public int PageIndex { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

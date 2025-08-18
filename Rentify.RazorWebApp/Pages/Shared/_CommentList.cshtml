@@ -3,7 +3,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    var currentUserId = HttpContextAccessor.HttpContext?.Request.Cookies["userId"];
+    var currentUserId = HttpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
     var isAdmin = HttpContextAccessor.HttpContext?.User?.IsInRole("Admin") ?? false;
 }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Rentify.BusinessObjects.Enum;
+﻿using Rentify.BusinessObjects.Enum;
 
 namespace Rentify.BusinessObjects.DTO.RentalDTO
 {

@@ -81,8 +81,16 @@ namespace Rentify.Services.Service
 
         private string? GetCurrentUserId()
         {
-            var userId = _contextAccessor.HttpContext?.Request.Cookies.TryGetValue("userId", out var value) == true ? value : null;
-            return userId;
+            var httpContext = _contextAccessor.HttpContext;
+            if (httpContext == null)
+                return null;
+
+            // Try cookie first
+            if (httpContext.Request?.Cookies.TryGetValue("userId", out var value) == true && !string.IsNullOrEmpty(value))
+                return value;
+
+            // Fallback to claims (works with auto-login)
+            return httpContext.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }

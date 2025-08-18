@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Rentify.BusinessObjects.DTO.PostDto;
 using Rentify.BusinessObjects.Entities;

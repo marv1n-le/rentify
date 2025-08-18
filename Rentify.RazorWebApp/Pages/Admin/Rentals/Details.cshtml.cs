@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Services.Interface;
-using Rentify.Services.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Rentify.RazorWebApp.Pages.Rentals
 {
