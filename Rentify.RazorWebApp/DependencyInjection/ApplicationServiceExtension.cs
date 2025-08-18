@@ -1,9 +1,9 @@
-﻿using MamaFit.Services.ExternalService.CloudinaryService;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.Repositories.Implement;
 using Rentify.Repositories.Interface;
 using Rentify.Repositories.Repository;
+using Rentify.Services.ExternalService.CloudinaryService;
 using Rentify.Services.ExternalService.Redis;
 using Rentify.Services.Interface;
 using Rentify.Services.Mapper;
@@ -38,6 +38,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<ICloudinaryService, CloudinaryService>();
         services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<IChatService, ChatService>();
     }
 
     public static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)

@@ -7,6 +7,9 @@
 }
 
 <div class="chat-container">
+    <form method="post" style="display: none;">
+        @Html.AntiForgeryToken()
+    </form>
     <div class="user-list">
         <h3>Online Users</h3>
         <div class="list-group">
@@ -21,7 +24,7 @@
             </div>
             <div class="message-container" id="messageContainer"></div>
             <div class="message-input">
-                <input type="text" id="newMessage" placeholder="Type your message..." />
+                <input type="text" id="newMessage" placeholder="Type your message..."/>
                 <button id="sendButton" disabled>Send</button>
             </div>
         </div>
@@ -33,197 +36,170 @@
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-            // Initialize variables
+        $(async function () {
             let currentRoomId = null;
             const userId = '@Model.UserId';
+            const userEmail = '@Model.UserEmail';
             const userName = '@Model.UserName';
 
-            // Initialize SignalR connection
             const connection = new signalR.HubConnectionBuilder()
                 .withUrl("/chatHub")
                 .configureLogging(signalR.LogLevel.Information)
                 .build();
 
-            // Load all users when page loads
-            loadAllUsers();
-
-            // Start SignalR connection
-            startSignalRConnection();
-
-            // Function to load all users except current
-            async function loadAllUsers() {
-                try {
-                    const response = await fetch('/ChatPages/Chat?handler=GetAllUsersExceptCurrent');
-                    if (response.ok) {
-                        const users = await response.json();
-                        renderUserList(users);
-                    }
-                } catch (error) {
-                    console.error('Error loading users:', error);
-                }
-            }
-
-            // Function to render user list
-            function renderUserList(users) {
-                const userList = $('#onlineUsersList');
-                userList.empty();
-
-                users.forEach(user => {
-                    userList.append(`
-                        <button class="list-group-item list-group-item-action user-item"
-                                data-userid="${user.id}">
-                            ${user.fullName}
-                        </button>
-                    `);
-                });
-            }
-
-            // Function to start SignalR connection
-            async function startSignalRConnection() {
-                try {
-                    await connection.start();
-                    console.log("SignalR Connected.");
-
-                    // Register current user
-                    await connection.invoke("RegisterUser", userId, userName);
-
-                    // Setup message handler
-                    connection.on("ReceiveMessage", (message) => {
-                        renderMessage(message);
-                        scrollToBottom();
-                    });
-
-                } catch (err) {
-                    console.log(err);
-                    setTimeout(startSignalRConnection, 5000);
-                }
-            }
-
-            // Handle click on user item
-            $(document).on('click', '.user-item', async function() {
-                const otherUserId = $(this).data('userid');
-                const otherUserName = $(this).text().trim();
-                await startChat(otherUserId, otherUserName);
-            });
-
-            // Function to start chat with a user
-            async function startChat(otherUserId, otherUserName) {
-                try {
-                    // Create or get chat room
-                    const response = await fetch('/ChatPages/Chat?handler=CreateRoom', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                        },
-                        body: JSON.stringify({ othersUserId: otherUserId })
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        currentRoomId = data.roomId;
-
-                        // Join SignalR room
-                        await connection.invoke("JoinRoom", currentRoomId);
-
-                        // Show chat UI
-                        showChatUI(otherUserName);
-
-                        // Load previous messages
-                        await loadMessages(currentRoomId);
-                    }
-                } catch (error) {
-                    console.error('Error starting chat:', error);
-                }
-            }
-
-            // Function to show chat UI
-            function showChatUI(userName) {
-                $('#currentRoomName').text(userName);
-                $('#currentRoomInfo').show();
-                $('#chatPlaceholder').hide();
-                $('#newMessage').focus();
-            }
-
-            // Function to load messages
-            async function loadMessages(roomId) {
-                try {
-                    const response = await fetch(`/ChatPages/Chat?handler=GetRoomMessages&roomId=${roomId}`);
-                    if (response.ok) {
-                        const messages = await response.json();
-                        renderMessages(messages);
-                    }
-                } catch (error) {
-                    console.error('Error loading messages:', error);
-                }
-            }
-
-            // Function to render messages
-            function renderMessages(messages) {
-                $('#messageContainer').empty();
-                messages.forEach(message => {
-                    renderMessage(message);
+            connection.on("ReceiveMessage", (senderEmail, senderName, content, createdAt) => {
+                renderMessage({
+                    userEmail: senderEmail,
+                    userName: senderName || senderEmail,
+                    message: content,
+                    timestamp: new Date(createdAt).toLocaleTimeString()
                 });
                 scrollToBottom();
+            });
+
+            await startSignalR();
+            await loadAllUsers();
+
+            async function startSignalR() {
+                try {
+                    await connection.start();
+                    console.log("SignalR Connected");
+                } catch (e) {
+                    console.error(e);
+                    setTimeout(startSignalR, 2000);
+                }
             }
 
-            // Function to render a single message
-            function renderMessage(message) {
-                const messageClass = message.userId === userId ? 'sent' : 'received';
-                $('#messageContainer').append(`
-                    <div class="message ${messageClass}">
-                        <div class="message-sender">${message.userName}</div>
-                        <div class="message-content">${message.message}</div>
-                        <div class="message-time">${message.timestamp}</div>
-                    </div>
-                `);
-            }
-
-            // Function to send message
-            async function sendMessage() {
-                const messageText = $('#newMessage').val().trim();
-                if (messageText && currentRoomId) {
-                    try {
-                        await connection.invoke("SendMessage", currentRoomId, messageText);
-                        $('#newMessage').val('');
-                    } catch (error) {
-                        console.error('Error sending message:', error);
+            async function loadAllUsers() {
+                try {
+                    const res = await fetch('/ChatPages/Chat?handler=GetAllUsersExceptCurrent');
+                    if (res.ok) {
+                        const users = await res.json();
+                        renderUserList(users);
                     }
+                } catch (e) {
+                    console.error(e);
                 }
             }
 
-            // Send message on button click
-            $('#sendButton').click(async function() {
-                await sendMessage();
-            });
+            function renderUserList(users) {
+                const $list = $('#onlineUsersList');
+                $list.empty();
+                users.forEach(u => {
+                    $list.append(
+                        `<button class="list-group-item list-group-item-action user-item" data-userid="${u.id}" data-name="${u.fullName}">
+                           ${u.fullName}
+                         </button>`
+                    );
+                });
+            }
 
-            // Send message on Enter key
-            $('#newMessage').keypress(function(e) {
-                if (e.which === 13) { // Enter key
-                    sendMessage();
+            // CHỈ CÓ MỘT CLICK HANDLER DUY NHẤT
+            $(document).on('click', '.user-item', async function () {
+                const otherUserId = this.dataset.userid;
+                const otherUserName = this.dataset.name;
+
+                // Lấy CSRF token từ form ẩn
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                console.log('Token found:', token ? 'YES' : 'NO');
+
+                try {
+                    // Tạo/lấy private room với CSRF token
+                    const resp = await fetch('/ChatPages/Chat?handler=CreateRoom', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `othersUserId=${encodeURIComponent(otherUserId)}&__RequestVerificationToken=${encodeURIComponent(token)}`
+                    });
+
+                    if (!resp.ok) {
+                        const errorText = await resp.text();
+                        console.error('CreateRoom failed:', resp.status, errorText);
+                        return;
+                    }
+
+                    const data = await resp.json();
+                    currentRoomId = data.roomId;
+                    console.log('Room created/found:', currentRoomId);
+
+                    // JOIN ROOM
+                    await connection.invoke("JoinRoom", currentRoomId, userEmail);
+
+                    showChatUI(otherUserName);
+                    await loadMessages(currentRoomId);
+                    $('#sendButton').prop('disabled', false);
+                    $('#newMessage').focus();
+
+                } catch (error) {
+                    console.error('Error in user click:', error);
                 }
             });
 
-            // Enable/disable send button based on input
-            $('#newMessage').on('input', function() {
-                $('#sendButton').prop('disabled', $(this).val().trim() === '');
+            async function loadMessages(roomId) {
+                try {
+                    const res = await fetch(`/ChatPages/Chat?handler=GetRoomMessages&roomId=${encodeURIComponent(roomId)}`);
+                    if (!res.ok) {
+                        console.error('Load messages failed:', res.status);
+                        return;
+                    }
+                    const messages = await res.json();
+                    $('#messageContainer').empty();
+                    (messages || []).forEach(m => renderMessage(m));
+                    scrollToBottom();
+                } catch (e) {
+                    console.error('Load messages error:', e);
+                }
+            }
+
+            function renderMessage(m) {
+                // Kiểm tra cả userId và userEmail
+                const mine = (m.userId === userId) || (m.userEmail === userEmail);
+                const cls = mine ? 'sent' : 'received';
+                $('#messageContainer').append(
+                    `<div class="message ${cls}">
+           <div class="message-sender">${m.userName || m.userEmail || m.userId}</div>
+           <div class="message-content">${m.message || m.content}</div>
+           <div class="message-time">${m.timestamp}</div>
+         </div>`
+                );
+            }
+
+            async function sendMessage() {
+                const text = $('#newMessage').val().trim();
+                if (!text || !currentRoomId) return;
+
+                try {
+                    await connection.invoke("SendMessage", currentRoomId, userEmail, text);
+                    $('#newMessage').val('');
+                } catch (e) {
+                    console.error('SendMessage error', e);
+                }
+            }
+
+            $('#sendButton').on('click', sendMessage);
+            $('#newMessage').on('keypress', e => {
+                if (e.which === 13) sendMessage();
             });
 
-            // Function to scroll to bottom of messages
+            function showChatUI(name) {
+                $('#currentRoomName').text(name);
+                $('#currentRoomInfo').show();
+                $('#chatPlaceholder').hide();
+            }
+
             function scrollToBottom() {
-                const container = $('#messageContainer');
-                container.scrollTop(container[0].scrollHeight);
+                const c = $('#messageContainer');
+                c.scrollTop(c[0].scrollHeight);
             }
 
-            // Reconnect if connection is lost
-            connection.onclose(async () => {
-                await startSignalRConnection();
-            });
+            connection.onclose(startSignalR);
         });
     </script>
 }
+
 
 <style>
     .chat-container {
@@ -268,16 +244,16 @@
         word-wrap: break-word;
     }
 
-        .message.sent {
-            background-color: #007bff;
-            color: white;
-            margin-left: auto;
-        }
+    .message.sent {
+        background-color: #007bff;
+        color: white;
+        margin-left: auto;
+    }
 
-        .message.received {
-            background-color: #e9ecef;
-            margin-right: auto;
-        }
+    .message.received {
+        background-color: #e9ecef;
+        margin-right: auto;
+    }
 
     .message-sender {
         font-weight: bold;
@@ -297,27 +273,27 @@
         background-color: #f8f9fa;
     }
 
-        .message-input input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
+    .message-input input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
 
-        .message-input button {
-            padding: 8px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+    .message-input button {
+        padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 
-            .message-input button:disabled {
-                background-color: #cccccc;
-                cursor: not-allowed;
-            }
+    .message-input button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
 
     .chat-placeholder {
         display: flex;
@@ -332,7 +308,7 @@
         transition: background-color 0.2s;
     }
 
-        .list-group-item:hover {
-            background-color: #e9ecef;
-        }
+    .list-group-item:hover {
+        background-color: #e9ecef;
+    }
 </style>

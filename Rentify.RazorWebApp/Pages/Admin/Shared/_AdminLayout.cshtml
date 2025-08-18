@@ -3,112 +3,125 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Admin Dashboard</title>
+    <title>@ViewData["Title"] - Rentify Admin</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <!-- Tách CSS ra file riêng để tránh lỗi IDE -->
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
-<body>
-    <div class="d-flex">
-        <!-- Sidebar navigation -->
-        <nav class="admin-sidebar text-white">
-            <a href="/Admin/Dashboard" class="sidebar-brand text-decoration-none">
-                <i class="fas fa-crown me-2"></i>
-                Admin Panel
-            </a>
+<body class="admin-body">
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-header">
+                <h4><i class="fas fa-shield-alt me-2"></i>Admin Panel</h4>
+            </div>
             
-            <div class="p-3">
-                <ul class="nav flex-column sidebar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Dashboard">
-                            <i class="fas fa-tachometer-alt me-3"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Users/Index">
-                            <i class="fas fa-users me-3"></i>Quản lý User
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Roles/Index">
-                            <i class="fas fa-user-tag me-3"></i>Quản lý Role
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Category/Index">
-                            <i class="fas fa-tags me-3"></i>Quản lý Category
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Items/Index">
-                            <i class="fas fa-box me-3"></i>Quản lý Items
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Rentals/Index">
-                            <i class="fas fa-handshake me-3"></i>Quản lý Rentals
-                        </a>
-                    </li>
-                </ul>
+            <div class="sidebar-menu">
+                <a href="/Admin/Dashboard" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
                 
-                <!-- User info và logout ở sidebar -->
-                <div class="mt-5 pt-4 border-top border-light border-opacity-25">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                            <i class="fas fa-user text-white"></i>
-                        </div>
-                        <div>
-                            <div class="fw-semibold">@(Context.Request.Cookies["UserName"] ?? User.Identity.Name)</div>
-                            <small class="text-white-50">Administrator</small>
-                        </div>
-                    </div>
-                    <a class="btn btn-outline-light btn-sm w-100" asp-page="/Account/Logout">
-                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                <div class="menu-section">
+                    <div class="menu-title">Quản lý người dùng</div>
+                    <a href="/Admin/Users/Index" class="menu-item">
+                        <i class="fas fa-users"></i>
+                        <span>Người dùng</span>
+                    </a>
+                    <a href="/Role/Index" class="menu-item">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Vai trò</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-title">Quản lý sản phẩm</div>
+                    <a href="/ItemPages/Index" class="menu-item">
+                        <i class="fas fa-box"></i>
+                        <span>Sản phẩm</span>
+                    </a>
+                    <a href="/Category/Index" class="menu-item">
+                        <i class="fas fa-tags"></i>
+                        <span>Danh mục</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-title">Quản lý thuê</div>
+                    <a href="/Admin/Rentals/Index" class="menu-item">
+                        <i class="fas fa-handshake"></i>
+                        <span>Đơn thuê</span>
+                    </a>
+                    <a href="/PostPages/Index" class="menu-item">
+                        <i class="fas fa-newspaper"></i>
+                        <span>Bài đăng</span>
+                    </a>
+                </div>
+
+                <!-- Added Chat management menu for admin -->
+                <div class="menu-section">
+                    <div class="menu-title">Giao tiếp</div>
+                    <a href="/Admin/Chat/Index" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Quản lý Chat</span>
+                    </a>
+                    <a href="/ChatPages/Chat" class="menu-item">
+                        <i class="fas fa-comment-dots"></i>
+                        <span>Chat trực tiếp</span>
                     </a>
                 </div>
             </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>@(Context.Request.Cookies["UserName"] ?? User.Identity.Name)</span>
+                </div>
+                <a href="/Account/Logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
         </nav>
 
-        <!-- Main content -->
-        <div class="admin-content flex-grow-1">
-            <!-- Top bar -->
-            <header class="admin-topbar d-flex justify-content-between align-items-center">
-                <div>
-                    <h4 class="mb-0 text-dark">@ViewData["Title"]</h4>
-                    <small class="text-muted">Quản lý hệ thống Rentify</small>
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Bar -->
+            <header class="admin-topbar">
+                <div class="topbar-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h5 class="page-title mb-0">@ViewData["Title"]</h5>
                 </div>
                 
-                <!-- User dropdown menu ở header -->
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-2"></i>
-                        @(Context.Request.Cookies["UserName"] ?? User.Identity.Name)
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" asp-page="/">
-                                <i class="fas fa-home me-2"></i>Về trang chủ
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" asp-page="/Account/Profile">
-                                <i class="fas fa-user me-2"></i>Hồ sơ cá nhân
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item text-danger" asp-page="/Account/Logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                            </a>
-                        </li>
-                    </ul>
+                <div class="topbar-right">
+                    <!-- Added chat notification icon -->
+                    <div class="topbar-item">
+                        <a href="/Admin/Chat/Index" class="topbar-link" title="Chat Management">
+                            <i class="fas fa-comments"></i>
+                            <span class="badge bg-danger" id="chatNotificationBadge" style="display: none;">0</span>
+                        </a>
+                    </div>
+                    
+                    <div class="topbar-item dropdown">
+                        <a class="topbar-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i>
+                            <span>@(Context.Request.Cookies["UserName"] ?? User.Identity.Name)</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/Admin/Dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item" href="/ChatPages/Chat"><i class="fas fa-comments me-2"></i>Chat</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/Account/Logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
                 </div>
             </header>
 
-            <!-- Page content -->
-            <main class="p-4">
+            <!-- Content Area -->
+            <main class="admin-content">
                 @RenderBody()
             </main>
         </div>
@@ -116,6 +129,52 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <!-- Added SignalR for real-time chat notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script>
+        // Admin layout chat notifications
+        $(document).ready(function() {
+            // Sidebar toggle
+            $('#sidebarToggle').click(function() {
+                $('.admin-wrapper').toggleClass('sidebar-collapsed');
+            });
+
+            // Initialize SignalR for admin notifications
+            initAdminNotifications();
+        });
+
+        async function initAdminNotifications() {
+            try {
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl("/chatHub")
+                    .build();
+
+                connection.on("ReceiveMessage", function(message) {
+                    // Update chat notification badge
+                    updateChatNotification();
+                });
+
+                connection.on("UserOnline", function(userId, userName) {
+                    // Could show online user notifications
+                });
+
+                await connection.start();
+                await connection.invoke("RegisterUser", "@(Context.Request.Cookies["UserId"] ?? "")", "@(Context.Request.Cookies["UserName"] ?? "")");
+            } catch (err) {
+                console.error('Admin SignalR connection error:', err);
+            }
+        }
+
+        function updateChatNotification() {
+            const badge = $('#chatNotificationBadge');
+            let count = parseInt(badge.text()) || 0;
+            count++;
+            badge.text(count).show();
+        }
+    </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
