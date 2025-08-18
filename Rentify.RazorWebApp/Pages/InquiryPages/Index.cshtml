@@ -1,0 +1,102 @@
+﻿@page
+@model Rentify.RazorWebApp.Pages.InquiryPages.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].Note)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].Post)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].UpdatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].UpdatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inquiry[0].IsDeleted)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Inquiry) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Post.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsDeleted)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

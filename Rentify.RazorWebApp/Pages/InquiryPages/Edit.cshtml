@@ -1,0 +1,90 @@
+﻿@page
+@model Rentify.RazorWebApp.Pages.InquiryPages.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Inquiry</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Inquiry.PostId" class="control-label"></label>
+                <select asp-for="Inquiry.PostId" class="form-control" asp-items="ViewBag.PostId"></select>
+                <span asp-validation-for="Inquiry.PostId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.UserId" class="control-label"></label>
+                <select asp-for="Inquiry.UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                <span asp-validation-for="Inquiry.UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.StartDate" class="control-label"></label>
+                <input asp-for="Inquiry.StartDate" class="form-control" />
+                <span asp-validation-for="Inquiry.StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.EndDate" class="control-label"></label>
+                <input asp-for="Inquiry.EndDate" class="form-control" />
+                <span asp-validation-for="Inquiry.EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.Quantity" class="control-label"></label>
+                <input asp-for="Inquiry.Quantity" class="form-control" />
+                <span asp-validation-for="Inquiry.Quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.Note" class="control-label"></label>
+                <input asp-for="Inquiry.Note" class="form-control" />
+                <span asp-validation-for="Inquiry.Note" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.Status" class="control-label"></label>
+                <select asp-for="Inquiry.Status" class="form-control"></select>
+                <span asp-validation-for="Inquiry.Status" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="Inquiry.Id" />
+            <div class="form-group">
+                <label asp-for="Inquiry.CreatedBy" class="control-label"></label>
+                <input asp-for="Inquiry.CreatedBy" class="form-control" />
+                <span asp-validation-for="Inquiry.CreatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.UpdatedBy" class="control-label"></label>
+                <input asp-for="Inquiry.UpdatedBy" class="form-control" />
+                <span asp-validation-for="Inquiry.UpdatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.CreatedAt" class="control-label"></label>
+                <input asp-for="Inquiry.CreatedAt" class="form-control" />
+                <span asp-validation-for="Inquiry.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Inquiry.UpdatedAt" class="control-label"></label>
+                <input asp-for="Inquiry.UpdatedAt" class="form-control" />
+                <span asp-validation-for="Inquiry.UpdatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Inquiry.IsDeleted" /> @Html.DisplayNameFor(model => model.Inquiry.IsDeleted)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
