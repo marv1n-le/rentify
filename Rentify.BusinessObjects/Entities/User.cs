@@ -11,6 +11,7 @@ public class User : BaseEntity
     public string? ProfilePicture { get; set; }
     public DateTime? BirthDate { get; set; }
     public string? RoleId { get; set; }
+    public bool IsVerify { get; set; } = false;
 
     public virtual Role? Role { get; set; }
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
