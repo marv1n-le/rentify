@@ -2,7 +2,7 @@
 using Rentify.BusinessObjects.Entities;
 using Rentify.Services.Interface;
 
-namespace Rentify.RazorWebApp.Pages.Rentals
+namespace Rentify.RazorWebApp.Pages.Admin.Rentals
 {
     public class IndexModel : PageModel
     {

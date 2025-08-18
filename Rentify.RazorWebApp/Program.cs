@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Rentify.RazorWebApp.DependencyInjection;
-using Rentify.RazorWebApp.Hubs;
 using Rentify.RazorWebApp.Pages.ChatPages;
 using Rentify.Repositories.Helper;
+using Rentify.Services.Hub;
 
 namespace Rentify.RazorWebApp;
 
