@@ -16,6 +16,7 @@ public class Program
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddApplicationServices(builder.Configuration);
         builder.Services.AddHttpClientServices();
+        builder.Services.AddHealthChecks();
 
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
@@ -41,7 +42,7 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
-
+        app.MapHealthChecks("/health");
         app.UseAuthentication();
         app.UseAuthorization();
 
