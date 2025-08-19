@@ -10,5 +10,5 @@ public interface IInquiryService
     Task<Inquiry?> GetInquiryById(string id);
     Task<string> CreateInquiry(InquiryCreationDto inquiryCreationDto);
     Task UpdateInquiry(Inquiry Inquiry);
-    Task SoftDeleteInquiry(object id);
+    Task SoftDeleteInquiry(string id);
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.BusinessObjects.DTO.RentalDTO;
-using Rentify.BusinessObjects.Entities;
 using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.Admin.Rentals

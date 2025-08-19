@@ -154,11 +154,21 @@
                     </button>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-link text-muted text-decoration-none w-100 py-2 rounded"
-                            data-bs-toggle="modal" data-bs-target="#inquiryModal-@Model.Id">
-                        <i class="bi bi-cart me-2"></i>
-                        Thuê
-                    </button>
+                    @if (Model.ItemQuantity > 0)
+                    {
+                        <button class="btn btn-link text-muted text-decoration-none w-100 py-2 rounded"
+                                data-bs-toggle="modal" data-bs-target="#inquiryModal-@Model.Id">
+                            <i class="bi bi-cart me-2"></i>
+                            Thuê
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-link text-muted text-decoration-none w-100 py-2 rounded" disabled title="Hết hàng">
+                            <i class="bi bi-cart me-2"></i>
+                            Hết hàng
+                        </button>
+                    }
                 </div>
             </div>
         </div>
