@@ -133,8 +133,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                     {
                         if (file == null || file.Length == 0)
                             continue;
-
-                        // Validate file size (5MB max)
+                        
                         if (file.Length > 5 * 1024 * 1024)
                         {
                             return new JsonResult(new
@@ -145,7 +144,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                         }
 
                         // Validate file extensions
-                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
                         if (!allowedExtensions.Contains(extension))
                         {
@@ -257,7 +256,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                         }
 
                         // Validate file extensions
-                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
                         if (!allowedExtensions.Contains(extension))
                         {
