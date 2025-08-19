@@ -16,10 +16,13 @@ namespace Rentify.Repositories.Repository
 
         public async Task<List<Rental>> GetAllRental()
         {
-            var resultList = await _dbSet.AsNoTracking()
+            var resultList = await _dbSet
                 .Include(p => p.User).ThenInclude(u => u.Role)
-                .Include(p => p.RentalItems).ThenInclude(ri => ri.Item)
+                .Include(p => p.RentalItems)
+                //.ThenInclude(ri => ri.Item)
                 .ToListAsync();
+
+            //List<Rental> resultList = new List<Rental>();
 
             return resultList;
         }

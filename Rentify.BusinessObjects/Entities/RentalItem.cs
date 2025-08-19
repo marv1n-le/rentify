@@ -1,7 +1,7 @@
 namespace Rentify.BusinessObjects.Entities;
 using Rentify.BusinessObjects.Entities.Base;
 
-public class RentalItem : BaseEntity
+public class RentalItem
 {
     public string? ItemId { get; set; }
     public string? RentalId { get; set; }
