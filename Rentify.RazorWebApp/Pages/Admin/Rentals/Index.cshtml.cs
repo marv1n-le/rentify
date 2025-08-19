@@ -19,6 +19,7 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
 
         public List<Rental> Rental { get; set; } = new List<Rental>();
         public List<Inquiry> Inquiries { get; set; } = new List<Inquiry>();
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public async Task OnGetAsync()
         {
@@ -29,32 +30,40 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
         public async Task<IActionResult> OnPostConfirmAsync(string id)
         {
             await _rentalService.ConfirmRental(id);
-            return RedirectToPage();
+            return RedirectToPage("./Index");
         }
 
         public async Task<IActionResult> OnPostActivateAsync(string id)
         {
             await _rentalService.ActivateRental(id);
-            return RedirectToPage();
+            return RedirectToPage("./Index");
         }
 
         public async Task<IActionResult> OnPostCompleteAsync(string id)
         {
             await _rentalService.CompleteRental(id, 0, 0);
-            return RedirectToPage();
+            return RedirectToPage("./Index");
         }
 
         public async Task<IActionResult> OnPostCancelAsync(string id)
         {
             await _rentalService.CancelRental(id);
-            return RedirectToPage();
+            return RedirectToPage("./Index");
         }
 
         public async Task<IActionResult> OnPostApproveInquiryAsync(string inquiryId)
         {
             var rentalDto = new RentalCreateDTO();
-            await _rentalService.CreateFromInquiryAsync(inquiryId, rentalDto);
-            return RedirectToPage();
+            try
+            {
+                await _rentalService.CreateFromInquiryAsync(inquiryId, rentalDto);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message.ToString();
+            }
+
+            return RedirectToPage("./Index");
         }
     }
 }

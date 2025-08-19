@@ -4,7 +4,6 @@
 @{
     ViewData["Title"] = "Bài viết";
 }
-@* TODO: Cần phải centralize css  *@
 <!-- Search + Filter -->
 <form method="get" class="mb-3">
     <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -14,45 +13,7 @@
                 <i class="bi bi-search text-primary me-2"></i>
                 <input asp-for="SearchFilterPostDto.Keyword"
                        class="form-control border-0 shadow-none"
-                       placeholder="Tìm kiếm theo từ khóa hoặc status..."/>
-            </div>
-        </div>
-
-        <!-- Status Dropdown -->
-        <div class="dropdown" style="flex:0 0 250px;">
-            <button class="btn btn-outline-primary dropdown-toggle rounded-pill w-100" type="button" id="statusDropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                Chọn trạng thái
-            </button>
-            <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3" aria-labelledby="statusDropdown"
-                 onclick="event.stopPropagation();" style="min-width: 200px;">
-                <div class="form-check">
-                    <input class="form-check-input status-checkbox" type="checkbox"
-                           value="Pending" id="statusPending"
-                           name="SearchFilterPostDto.Status" data-text="Đang chờ xử lý">
-                    <label class="form-check-label" for="statusPending">Đang chờ xử lý</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input status-checkbox" type="checkbox"
-                           value="Active" id="statusActive"
-                           name="SearchFilterPostDto.Status" data-text="Đang hoạt động">
-                    <label class="form-check-label" for="statusActive">Đang hoạt động</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input status-checkbox" type="checkbox"
-                           value="Completed" id="statusCompleted"
-                           name="SearchFilterPostDto.Status" data-text="Đã hoàn tất">
-                    <label class="form-check-label" for="statusCompleted">Đã hoàn tất</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input status-checkbox" type="checkbox"
-                           value="Cancelled" id="statusCancelled"
-                           name="SearchFilterPostDto.Status" data-text="Đã hủy">
-                    <label class="form-check-label" for="statusCancelled">Đã hủy</label>
-                </div>
-                <div class="d-flex justify-content-end mt-3">
-                    <button type="button" class="btn btn-primary btn-sm rounded-pill" id="applyStatusBtn">Apply</button>
-                </div>
+                       placeholder="Tìm kiếm theo từ khóa hoặc tag..." />
             </div>
         </div>
 
@@ -132,12 +93,6 @@
     </div>
 </div>
 
-<form method="post" enctype="multipart/form-data">
-    <input type="file" class="form-control" id="postImages" name="PostImages" multiple
-           accept="image/jpeg,image/png,image/gif,image/webp" />
-    <button type="submit" class="btn btn-primary">Upload</button>
-</form>
-
 <!-- Modal tạo bài viết -->
 <div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -155,7 +110,7 @@
                     <div class="form-group mb-3">
                         <label for="postTitle" class="form-label">Tiêu đề</label>
                         <input type="text" class="form-control" id="postTitle" name="Title"
-                               placeholder="Nhập tiêu đề bài viết..." required/>
+                               placeholder="Nhập tiêu đề bài viết..." required />
                         <span class="text-danger" id="titleError"></span>
                     </div>
 
@@ -177,7 +132,7 @@
                     <div class="form-group mb-3">
                         <label for="postQuantity" class="form-label">Số lượng</label>
                         <input type="number" class="form-control" id="postQuantity" name="Quantity" min="1"
-                               placeholder="Số lượng" required/>
+                               placeholder="Số lượng" required />
                         <span class="text-danger" id="quantityError"></span>
                     </div>
 
@@ -191,14 +146,16 @@
                     <div class="form-group mb-3">
                         <label for="postTags" class="form-label">Tags (phân cách bằng dấu phẩy)</label>
                         <input type="text" class="form-control" id="postTags" name="Tags"
-                               placeholder="tag1, tag2, tag3"/>
+                               placeholder="tag1, tag2, tag3" />
                         <span class="text-danger" id="tagsError"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label for="postImages" class="form-label">Hình ảnh (JPEG, PNG, GIF, WEBP - tối đa 5MB mỗi
-                            ảnh)</label>
-                        <input type="file" class="form-control" id="postImages" name="PostImages" multiple accept="image/jpeg,image/png,image/gif,image/webp"/>
+                        <label for="postImages" class="form-label">
+                            Hình ảnh (JPEG, PNG, GIF, WEBP - tối đa 5MB mỗi
+                            ảnh)
+                        </label>
+                        <input type="file" class="form-control" id="postImages" name="PostImages" multiple accept="image/jpeg,image/png,image/gif,image/webp" />
                         <span class="text-danger" id="imagesError"></span>
                         <div id="imagePreview" class="mt-2 d-flex flex-wrap gap-2"></div>
                     </div>
@@ -313,10 +270,10 @@
         line-height: 1.5;
     }
 
-    .post-content.expanded {
-        display: block;
-        -webkit-line-clamp: unset;
-    }
+        .post-content.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+        }
 
     .show-more-link {
         color: #1877f2;
@@ -326,9 +283,9 @@
         font-weight: 500;
     }
 
-    .show-more-link:hover {
-        text-decoration: underline;
-    }
+        .show-more-link:hover {
+            text-decoration: underline;
+        }
 
     .btn-light {
         background-color: #f0f2f5;
@@ -337,9 +294,9 @@
         padding: 10px 15px;
     }
 
-    .btn-light:hover {
-        background-color: #e4e6eb;
-    }
+        .btn-light:hover {
+            background-color: #e4e6eb;
+        }
 
     .text-muted {
         color: #65676b !important;
@@ -402,9 +359,9 @@
         transition: opacity 0.2s;
     }
 
-    .clickable-image:hover {
-        opacity: 0.8;
-    }
+        .clickable-image:hover {
+            opacity: 0.8;
+        }
 
     /* Search + Filter styles */
     .d-flex.align-items-center.gap-2 {
@@ -420,26 +377,26 @@
         min-height: 44px;
     }
 
-    .search-box input {
-        border: none;
-        outline: none;
-        box-shadow: none;
-        padding: 0;
-    }
+        .search-box input {
+            border: none;
+            outline: none;
+            box-shadow: none;
+            padding: 0;
+        }
 
     .dropdown-menu {
         border-radius: 12px;
         border: 1px solid #e9eef7;
     }
 
-    .dropdown-menu .form-check-label {
-        user-select: none;
-    }
+        .dropdown-menu .form-check-label {
+            user-select: none;
+        }
 
-    .dropdown-menu .form-check-input {
-        width: 1.05em;
-        height: 1.05em;
-    }
+        .dropdown-menu .form-check-input {
+            width: 1.05em;
+            height: 1.05em;
+        }
 
     .filter-btn {
         border-radius: 28px;

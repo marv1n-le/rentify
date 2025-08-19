@@ -118,7 +118,6 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="text-muted small">
                     <span class="me-3">@Model.CommentCount bình luận</span>
-                    <span>@Model.Status</span>
                 </div>
             </div>
         </div>
@@ -156,7 +155,7 @@
                     </button>
                 </div>
                 <div class="col-6">
-                    @if (Model.ItemQuantity > 0)
+                    @if (true)
                     {
                         <button class="btn btn-link text-muted text-decoration-none w-100 py-2 rounded"
                                 data-bs-toggle="modal" data-bs-target="#inquiryModal-@Model.Id">

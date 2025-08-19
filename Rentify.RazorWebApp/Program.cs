@@ -24,7 +24,7 @@ public class Program
         builder.Services.AddSignalR();
         builder.Services.AddSession(options =>
         {
-            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.IdleTimeout = TimeSpan.FromMinutes(60);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
         });
@@ -35,7 +35,7 @@ public class Program
             {
                 options.LoginPath = "/Account/Login";
                 options.AccessDeniedPath = "/Account/Forbidden";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
             });
         builder.Services.Configure<FormOptions>(o =>
         {
