@@ -1,0 +1,314 @@
+@page
+@model Rentify.RazorWebApp.Pages.ChatPages.ChatModel
+@using Microsoft.AspNetCore.SignalR
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Chat";
+}
+
+<div class="chat-container">
+    <form method="post" style="display: none;">
+        @Html.AntiForgeryToken()
+    </form>
+    <div class="user-list">
+        <h3>Online Users</h3>
+        <div class="list-group">
+            <div id="onlineUsersList"></div>
+        </div>
+    </div>
+
+    <div class="chat-area">
+        <div id="currentRoomInfo" style="display: none;">
+            <div class="chat-header">
+                <h4 id="currentRoomName"></h4>
+            </div>
+            <div class="message-container" id="messageContainer"></div>
+            <div class="message-input">
+                <input type="text" id="newMessage" placeholder="Type your message..."/>
+                <button id="sendButton" disabled>Send</button>
+            </div>
+        </div>
+        <div id="chatPlaceholder" class="chat-placeholder">
+            <p>Select a user to start chatting</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+
+    <script>
+        $(async function () {
+            let currentRoomId = null;
+            const userId = '@Model.UserId';
+            const userEmail = '@Model.UserEmail';
+            const userName = '@Model.UserName';
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatHub")
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            connection.on("ReceiveMessage", (senderEmail, senderName, content, createdAt) => {
+                renderMessage({
+                    userEmail: senderEmail,
+                    userName: senderName || senderEmail,
+                    message: content,
+                    timestamp: new Date(createdAt).toLocaleTimeString()
+                });
+                scrollToBottom();
+            });
+
+            await startSignalR();
+            await loadAllUsers();
+
+            async function startSignalR() {
+                try {
+                    await connection.start();
+                    console.log("SignalR Connected");
+                } catch (e) {
+                    console.error(e);
+                    setTimeout(startSignalR, 2000);
+                }
+            }
+
+            async function loadAllUsers() {
+                try {
+                    const res = await fetch('/ChatPages/Chat?handler=GetAllUsersExceptCurrent');
+                    if (res.ok) {
+                        const users = await res.json();
+                        renderUserList(users);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            function renderUserList(users) {
+                const $list = $('#onlineUsersList');
+                $list.empty();
+                users.forEach(u => {
+                    $list.append(
+                        `<button class="list-group-item list-group-item-action user-item" data-userid="${u.id}" data-name="${u.fullName}">
+                           ${u.fullName}
+                         </button>`
+                    );
+                });
+            }
+
+            // CHỈ CÓ MỘT CLICK HANDLER DUY NHẤT
+            $(document).on('click', '.user-item', async function () {
+                const otherUserId = this.dataset.userid;
+                const otherUserName = this.dataset.name;
+
+                // Lấy CSRF token từ form ẩn
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                console.log('Token found:', token ? 'YES' : 'NO');
+
+                try {
+                    // Tạo/lấy private room với CSRF token
+                    const resp = await fetch('/ChatPages/Chat?handler=CreateRoom', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `othersUserId=${encodeURIComponent(otherUserId)}&__RequestVerificationToken=${encodeURIComponent(token)}`
+                    });
+
+                    if (!resp.ok) {
+                        const errorText = await resp.text();
+                        console.error('CreateRoom failed:', resp.status, errorText);
+                        return;
+                    }
+
+                    const data = await resp.json();
+                    currentRoomId = data.roomId;
+                    console.log('Room created/found:', currentRoomId);
+
+                    // JOIN ROOM
+                    await connection.invoke("JoinRoom", currentRoomId, userEmail);
+
+                    showChatUI(otherUserName);
+                    await loadMessages(currentRoomId);
+                    $('#sendButton').prop('disabled', false);
+                    $('#newMessage').focus();
+
+                } catch (error) {
+                    console.error('Error in user click:', error);
+                }
+            });
+
+            async function loadMessages(roomId) {
+                try {
+                    const res = await fetch(`/ChatPages/Chat?handler=GetRoomMessages&roomId=${encodeURIComponent(roomId)}`);
+                    if (!res.ok) {
+                        console.error('Load messages failed:', res.status);
+                        return;
+                    }
+                    const messages = await res.json();
+                    $('#messageContainer').empty();
+                    (messages || []).forEach(m => renderMessage(m));
+                    scrollToBottom();
+                } catch (e) {
+                    console.error('Load messages error:', e);
+                }
+            }
+
+            function renderMessage(m) {
+                // Kiểm tra cả userId và userEmail
+                const mine = (m.userId === userId) || (m.userEmail === userEmail);
+                const cls = mine ? 'sent' : 'received';
+                $('#messageContainer').append(
+                    `<div class="message ${cls}">
+           <div class="message-sender">${m.userName || m.userEmail || m.userId}</div>
+           <div class="message-content">${m.message || m.content}</div>
+           <div class="message-time">${m.timestamp}</div>
+         </div>`
+                );
+            }
+
+            async function sendMessage() {
+                const text = $('#newMessage').val().trim();
+                if (!text || !currentRoomId) return;
+
+                try {
+                    await connection.invoke("SendMessage", currentRoomId, userEmail, text);
+                    $('#newMessage').val('');
+                } catch (e) {
+                    console.error('SendMessage error', e);
+                }
+            }
+
+            $('#sendButton').on('click', sendMessage);
+            $('#newMessage').on('keypress', e => {
+                if (e.which === 13) sendMessage();
+            });
+
+            function showChatUI(name) {
+                $('#currentRoomName').text(name);
+                $('#currentRoomInfo').show();
+                $('#chatPlaceholder').hide();
+            }
+
+            function scrollToBottom() {
+                const c = $('#messageContainer');
+                c.scrollTop(c[0].scrollHeight);
+            }
+
+            connection.onclose(startSignalR);
+        });
+    </script>
+}
+
+
+<style>
+    .chat-container {
+        display: flex;
+        height: 80vh;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: white;
+    }
+
+    .user-list {
+        width: 250px;
+        border-right: 1px solid #ddd;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+    }
+
+    .chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-header {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        background-color: #f1f1f1;
+    }
+
+    .message-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: white;
+    }
+
+    .message {
+        margin: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 70%;
+        word-wrap: break-word;
+    }
+
+    .message.sent {
+        background-color: #007bff;
+        color: white;
+        margin-left: auto;
+    }
+
+    .message.received {
+        background-color: #e9ecef;
+        margin-right: auto;
+    }
+
+    .message-sender {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .message-time {
+        font-size: 0.8em;
+        opacity: 0.7;
+        margin-top: 5px;
+    }
+
+    .message-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        background-color: #f8f9fa;
+    }
+
+    .message-input input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    .message-input button {
+        padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .message-input button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+
+    .chat-placeholder {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        color: #6c757d;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .list-group-item:hover {
+        background-color: #e9ecef;
+    }
+</style>

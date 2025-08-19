@@ -17,7 +17,7 @@ public class ItemService : IItemService
     {
         return await _unitOfWork.ItemRepository.GetAllAsync();
     }
-
+    
     public async Task<Item?> GetItemById(string id)
     {
         return await _unitOfWork.ItemRepository.GetByIdAsync(id);

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.BusinessObjects.DTO.RentalDTO;
 using Rentify.Services.Interface;
 
-namespace Rentify.RazorWebApp.Pages.Rentals
+namespace Rentify.RazorWebApp.Pages.Admin.Rentals
 {
     public class EditModel : PageModel
     {

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Rentify.RazorWebApp.DependencyInjection;
+using Rentify.RazorWebApp.Pages.ChatPages;
 using Rentify.Repositories.Helper;
+using Rentify.Services.Hub;
 
 namespace Rentify.RazorWebApp;
 
@@ -12,10 +14,19 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddRazorPages();
+        builder.Services.AddScoped<ChatModel>();
+        builder.Services.AddRedisCache(builder.Configuration);
         builder.Services.AddDatabase(builder.Configuration);
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddApplicationServices(builder.Configuration);
         builder.Services.AddHttpClientServices();
+        builder.Services.AddSignalR();
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
         builder.Services.AddHealthChecks();
 
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -42,12 +53,16 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseSession();
+
         app.MapHealthChecks("/health");
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapRazorPages().RequireAuthorization();
+        app.MapRazorPages();
 
+        app.MapHub<ChatHub>("/chatHub");
         app.Run();
     }
 }

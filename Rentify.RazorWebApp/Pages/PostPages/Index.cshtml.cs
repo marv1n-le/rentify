@@ -14,12 +14,14 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
         private readonly IUserService _userService;
+        private readonly IItemService _itemService;
 
-        public IndexModel(IPostService postService, ICommentService commentService, IUserService userService)
+        public IndexModel(IPostService postService, ICommentService commentService, IUserService userService, IItemService itemService)
         {
             _postService = postService;
             _commentService = commentService;
             _userService = userService;
+            _itemService = itemService;
         }
 
         public class PostWithCommentCount
@@ -32,12 +34,21 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public SearchFilterPostDto SearchFilterPostDto { get; set; } = new();
         public List<SelectListItem> AvailableStatus { get; set; } = new();
         public IList<PostViewModel> Posts { get; set; } = default!;
+        public IEnumerable<SelectListItem> ItemOptions { get; set; }
         public async Task OnGetAsync()
         {
             if (SearchFilterPostDto.PageIndex < 1)
                 SearchFilterPostDto.PageIndex = 1;
 
             var posts = await _postService.GetAllPost(SearchFilterPostDto);
+            var items = await _itemService.GetAllItems();
+
+            ItemOptions = items.Select(i => new SelectListItem
+            {
+                Value = i.Id,
+                Text = i.Name
+            }).ToList();
+
             Posts = new List<PostViewModel>();
 
             foreach (var post in posts)
@@ -52,7 +63,9 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                     Tags = post.Tags,
                     CreatedAt = post.CreatedAt,
                     User = post.User,
-                    CommentCount = count
+                    CommentCount = count,
+                    Status = (RentalStatus)post.Status,
+                    Inquiries = post.Inquiries
                 });
             }
 
@@ -261,5 +274,8 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public DateTime CreatedAt { get; set; }
         public User? User { get; set; }
         public int CommentCount { get; set; }
+        public RentalStatus Status { get; set; }
+        public ICollection<Inquiry> Inquiries { get; set; } = new List<Inquiry>();
+
     }
 }

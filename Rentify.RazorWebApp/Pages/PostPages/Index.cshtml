@@ -230,6 +230,24 @@
                         <label for="postTitle" class="form-label">Tiêu đề</label>
                         <input type="text" class="form-control" id="postTitle" name="Title" placeholder="Nhập tiêu đề bài viết...">
                     </div>
+
+                    <div class="mb-3">
+                        <label for="postItem" class="form-label">Chọn vật phẩm</label>
+                        <select class="form-select" id="postItem">
+                            <option value="">-- Chọn một vật phẩm --</option>
+                            @if (Model.ItemOptions != null)
+                            {
+                                @foreach (var item in Model.ItemOptions)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="postQuantity" class="form-label">Số lượng</label>
+                        <input type="number" class="form-control" id="postQuantity" min="1" placeholder="Số lượng" disabled>
+                    </div>
                     <div class="mb-3">
                         <label for="postContent" class="form-label">Nội dung</label>
                         <textarea class="form-control" id="postContent" name="Content" rows="5" placeholder="Bạn đang nghĩ gì?"></textarea>
@@ -272,6 +290,8 @@
                         <label for="editPostContent" class="form-label">Nội dung</label>
                         <textarea class="form-control" id="editPostContent" name="Content" rows="5" placeholder="Bạn đang nghĩ gì?"></textarea>
                     </div>
+
+
                     <div class="mb-3">
                         <label for="editPostTags" class="form-label">Tags (phân cách bằng dấu phẩy)</label>
                         <input type="text" class="form-control" id="editPostTags" name="Tags" placeholder="tag1, tag2, tag3">
@@ -508,6 +528,27 @@
         }
     }
 
+    function initializeItemAndQuantityControls() {
+        const itemDropdown = document.getElementById('postItem');
+        const quantityInput = document.getElementById('postQuantity');
+        if (!itemDropdown || !quantityInput) {
+            return;
+        }
+        const handleItemChange = () => {
+            if (itemDropdown.value) {
+                quantityInput.disabled = false; 
+                if (!quantityInput.value) {
+                    quantityInput.value = 1;
+                }
+            } else {
+                quantityInput.disabled = true;
+                quantityInput.value = '';      
+            }
+        };
+
+        itemDropdown.addEventListener('change', handleItemChange);
+        handleItemChange();
+    }
     function toggleContent(postId) {
         const content = document.getElementById("content-" + postId);
         const btn = document.getElementById("showmore-" + postId);
@@ -615,38 +656,40 @@
     }
 
     // Form submit handlers
-    document.getElementById('createPostForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            Title: document.getElementById('postTitle').value,
-            Content: document.getElementById('postContent').value,
-            TagsString: document.getElementById('postTags').value,
-            ImagesString: document.getElementById('postImages').value
-        };
+        document.getElementById('createPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        fetch('?handler=Create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Reload trang để hiển thị bài viết mới
-                location.reload();
-            } else {
-                alert('Tạo bài viết thất bại: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi tạo bài viết');
+            const formData = {
+                Title: document.getElementById('postTitle').value,
+                Content: document.getElementById('postContent').value,
+                TagsString: document.getElementById('postTags').value,
+                ImagesString: document.getElementById('postImages').value,
+                ItemId: document.getElementById('postItem').value,
+                // Thêm Quantity vào đây. Gửi null nếu không có giá trị
+                Quantity: document.getElementById('postQuantity').value ? parseInt(document.getElementById('postQuantity').value) : null
+            };
+
+            fetch('?handler=Create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#createPostForm input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Tạo bài viết thất bại: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi tạo bài viết');
+            });
         });
-    });
 
     document.getElementById('editPostForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -850,6 +893,7 @@
     // Khởi tạo các function cho các bài post ban đầu
     document.addEventListener('DOMContentLoaded', function() {
         const initialPosts = document.querySelectorAll('[id^="post-"]');
+            initializeItemAndQuantityControls();
         initialPosts.forEach(post => {
             const postId = post.id.replace('post-', '');
             initializePostFunctions(postId);
@@ -957,4 +1001,74 @@
             closeAllCommentMenus();
         }
     });
+
+    function openInquiryModal(postId) {
+        const postElement = document.getElementById(`post-${postId}`);
+        const modalContent = document.getElementById('inquiryModalContent');
+
+        if (!postElement) {
+            console.error(`Post element with id 'post-${postId}' not found.`);
+            return;
+        }
+
+        const inquiries = JSON.parse(postElement.dataset.inquiries || '[]');
+        let contentHtml = '';
+
+        if (inquiries && inquiries.length > 0) {
+            // Ánh xạ InquiryStatus (số) sang text và màu sắc badge
+            const statusMap = {
+                0: { text: "Open", class: "bg-primary" },
+                1: { text: "Quoted", class: "bg-info text-dark" },
+                2: { text: "Accepted", class: "bg-success" },
+                3: { text: "Rejected", class: "bg-danger" },
+                4: { text: "Duplicate", class: "bg-secondary" }
+            };
+
+            let inquiryItemsHtml = inquiries.map(inquiry => {
+                // Lấy thông tin trạng thái từ map
+                const statusInfo = statusMap[inquiry.Status] || { text: "Unknown", class: "bg-dark" };
+                const userAvatar = inquiry.User?.ProfilePicture ?? 'https://via.placeholder.com/40';
+                const userName = inquiry.User?.FullName ?? 'Người dùng ẩn danh';
+                const inquiryDate = new Date(inquiry.CreatedAt).toLocaleString('vi-VN');
+
+                // Nút hành động chỉ active khi status là 'Open' (giá trị 0)
+                const areActionsDisabled = inquiry.Status !== 0;
+                const disabledAttr = areActionsDisabled ? 'disabled' : '';
+
+                return `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="${userAvatar}" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
+                            <div>
+                                <h6 class="mb-0">${userName}</h6>
+                                <small class="text-muted">Gửi lúc: ${inquiryDate}</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+
+                            <span class="badge ${statusInfo.class} me-3">${statusInfo.text}</span>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-success" ${disabledAttr}>Chấp nhận</button>
+                                <button class="btn btn-sm btn-outline-danger" ${disabledAttr}>Từ chối</button>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            }).join('');
+
+            contentHtml = `<ul class="list-group list-group-flush">${inquiryItemsHtml}</ul>`;
+
+        } else {
+            contentHtml = `
+                <div class="text-center p-4">
+                    <p class="text-muted mb-0">Chưa có yêu cầu nào cho bài viết này.</p>
+                </div>
+            `;
+        }
+
+        // Đưa HTML vào modal và hiển thị
+        modalContent.innerHTML = contentHtml;
+        const inquiryModal = new bootstrap.Modal(document.getElementById('inquiryModal'));
+        inquiryModal.show();
+    }
 </script>

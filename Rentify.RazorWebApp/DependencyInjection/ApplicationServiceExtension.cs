@@ -1,12 +1,14 @@
-﻿using MamaFit.Services.ExternalService.CloudinaryService;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.ApplicationDbContext;
 using Rentify.Repositories.Implement;
 using Rentify.Repositories.Interface;
 using Rentify.Repositories.Repository;
+using Rentify.Services.ExternalService.CloudinaryService;
+using Rentify.Services.ExternalService.Redis;
 using Rentify.Services.Interface;
 using Rentify.Services.Mapper;
 using Rentify.Services.Service;
+using StackExchange.Redis;
 
 namespace Rentify.RazorWebApp.DependencyInjection;
 
@@ -23,6 +25,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IItemRepository, ItemRepository>();
+        services.AddScoped<IInquiryRepository, InquiryRepository>();
     }
 
     public static void AddServices(this IServiceCollection services)
@@ -35,16 +38,20 @@ public static class ApplicationServiceExtension
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<ICloudinaryService, CloudinaryService>();
+        services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<IInquiryService, InquiryService>();
+        services.AddScoped<IChatService, ChatService>();
     }
 
-    public static IServiceCollection AddGhtkClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHttpClient("GhtkClient", client =>
+        services.AddStackExchangeRedisCache(options =>
         {
-            client.BaseAddress = new Uri(configuration["GhtkSettings:BaseUri"]!);
-            client.DefaultRequestHeaders.Add("Token", configuration["GhtkSettings:ApiToken"]);
-            client.Timeout = TimeSpan.FromSeconds(15);
+            options.Configuration = configuration["RedisSettings:ConnectionString"];
         });
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+            ConnectionMultiplexer.Connect(configuration["RedisSettings:ConnectionString"]!)
+        );
         return services;
     }
 
@@ -72,5 +79,4 @@ public static class ApplicationServiceExtension
         services.AddRepositories();
         services.AddServices();
     }
-
 }

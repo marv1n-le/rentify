@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Rentify.BusinessObjects.DTO.UserDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
@@ -9,10 +10,12 @@ namespace Rentify.Services.Service;
 public class UserService : IUserService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public UserService(IUnitOfWork unitOfWork)
+    public UserService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
     {
         _unitOfWork = unitOfWork;
+        _contextAccessor = contextAccessor;
     }
 
     public async Task<IEnumerable<User>> GetAllUsers()
@@ -90,14 +93,19 @@ public class UserService : IUserService
         return true;
     }
 
-    public string? GetCurrentUserId(ClaimsPrincipal user)
+    public string GetCurrentUserId()
     {
-        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userId))
-        {
-            // Fallback: try custom claim "Id"
-            userId = user.FindFirst("Id")?.Value;
-        }
+        var userId = _contextAccessor.HttpContext.Request.Cookies.TryGetValue("userId", out var value) ? value.ToString() : null;
         return userId;
+    }
+
+    public async Task<List<User>> GetAllUsersExceptCurrent()
+    {
+        var currentUserId = GetCurrentUserId();
+
+        var userList = await _unitOfWork.UserRepository.GetAllAsync();
+        userList = userList.Where(x => !x.IsDeleted && x.Id != currentUserId);
+
+        return userList.ToList();
     }
 }

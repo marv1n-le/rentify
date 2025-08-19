@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
 
-namespace Rentify.RazorWebApp
+namespace Rentify.RazorWebApp.Pages.Admin.Category
 {
     public class EditModel : PageModel
     {
@@ -49,7 +48,7 @@ namespace Rentify.RazorWebApp
 
             var category = await _categoryService.GetCategoryById(Category.Id);
 
-            if (category == null)
+            if(category == null)
             {
                 return NotFound();
             }

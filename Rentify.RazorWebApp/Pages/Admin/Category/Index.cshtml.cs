@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Rentify.BusinessObjects.Entities;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
 
-namespace Rentify.RazorWebApp
+namespace Rentify.RazorWebApp.Pages.Admin.Category
 {
     public class IndexModel : PageModel
     {
         private readonly ICategoryService _categoryService;
         private readonly IUnitOfWork _unitOfWork;
-        public IList<Category> Category { get; set; } = default!;
+        public IList<BusinessObjects.Entities.Category> Category { get; set; } = default!;
 
         public IndexModel(ICategoryService categoryService, IUnitOfWork unitOfWork)
         {
@@ -19,7 +18,7 @@ namespace Rentify.RazorWebApp
 
         public async Task OnGetAsync()
         {
-            Category = (IList<Category>)await _categoryService.GetAllCategories();
+            Category = (IList<BusinessObjects.Entities.Category>)await _categoryService.GetAllCategories();
         }
     }
 }
