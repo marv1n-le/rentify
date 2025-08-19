@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rentify.BusinessObjects.DTO.RentalDTO;
+using Rentify.BusinessObjects.Entities;
 using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.Admin.Rentals
@@ -8,6 +9,7 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
     public class EditModel : PageModel
     {
         private readonly IRentalService _rentalService;
+
         public EditModel(IRentalService rentalService)
         {
             _rentalService = rentalService;
@@ -15,6 +17,7 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
 
         [BindProperty]
         public RentalUpdateDTO Rental { get; set; } = default!;
+
         public async Task<IActionResult> OnGetAsync(string id)
         {
             if (id == null)
@@ -28,7 +31,7 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
                 return NotFound();
             }
 
-            // Map the entity to the DTO and set RentalId
+            // Map the entity to the DTO and include RentalItems
             Rental = new RentalUpdateDTO
             {
                 RentalId = rental.Id,
@@ -36,7 +39,13 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
                 ReturnDate = rental.ReturnDate,
                 TotalAmount = rental.TotalAmount,
                 Status = rental.Status,
-                PaymentStatus = rental.PaymentStatus
+                PaymentStatus = rental.PaymentStatus,
+                RentalItems = rental.RentalItems.Select(ri => new RentalItemDTO
+                {
+                    ItemId = ri.ItemId,
+                    Quantity = ri.Quantity,
+                    Price = ri.Price
+                }).ToList()
             };
 
             return Page();
@@ -44,8 +53,13 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await _rentalService.UpdateRental(Rental);
+            if (!ModelState.IsValid || !Rental.RentalItems.Any())
+            {
+                ModelState.AddModelError("", "At least one RentalItem is required");
+                return Page();
+            }
 
+            await _rentalService.UpdateRental(Rental);
             return RedirectToPage("./Index");
         }
     }

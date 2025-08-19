@@ -12,6 +12,50 @@
     <a asp-page="Create" class="btn btn-primary">Create New</a>
 </p>
 
+<h2>Inquiries</h2>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>User</th>
+                <th>Item</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Quantity</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var inquiry in Model.Inquiries)
+            {
+                <tr>
+                    <td>@(inquiry.User?.FullName ?? "Unknown")</td>
+                    <td>@(inquiry.Post?.Item?.Name ?? "Unknown")</td>
+                    <td>@Html.DisplayFor(modelItem => inquiry.StartDate)</td>
+                    <td>@Html.DisplayFor(modelItem => inquiry.EndDate)</td>
+                    <td>@inquiry.Quantity</td>
+                    <td>
+                        <span class="badge @GetInquiryStatusBadgeClass(inquiry.Status)">
+                            @Html.DisplayFor(modelItem => inquiry.Status)
+                        </span>
+                    </td>
+                    <td>
+                        @if (inquiry.Status == InquiryStatus.Open)
+                        {
+                            <form asp-page-handler="ApproveInquiry" method="post" class="d-inline">
+                                <input type="hidden" name="inquiryId" value="@inquiry.Id" />
+                                <button type="submit" class="btn btn-sm btn-primary">Approve</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<h2>Rentals</h2>
 <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead class="thead-dark">
@@ -121,6 +165,18 @@
             PaymentStatus.Pending => "bg-warning",
             PaymentStatus.Failed => "bg-danger",
             PaymentStatus.Refunded => "bg-info",
+            _ => "bg-secondary"
+        };
+    }
+
+    string GetInquiryStatusBadgeClass(InquiryStatus status)
+    {
+        return status switch
+        {
+            InquiryStatus.Open => "bg-warning",
+            InquiryStatus.Quoted => "bg-info",
+            InquiryStatus.ClosedAccepted => "bg-success",
+            InquiryStatus.ClosedRejected => "bg-danger",
             _ => "bg-secondary"
         };
     }

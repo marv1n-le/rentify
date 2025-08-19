@@ -15,12 +15,16 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
         {
             _rentalService = rentalService;
         }
+
         [BindProperty]
-        public RentalCreateDTO Rental { get; set; } = default!;
+        public RentalCreateDTO Rental { get; set; } = new RentalCreateDTO { RentalItems = new List<RentalItemDTO>() };
+
         public IEnumerable<SelectListItem> StatusList { get; set; } = [];
         public IEnumerable<SelectListItem> PaymentStatusList { get; set; } = [];
+
         public void OnGet()
         {
+            Rental.RentalItems.Add(new RentalItemDTO());
             StatusList = Enum.GetValues(typeof(RentalStatus))
                 .Cast<RentalStatus>()
                 .Select(s => new SelectListItem { Value = s.ToString(), Text = s.ToString() });
@@ -32,11 +36,13 @@ namespace Rentify.RazorWebApp.Pages.Admin.Rentals
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || !Rental.RentalItems.Any())
             {
+                ModelState.AddModelError("", "At least one RentalItem is required");
                 OnGet();
                 return Page();
             }
+
             await _rentalService.CreateRental(Rental);
             return RedirectToPage("./Index");
         }

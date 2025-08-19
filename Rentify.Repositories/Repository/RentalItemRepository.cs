@@ -9,14 +9,33 @@ namespace Rentify.Repositories.Repository
 {
     public class RentalItemRepository : IRentalItemRepository
     {
-        public Task<List<RentalItem>> GetByRentalIdAsync(string rentalId)
+        private readonly RentifyDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public RentalItemRepository(RentifyDbContext context, IHttpContextAccessor httpContextAccessor)
         {
-            throw new NotImplementedException();
+            _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task UpdateQuantityAsync(string rentalId, string itemId, int newQuantity)
+        public async Task<List<RentalItem>> GetByRentalIdAsync(string rentalId)
         {
-            throw new NotImplementedException();
+            return await _context.RentalItems
+                .Where(ri => ri.RentalId == rentalId)
+                .Include(ri => ri.Item)
+                .ToListAsync();
+        }
+
+        public async Task UpdateQuantityAsync(string rentalId, string itemId, int newQuantity)
+        {
+            var rentalItem = await _context.RentalItems
+                .FirstOrDefaultAsync(ri => ri.RentalId == rentalId && ri.ItemId == itemId);
+            if (rentalItem != null)
+            {
+                rentalItem.Quantity = newQuantity;
+                _context.RentalItems.Update(rentalItem);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
