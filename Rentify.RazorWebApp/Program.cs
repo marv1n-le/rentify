@@ -34,7 +34,7 @@ public class Program
             {
                 options.LoginPath = "/Account/Login";
                 options.AccessDeniedPath = "/Account/Forbidden";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
             });
 
         builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
