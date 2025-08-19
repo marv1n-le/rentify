@@ -12,8 +12,6 @@
                         <div class="fw-bold text-dark">@Model.User?.FullName</div>
                         <div class="text-muted small d-flex align-items-center">
                             <span class="me-2">@Model.CreatedAt.ToString("dd-MM-yyyy 'lúc' HH:mm")</span>
-
-                            @* <span class="badge @statusClass">@statusText</span> *@
                         </div>
                     </div>
                 </div>
@@ -148,12 +146,57 @@
 
         <div class="px-3 py-2 border-top">
             <div class="row text-center">
-                <div class="col-12">
+                <div class="col-6">
                     <button class="btn btn-link text-muted text-decoration-none w-100 py-2 rounded"
                             onclick="openCommentModal('@Model.Id')">
                         <i class="bi bi-chat me-2"></i>
                         Bình luận
                     </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-link text-muted text-decoration-none w-100 py-2 rounded"
+                            data-bs-toggle="modal" data-bs-target="#inquiryModal-@Model.Id">
+                        <i class="bi bi-cart me-2"></i>
+                        Thuê
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for creating Inquiry -->
+        <div class="modal fade" id="inquiryModal-@Model.Id" tabindex="-1" aria-labelledby="inquiryModalLabel-@Model.Id" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="inquiryModalLabel-@Model.Id">Gửi yêu cầu thuê</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-page="/InquiryPages/Create" method="post">
+                            <input type="hidden" name="Inquiry.PostId" value="@Model.Id" />
+                            <input type="hidden" name="Inquiry.Status" value="@InquiryStatus.Open" />
+                            <div class="mb-3">
+                                <label for="startDate-@Model.Id" class="form-label">Ngày bắt đầu</label>
+                                <input type="date" class="form-control" id="startDate-@Model.Id" name="Inquiry.StartDate" required />
+                                <span class="text-danger" id="startDateError-@Model.Id"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label for="endDate-@Model.Id" class="form-label">Ngày kết thúc</label>
+                                <input type="date" class="form-control" id="endDate-@Model.Id" name="Inquiry.EndDate" required />
+                                <span class="text-danger" id="endDateError-@Model.Id"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label for="quantity-@Model.Id" class="form-label">Số lượng</label>
+                                <input type="number" class="form-control" id="quantity-@Model.Id" name="Inquiry.Quantity" min="1" required />
+                                <span class="text-danger" id="quantityError-@Model.Id"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label for="note-@Model.Id" class="form-label">Ghi chú</label>
+                                <textarea class="form-control" id="note-@Model.Id" name="Inquiry.Note" rows="4"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Gửi yêu cầu</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

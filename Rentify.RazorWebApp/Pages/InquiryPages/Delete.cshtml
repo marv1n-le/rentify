@@ -2,93 +2,304 @@
 @model Rentify.RazorWebApp.Pages.InquiryPages.DeleteModel
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Inquiry";
 }
 
-<h1>Delete</h1>
+<style>
+    .delete-inquiry {
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Inquiry</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.StartDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.StartDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.EndDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.EndDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.Quantity)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.Quantity)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.Note)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.Note)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.Status)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.Post)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.Post.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.User)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.User.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.CreatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.CreatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.UpdatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.UpdatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.CreatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.CreatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.UpdatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.UpdatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.IsDeleted)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.IsDeleted)
-        </dd>
-    </dl>
-    
-    <form method="post">
-        <input type="hidden" asp-for="Inquiry.Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-page="./Index">Back to List</a>
-    </form>
+    .delete-container {
+        max-width: 700px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .delete-header {
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+
+        .delete-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+    .warning-message {
+        background: #fed7d7;
+        border: 2px solid #feb2b2;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem;
+        text-align: center;
+    }
+
+        .warning-message h3 {
+            color: #742a2a;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .warning-message p {
+            color: #742a2a;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+    .delete-content {
+        padding: 0 2rem 2rem 2rem;
+    }
+
+    .inquiry-summary {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid #e53e3e;
+        margin-bottom: 2rem;
+    }
+
+    .summary-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+        .summary-title i {
+            margin-right: 0.5rem;
+            color: #e53e3e;
+        }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .summary-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .summary-label {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-value {
+        color: #2d3748;
+        font-size: 1rem;
+        word-break: break-word;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-open {
+        background: #e6fffa;
+        color: #00695c;
+    }
+
+    .status-quoted {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-closedaccepted {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-closedrejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-closedduplicate {
+        background: #e2e3e5;
+        color: #383d41;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-modern {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        color: white;
+    }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(229, 62, 62, 0.4);
+        }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+    .confirmation-section {
+        background: #fff5f5;
+        border: 2px solid #fed7d7;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .confirmation-text {
+        color: #742a2a;
+        font-size: 1.1rem;
+        text-align: center;
+        margin: 0;
+        font-weight: 500;
+    }
+</style>
+
+<div class="delete-inquiry">
+    <div class="delete-container">
+        <!-- Enhanced header with danger-themed gradient -->
+        <div class="delete-header">
+            <h1>Delete Inquiry</h1>
+        </div>
+
+        <!-- Added prominent warning message -->
+        <div class="warning-message">
+            <h3>
+                <i class="fas fa-exclamation-triangle"></i>
+                Are you sure you want to delete this inquiry?
+            </h3>
+            <p>This action cannot be undone. All inquiry data will be permanently removed.</p>
+        </div>
+
+        <div class="delete-content">
+            <!-- Organized inquiry information into a clean summary format -->
+            <div class="inquiry-summary">
+                <div class="summary-title">
+                    <i class="fas fa-file-alt"></i>
+                    Inquiry Summary
+                </div>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Start Date</div>
+                        <div class="summary-value">
+                            @(Model.Inquiry.StartDate?.ToString("MMM dd, yyyy") ?? "Not specified")
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">End Date</div>
+                        <div class="summary-value">
+                            @(Model.Inquiry.EndDate?.ToString("MMM dd, yyyy") ?? "Not specified")
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Quantity</div>
+                        <div class="summary-value">@Model.Inquiry.Quantity</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Status</div>
+                        <div class="summary-value">
+                            <!-- Added status badge for better visual identification -->
+                            <span class="status-badge status-@Model.Inquiry.Status.ToString().ToLower()">
+                                @Model.Inquiry.Status
+                            </span>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Inquiry.Note))
+                    {
+                        <div class="summary-item" style="grid-column: 1 / -1;">
+                            <div class="summary-label">Note</div>
+                            <div class="summary-value">@Model.Inquiry.Note</div>
+                        </div>
+                    }
+                    <div class="summary-item">
+                        <div class="summary-label">Created</div>
+                        <div class="summary-value">@Model.Inquiry.CreatedAt.ToString("MMM dd, yyyy")</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Created By</div>
+                        <div class="summary-value">@Model.Inquiry.CreatedBy</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Added confirmation section for extra safety -->
+            <div class="confirmation-section">
+                <p class="confirmation-text">
+                    <i class="fas fa-shield-alt"></i>
+                    Please confirm that you want to permanently delete this inquiry.
+                </p>
+            </div>
+
+            <form method="post">
+                <input type="hidden" asp-for="Inquiry.Id" />
+                <!-- Enhanced action buttons with modern styling and clear visual hierarchy -->
+                <div class="action-buttons">
+                    <button type="submit" class="btn-modern btn-danger">
+                        <i class="fas fa-trash-alt"></i> Yes, Delete Inquiry
+                    </button>
+                    <a asp-page="./Index" class="btn-modern btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<!-- Added Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

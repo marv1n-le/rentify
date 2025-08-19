@@ -2,89 +2,287 @@
 @model Rentify.RazorWebApp.Pages.InquiryPages.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Inquiry";
 }
 
-<h1>Edit</h1>
+<style>
+    .edit-inquiry {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
 
-<h4>Inquiry</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Inquiry.PostId" class="control-label"></label>
-                <select asp-for="Inquiry.PostId" class="form-control" asp-items="ViewBag.PostId"></select>
-                <span asp-validation-for="Inquiry.PostId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.UserId" class="control-label"></label>
-                <select asp-for="Inquiry.UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="Inquiry.UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.StartDate" class="control-label"></label>
-                <input asp-for="Inquiry.StartDate" class="form-control" />
-                <span asp-validation-for="Inquiry.StartDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.EndDate" class="control-label"></label>
-                <input asp-for="Inquiry.EndDate" class="form-control" />
-                <span asp-validation-for="Inquiry.EndDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.Quantity" class="control-label"></label>
-                <input asp-for="Inquiry.Quantity" class="form-control" />
-                <span asp-validation-for="Inquiry.Quantity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.Note" class="control-label"></label>
-                <input asp-for="Inquiry.Note" class="form-control" />
-                <span asp-validation-for="Inquiry.Note" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.Status" class="control-label"></label>
-                <select asp-for="Inquiry.Status" class="form-control"></select>
-                <span asp-validation-for="Inquiry.Status" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Inquiry.Id" />
-            <div class="form-group">
-                <label asp-for="Inquiry.CreatedBy" class="control-label"></label>
-                <input asp-for="Inquiry.CreatedBy" class="form-control" />
-                <span asp-validation-for="Inquiry.CreatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.UpdatedBy" class="control-label"></label>
-                <input asp-for="Inquiry.UpdatedBy" class="form-control" />
-                <span asp-validation-for="Inquiry.UpdatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.CreatedAt" class="control-label"></label>
-                <input asp-for="Inquiry.CreatedAt" class="form-control" />
-                <span asp-validation-for="Inquiry.CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Inquiry.UpdatedAt" class="control-label"></label>
-                <input asp-for="Inquiry.UpdatedAt" class="form-control" />
-                <span asp-validation-for="Inquiry.UpdatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Inquiry.IsDeleted" /> @Html.DisplayNameFor(model => model.Inquiry.IsDeleted)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+    .edit-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .edit-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+
+        .edit-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+    .edit-content {
+        padding: 2rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid #667eea;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+        .section-title i {
+            margin-right: 0.5rem;
+            color: #667eea;
+        }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+    .control-label {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:invalid {
+            border-color: #e53e3e;
+        }
+
+    .text-danger {
+        color: #e53e3e;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        border: 2px solid #e2e8f0;
+    }
+
+    .form-check-input {
+        margin-right: 0.75rem;
+        transform: scale(1.2);
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        color: #4a5568;
+        margin: 0;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-modern {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+    .validation-summary {
+        background: #fed7d7;
+        border: 1px solid #feb2b2;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: #742a2a;
+    }
+
+    .form-hint {
+        font-size: 0.875rem;
+        color: #718096;
+        margin-top: 0.25rem;
+    }
+</style>
+
+<div class="edit-inquiry">
+    <div class="edit-container">
+        <!-- Enhanced header with gradient background -->
+        <div class="edit-header">
+            <h1>Edit Inquiry</h1>
+        </div>
+
+        <div class="edit-content">
+            <form method="post">
+                <!-- Added validation summary with better styling -->
+                <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+                <!-- Organized form into logical sections with modern card design -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Rental Details
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label asp-for="Inquiry.PostId" class="control-label">Post</label>
+                            <select asp-for="Inquiry.PostId" class="form-control" asp-items="ViewBag.PostId">
+                                <option value="">Select a post...</option>
+                            </select>
+                            <span asp-validation-for="Inquiry.PostId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Inquiry.UserId" class="control-label">User</label>
+                            <select asp-for="Inquiry.UserId" class="form-control" asp-items="ViewBag.UserId">
+                                <option value="">Select a user...</option>
+                            </select>
+                            <span asp-validation-for="Inquiry.UserId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Inquiry.StartDate" class="control-label">Start Date</label>
+                            <input asp-for="Inquiry.StartDate" class="form-control" type="date" />
+                            <span asp-validation-for="Inquiry.StartDate" class="text-danger"></span>
+                            <div class="form-hint">When the rental period should begin</div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Inquiry.EndDate" class="control-label">End Date</label>
+                            <input asp-for="Inquiry.EndDate" class="form-control" type="date" />
+                            <span asp-validation-for="Inquiry.EndDate" class="text-danger"></span>
+                            <div class="form-hint">When the rental period should end</div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Inquiry.Quantity" class="control-label">Quantity</label>
+                            <input asp-for="Inquiry.Quantity" class="form-control" type="number" min="1" />
+                            <span asp-validation-for="Inquiry.Quantity" class="text-danger"></span>
+                            <div class="form-hint">Number of items requested</div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Inquiry.Status" class="control-label">Status</label>
+                            <select asp-for="Inquiry.Status" class="form-control" asp-items="Html.GetEnumSelectList<Rentify.BusinessObjects.Enum.InquiryStatus>()"></select>
+                            <span asp-validation-for="Inquiry.Status" class="text-danger"></span>
+                        </div>
+                        <div class="form-group full-width">
+                            <label asp-for="Inquiry.Note" class="control-label">Note</label>
+                            <textarea asp-for="Inquiry.Note" class="form-control" rows="3" placeholder="Additional notes or special requests..."></textarea>
+                            <span asp-validation-for="Inquiry.Note" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden system fields that shouldn't be edited by users -->
+                <input type="hidden" asp-for="Inquiry.Id" />
+                <input type="hidden" asp-for="Inquiry.CreatedBy" />
+                <input type="hidden" asp-for="Inquiry.CreatedAt" />
+                <input type="hidden" asp-for="Inquiry.UpdatedBy" />
+                <input type="hidden" asp-for="Inquiry.UpdatedAt" />
+                <input type="hidden" asp-for="Inquiry.IsDeleted" />
+
+                <!-- Enhanced action buttons with modern styling -->
+                <div class="btn-group">
+                    <button type="submit" class="btn-modern btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a asp-page="./Index" class="btn-modern btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
+<!-- Added Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

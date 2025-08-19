@@ -2,101 +2,488 @@
 @model Rentify.RazorWebApp.Pages.InquiryPages.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Inquiry Management";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+@section Styles {
+    <style>
+        .inquiry-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+        }
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].EndDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].Note)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].Post)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].UpdatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].UpdatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Inquiry[0].IsDeleted)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Inquiry) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Note)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Post.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsDeleted)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-open {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-quoted {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-accepted {
+            background-color: #e8f5e8;
+            color: #388e3c;
+        }
+
+        .status-rejected {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .status-duplicate {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .inquiry-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .inquiry-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            }
+
+        .inquiry-card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .inquiry-card-body {
+            padding: 1.5rem;
+        }
+
+        .inquiry-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary-custom:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm-custom {
+            padding: 0.375rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-info-custom {
+            background-color: #17a2b8;
+            color: white;
+            border: 1px solid #17a2b8;
+        }
+
+        .btn-warning-custom {
+            background-color: #ffc107;
+            color: #212529;
+            border: 1px solid #ffc107;
+        }
+
+        .btn-danger-custom {
+            background-color: #dc3545;
+            color: white;
+            border: 1px solid #dc3545;
+        }
+
+        .btn-sm-custom:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+            .empty-state i {
+                font-size: 4rem;
+                margin-bottom: 1rem;
+                opacity: 0.5;
+            }
+    </style>
 }
-    </tbody>
-</table>
+
+<div class="inquiry-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-clipboard-list me-3"></i>
+                    Inquiry Management
+                </h1>
+                <p class="mb-0 opacity-75">Manage and track all rental inquiries</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a asp-page="Create" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>
+                    Create New Inquiry
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <h5 class="mb-3">
+            <i class="fas fa-filter me-2"></i>
+            Filter & Search
+        </h5>
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Open">Open</option>
+                    <option value="Quoted">Quoted</option>
+                    <option value="ClosedAccepted">Accepted</option>
+                    <option value="ClosedRejected">Rejected</option>
+                    <option value="ClosedDuplicate">Duplicate</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Date From</label>
+                <input type="date" name="dateFrom" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Date To</label>
+                <input type="date" name="dateTo" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="fas fa-search me-2"></i>
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Inquiries List -->
+    @if (Model.Inquiry?.Any() == true)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        <span class="badge bg-primary">@Model.Inquiry.Count</span>
+                        Total Inquiries
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary active" onclick="toggleView('card')">
+                            <i class="fas fa-th-large"></i> Card View
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="toggleView('table')">
+                            <i class="fas fa-table"></i> Table View
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card View -->
+        <div id="cardView">
+            @foreach (var item in Model.Inquiry)
+            {
+                <div class="inquiry-card">
+                    <div class="inquiry-card-header">
+                        <div>
+                            <h6 class="mb-1">
+                                <i class="fas fa-hashtag me-2"></i>
+                                Inquiry #@item.Id.Substring(0, 8)
+                            </h6>
+                            <small class="text-muted">
+                                Created: @item.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                            </small>
+                        </div>
+                        <div>
+                            @{
+                                var statusClass = item.Status.ToString().ToLower() switch
+                                {
+                                    "open" => "status-open",
+                                    "quoted" => "status-quoted",
+                                    "closedaccepted" => "status-accepted",
+                                    "closedrejected" => "status-rejected",
+                                    "closedduplicate" => "status-duplicate",
+                                    _ => "status-open"
+                                };
+                            }
+                            <span class="status-badge @statusClass">
+                                @item.Status.ToString().Replace("Closed", "")
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="inquiry-card-body">
+                        <div class="inquiry-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Rental Period</span>
+                                <span class="meta-value">
+                                    @if (item.StartDate.HasValue && item.EndDate.HasValue)
+                                    {
+                                        <span>
+                                            @item.StartDate.Value.ToString("MMM dd") - @item.EndDate.Value.ToString("MMM dd, yyyy")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not specified</span>
+                                    }
+                                </span>
+                            </div>
+
+                            <div class="meta-item">
+                                <span class="meta-label">Quantity</span>
+                                <span class="meta-value">
+                                    <i class="fas fa-cubes me-1"></i>
+                                    @item.Quantity units
+                                </span>
+                            </div>
+
+                            <div class="meta-item">
+                                <span class="meta-label">Post ID</span>
+                                <span class="meta-value">
+                                    <code>@item.PostId.Substring(0, 8)...</code>
+                                </span>
+                            </div>
+
+                            <div class="meta-item">
+                                <span class="meta-label">User ID</span>
+                                <span class="meta-value">
+                                    <code>@item.UserId.Substring(0, 8)...</code>
+                                </span>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(item.Note))
+                        {
+                            <div class="mt-3">
+                                <span class="meta-label">Note</span>
+                                <div class="alert alert-light mt-1">
+                                    <i class="fas fa-sticky-note me-2"></i>
+                                    @item.Note
+                                </div>
+                            </div>
+                        }
+
+                        <div class="action-buttons mt-3">
+                            <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-info-custom btn-sm-custom">
+                                <i class="fas fa-eye me-1"></i>
+                                Details
+                            </a>
+                            <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-warning-custom btn-sm-custom">
+                                <i class="fas fa-edit me-1"></i>
+                                Edit
+                            </a>
+                            <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger-custom btn-sm-custom">
+                                <i class="fas fa-trash me-1"></i>
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Table View (Hidden by default) -->
+        <div id="tableView" style="display: none;">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Status</th>
+                            <th>Period</th>
+                            <th>Quantity</th>
+                            <th>Note</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Inquiry)
+                        {
+                            <tr>
+                                <td>
+                                    <code>@item.Id.Substring(0, 8)...</code>
+                                </td>
+                                <td>
+                                    @{
+                                        var statusClass = item.Status.ToString().ToLower() switch
+                                        {
+                                            "open" => "status-open",
+                                            "quoted" => "status-quoted",
+                                            "closedaccepted" => "status-accepted",
+                                            "closedrejected" => "status-rejected",
+                                            "closedduplicate" => "status-duplicate",
+                                            _ => "status-open"
+                                        };
+                                    }
+                                    <span class="status-badge @statusClass">
+                                        @item.Status.ToString().Replace("Closed", "")
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (item.StartDate.HasValue && item.EndDate.HasValue)
+                                    {
+                                        <small>@item.StartDate.Value.ToString("MMM dd") - @item.EndDate.Value.ToString("MMM dd")</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>@item.Quantity</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Note))
+                                    {
+                                        <span title="@item.Note">@(item.Note.Length > 30 ? item.Note.Substring(0, 30) + "..." : item.Note)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <small>@item.CreatedAt.ToString("MMM dd, yyyy")</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h4>No Inquiries Found</h4>
+            <p>There are no inquiries to display. Create your first inquiry to get started.</p>
+            <a asp-page="Create" class="btn btn-primary-custom">
+                <i class="fas fa-plus me-2"></i>
+                Create First Inquiry
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function toggleView(viewType) {
+            const cardView = document.getElementById('cardView');
+            const tableView = document.getElementById('tableView');
+            const buttons = document.querySelectorAll('.btn-group button');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            if (viewType === 'card') {
+                cardView.style.display = 'block';
+                tableView.style.display = 'none';
+                buttons[0].classList.add('active');
+            } else {
+                cardView.style.display = 'none';
+                tableView.style.display = 'block';
+                buttons[1].classList.add('active');
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>
+}
