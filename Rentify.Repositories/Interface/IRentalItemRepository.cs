@@ -3,7 +3,7 @@ using Rentify.Repositories.Implement;
 
 namespace Rentify.Repositories.Interface
 {
-    public interface IRentalItemRepository : IGenericRepository<RentalItem>
+    public interface IRentalItemRepository
     {
         Task<List<RentalItem>> GetByRentalIdAsync(string rentalId);
         Task UpdateQuantityAsync(string rentalId, string itemId, int newQuantity);

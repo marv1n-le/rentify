@@ -22,6 +22,7 @@
                 <th>Total Amount</th>
                 <th>Status</th>
                 <th>Payment Status</th>
+                <th>Items</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -44,9 +45,52 @@
                         </span>
                     </td>
                     <td>
+                        <a class="btn btn-sm btn-secondary" data-bs-toggle="collapse" href="#items-@item.Id" role="button" aria-expanded="false" aria-controls="items-@item.Id">
+                            Xem Items (@item.RentalItems.Count)
+                        </a>
+                        <div class="collapse" id="items-@item.Id">
+                            <ul class="list-group list-group-flush">
+                                @foreach (var ri in item.RentalItems)
+                                {
+                                    <li class="list-group-item">
+                                        Item: @ri.Item?.Name | Quantity: @ri.Quantity | Price: @ri.Price
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </td>
+                    <td>
                         <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
                         <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
                         <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                        @if (item.Status == RentalStatus.Quoted)
+                        {
+                            <form asp-page-handler="Confirm" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+                            </form>
+                        }
+                        @if (item.Status == RentalStatus.Confirmed)
+                        {
+                            <form asp-page-handler="Activate" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-success">Activate</button>
+                            </form>
+                        }
+                        @if (item.Status == RentalStatus.Active)
+                        {
+                            <form asp-page-handler="Complete" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-primary">Complete</button>
+                            </form>
+                        }
+                        @if (item.Status != RentalStatus.Completed && item.Status != RentalStatus.Cancelled)
+                        {
+                            <form asp-page-handler="Cancel" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                            </form>
+                        }
                     </td>
                 </tr>
             }
@@ -59,9 +103,12 @@
     {
         return status switch
         {
+            RentalStatus.Quoted => "bg-info",
+            RentalStatus.Confirmed => "bg-warning",
             RentalStatus.Active => "bg-success",
             RentalStatus.Completed => "bg-primary",
             RentalStatus.Cancelled => "bg-danger",
+            RentalStatus.PendingRequest => "bg-secondary",
             _ => "bg-secondary"
         };
     }
@@ -73,6 +120,7 @@
             PaymentStatus.Paid => "bg-success",
             PaymentStatus.Pending => "bg-warning",
             PaymentStatus.Failed => "bg-danger",
+            PaymentStatus.Refunded => "bg-info",
             _ => "bg-secondary"
         };
     }
