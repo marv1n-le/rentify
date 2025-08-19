@@ -276,6 +276,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public int CommentCount { get; set; }
         public RentalStatus Status { get; set; }
         public ICollection<Inquiry> Inquiries { get; set; } = new List<Inquiry>();
+        public int ItemQuantity { get; set; }
 
     }
 }

@@ -34,24 +34,11 @@ namespace Rentify.Services.Service
             var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
             if (user == null) throw new Exception("Please log in first");
 
-            List<RentalItem>? rentalItems = null;
+            var item = await _unitOfWork.ItemRepository.GetByIdAsync(inquiry.Post?.ItemId);
+            if (item == null) throw new Exception("Item not found for this inquiry");
 
-            foreach (var item in rentalDto.RentalItems)
-            {
-                var oldItem = await _unitOfWork.ItemRepository.GetByIdAsync(item.ItemId);
-                if (oldItem == null) throw new Exception("Item not found for this inquiry");
-
-                if (!await CheckAvailabilityAsync(oldItem.Id, rentalDto.RentalDate, rentalDto.ReturnDate, item.Quantity))
-                    throw new Exception("Item not available in this period");
-
-                rentalItems.Add(new RentalItem
-                {
-                    ItemId = oldItem.Id,
-                    Item = oldItem,
-                    Price = oldItem.Price,
-                    Quantity = oldItem.Quantity,
-                });
-            }
+            if (!await CheckAvailabilityAsync(item.Id, inquiry.StartDate, inquiry.EndDate, inquiry.Quantity))
+                throw new Exception("Item not available in this period");
 
             var newRental = new Rental
             {
@@ -62,14 +49,24 @@ namespace Rentify.Services.Service
                 TotalAmount = 0,
                 Status = RentalStatus.Quoted,
                 PaymentStatus = PaymentStatus.Pending,
-                RentalItems = rentalItems
+                RentalItems = new List<RentalItem>()
             };
+
+            var rentalItem = new RentalItem
+            {
+                RentalId = newRental.Id,
+                ItemId = item.Id,
+                Item = item,
+                Quantity = inquiry.Quantity, // Use Inquiry.Quantity
+                Price = item.Price
+            };
+
+            newRental.RentalItems.Add(rentalItem);
 
             newRental.TotalAmount = await CalculateTotalAmountAsync(newRental);
 
             await _unitOfWork.RentalRepository.InsertAsync(newRental);
-
-            // Gán Rental vào Inquiry (thay vì inquiry.RentalId)
+            await _unitOfWork.RentalItemRepository.GetByRentalIdAsync(newRental.Id);
             inquiry.Rental = newRental;
             inquiry.Status = InquiryStatus.Quoted;
             await _unitOfWork.InquiryRepository.UpdateAsync(inquiry);
@@ -79,28 +76,12 @@ namespace Rentify.Services.Service
 
         public async Task<string> CreateRental(RentalCreateDTO rentalDto)
         {
+            if (!rentalDto.RentalItems.Any())
+                throw new Exception("At least one RentalItem is required");
+
             var userId = GetCurrentUserId();
             var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
             if (user == null) throw new Exception("Please log in first");
-
-            List<RentalItem>? rentalItems = null;
-
-            foreach (var item in rentalDto.RentalItems)
-            {
-                var oldItem = await _unitOfWork.ItemRepository.GetByIdAsync(item.ItemId);
-                if (oldItem == null) throw new Exception("Item not found for this inquiry");
-
-                if (!await CheckAvailabilityAsync(oldItem.Id, rentalDto.RentalDate, rentalDto.ReturnDate, item.Quantity))
-                    throw new Exception("Item not available in this period");
-
-                rentalItems.Add(new RentalItem
-                {
-                    ItemId = oldItem.Id,
-                    Item = oldItem,
-                    Price = oldItem.Price,
-                    Quantity = oldItem.Quantity,
-                });
-            }
 
             var newRental = new Rental
             {
@@ -109,17 +90,33 @@ namespace Rentify.Services.Service
                 RentalDate = rentalDto.RentalDate?.ToUniversalTime(),
                 ReturnDate = rentalDto.ReturnDate?.ToUniversalTime(),
                 TotalAmount = 0,
-                Status = RentalStatus.Quoted,
-                PaymentStatus = PaymentStatus.Pending,
-                RentalItems = rentalItems
+                Status = rentalDto.Status,
+                PaymentStatus = rentalDto.PaymentStatus,
+                RentalItems = new List<RentalItem>()
             };
-            if (rentalItems != null) {
-                newRental.TotalAmount = await CalculateTotalAmountAsync(newRental);
+
+            foreach (var itemDto in rentalDto.RentalItems)
+            {
+                var item = await _unitOfWork.ItemRepository.GetByIdAsync(itemDto.ItemId);
+                if (item == null) throw new Exception($"Item {itemDto.ItemId} not found");
+
+                if (!await CheckAvailabilityAsync(item.Id, newRental.RentalDate, newRental.ReturnDate, itemDto.Quantity))
+                    throw new Exception($"Item {itemDto.ItemId} not available");
+
+                var rentalItem = new RentalItem
+                {
+                    RentalId = newRental.Id,
+                    ItemId = item.Id,
+                    Item = item,
+                    Quantity = itemDto.Quantity, 
+                    Price = item.Price
+                };
+                newRental.RentalItems.Add(rentalItem);
             }
-            newRental.TotalAmount = 0;
+
+            newRental.TotalAmount = await CalculateTotalAmountAsync(newRental);
             await _unitOfWork.RentalRepository.InsertAsync(newRental);
             await _unitOfWork.SaveChangesAsync();
-            //await _unitOfWork.RentalRepository.UpdateAsync(newRental);
             return newRental.Id;
         }
 
@@ -269,10 +266,19 @@ namespace Rentify.Services.Service
 
         private async Task<decimal> CalculateTotalAmountAsync(Rental rental)
         {
-            //var rental = await _unitOfWork.RentalRepository.GetById(rentalId);
-            //if (rental == null) return 0;
+            if (rental == null)
+                throw new Exception("Rental cannot be null");
 
-            var rentalDays = Math.Max(1, (int)Math.Ceiling((rental.ReturnDate - rental.RentalDate)?.TotalDays ?? 0));
+            if (rental.RentalDate == null || rental.ReturnDate == null)
+                throw new Exception("RentalDate and ReturnDate must be specified");
+
+            if (rental.ReturnDate < rental.RentalDate)
+                throw new Exception("ReturnDate must be on or after RentalDate");
+
+            if (!rental.RentalItems.Any())
+                throw new Exception("Rental must have at least one RentalItem");
+
+            var rentalDays = Math.Max(1, (int)Math.Ceiling((rental.ReturnDate.Value - rental.RentalDate.Value).TotalDays));
             decimal total = 0;
 
             foreach (var ri in rental.RentalItems)
@@ -280,6 +286,7 @@ namespace Rentify.Services.Service
                 total += ri.Price * rentalDays * ri.Quantity;
             }
 
+            _logger.LogInformation($"Calculated TotalAmount for Rental {rental.Id}: {total} (Days: {rentalDays}, Items: {rental.RentalItems.Count})");
             return total;
         }
 
@@ -303,20 +310,14 @@ namespace Rentify.Services.Service
         public async Task<List<Rental>> GetAllRental()
         {
             var rentals = await _unitOfWork.RentalRepository.GetAllRental();
-
-            //if (rentals == null)
-            //    throw new Exception("Has no record for Rental");
-
-            return rentals;
+            return rentals ?? new List<Rental>();
         }
 
         public async Task<Rental> GetRentalById(string rentalId)
         {
             var rental = await _unitOfWork.RentalRepository.GetById(rentalId);
-
             if (rental == null)
                 throw new Exception($"Rental with id: {rentalId} has not found");
-
             return rental;
         }
 

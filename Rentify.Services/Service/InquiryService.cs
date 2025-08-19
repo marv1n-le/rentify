@@ -66,11 +66,11 @@ public class InquiryService : IInquiryService
     //    await _unitOfWork.SaveChangesAsync();
     //}
 
-    public async Task SoftDeleteInquiry(object id)
+    public async Task SoftDeleteInquiry(string id)
     {
-        var inquiry = await _unitOfWork.InquiryRepository.GetByIdAsync(id.ToString());
+        var inquiry = await _unitOfWork.InquiryRepository.GetByIdAsync(id);
         if (inquiry == null) throw new Exception("Inquiry not found");
-        await _unitOfWork.InquiryRepository.SoftDeleteAsync(inquiry);
+        await _unitOfWork.InquiryRepository.SoftDeleteAsync(id); 
         await _unitOfWork.SaveChangesAsync();
     }
 

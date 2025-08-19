@@ -20,34 +20,49 @@
 
             <div class="form-group">
                 <label asp-for="Rental.RentalDate" class="control-label"></label>
-                <input asp-for="Rental.RentalDate" class="form-control" />
+                <input asp-for="Rental.RentalDate" class="form-control" type="date" />
                 <span asp-validation-for="Rental.RentalDate" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Rental.ReturnDate" class="control-label"></label>
-                <input asp-for="Rental.ReturnDate" class="form-control" />
+                <input asp-for="Rental.ReturnDate" class="form-control" type="date" />
                 <span asp-validation-for="Rental.ReturnDate" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Rental.TotalAmount" class="control-label"></label>
-                <input asp-for="Rental.TotalAmount" class="form-control" />
-                <span asp-validation-for="Rental.TotalAmount" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
                 <label asp-for="Rental.Status" class="control-label"></label>
-                <select asp-for="Rental.Status" class="form-control"
-                        asp-items="Html.GetEnumSelectList<RentalStatus>()"></select>
+                <select asp-for="Rental.Status" class="form-control" asp-items="Html.GetEnumSelectList<RentalStatus>()"></select>
                 <span asp-validation-for="Rental.Status" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Rental.PaymentStatus" class="control-label"></label>
-                <select asp-for="Rental.PaymentStatus" class="form-control"
-                        asp-items="Html.GetEnumSelectList<PaymentStatus>()"></select>
+                <select asp-for="Rental.PaymentStatus" class="form-control" asp-items="Html.GetEnumSelectList<PaymentStatus>()"></select>
                 <span asp-validation-for="Rental.PaymentStatus" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Rental Items</label>
+                <div id="rentalItems">
+                    @for (int i = 0; i < Model.Rental.RentalItems.Count; i++)
+                    {
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <input asp-for="Rental.RentalItems[i].ItemId" class="form-control" placeholder="Item ID" />
+                                <span asp-validation-for="Rental.RentalItems[i].ItemId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <input asp-for="Rental.RentalItems[i].Quantity" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="Rental.RentalItems[i].Quantity" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-sm btn-danger remove-item">Remove</button>
+                            </div>
+                        </div>
+                    }
+                    <button type="button" class="btn btn-sm btn-success add-item">Add Item</button>
+                </div>
             </div>
 
             <div class="form-group mt-3">
@@ -62,4 +77,29 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(document).ready(function () {
+            let itemIndex = @Model.Rental.RentalItems.Count;
+            $('.add-item').click(function () {
+                $('#rentalItems').append(`
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <input name="Rental.RentalItems[${itemIndex}].ItemId" class="form-control" placeholder="Item ID" />
+                        </div>
+                        <div class="col-md-4">
+                            <input name="Rental.RentalItems[${itemIndex}].Quantity" class="form-control" type="number" min="1" value="1" />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-sm btn-danger remove-item">Remove</button>
+                        </div>
+                    </div>
+                `);
+                itemIndex++;
+            });
+
+            $(document).on('click', '.remove-item', function () {
+                $(this).closest('.row').remove();
+            });
+        });
+    </script>
 }
