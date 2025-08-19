@@ -58,7 +58,7 @@ public class Login : PageModel
 
             if (roleName == "Admin")
                 return RedirectToPage("/Admin/Dashboard");
-            return RedirectToPage("/Index");
+            return RedirectToPage("/PostPages/Index");
         }
 
         TempData["Message"] = "Login fail, please check your account";

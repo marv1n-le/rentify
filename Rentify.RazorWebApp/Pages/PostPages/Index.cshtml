@@ -68,40 +68,43 @@
         <!-- Nội dung chính -->
         <div class="col-md-8">
             <div class="main-content p-3">
-                <!-- Header tạo bài viết -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="@Model.CurrentUser.ProfilePicture" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
-                            <div class="flex-grow-1">
-                                <button class="btn btn-light w-100 text-start text-muted" onclick="openCreateModal()">
-                                    Bạn đang nghĩ gì?
-                                </button>
+                @if (User.IsInRole("Admin"))
+                {
+                    <!-- Header tạo bài viết -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="@Model.CurrentUser.ProfilePicture" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
+                                <div class="flex-grow-1">
+                                    <button class="btn btn-light w-100 text-start text-muted" onclick="openCreateModal()">
+                                        Bạn đang nghĩ gì?
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <hr>
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
-                                    <i class="bi bi-camera-video me-2"></i>
-                                    Video trực tiếp
-                                </button>
-                            </div>
-                            <div class="col-4">
-                                <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
-                                    <i class="bi bi-images me-2"></i>
-                                    Ảnh/Video
-                                </button>
-                            </div>
-                            <div class="col-4">
-                                <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
-                                    <i class="bi bi-emoji-smile me-2"></i>
-                                    Cảm xúc
-                                </button>
+                            <hr>
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
+                                        <i class="bi bi-camera-video me-2"></i>
+                                        Video trực tiếp
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
+                                        <i class="bi bi-images me-2"></i>
+                                        Ảnh/Video
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
+                                        <i class="bi bi-emoji-smile me-2"></i>
+                                        Cảm xúc
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
 
                 <!-- Danh sách bài viết -->
                 <div id="post-container">
