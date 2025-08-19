@@ -2,7 +2,7 @@ name: Build & Deploy Rentify Web (Prod)
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 # Tránh deploy chồng khi push liên tiếp
@@ -21,6 +21,12 @@ env:
   DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
 
   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+  
+  MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+  MAILGUN_API_BASE_URI: ${{ secrets.MAILGUN_API_BASE_URI }}
+  MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+  MAILGUN_FROM_EMAIL: ${{ secrets.MAILGUN_FROM_EMAIL }}
+  MAILGUN_FROM_NAME: ${{ secrets.MAILGUN_FROM_NAME }}
 
 jobs:
   test:
@@ -166,7 +172,7 @@ jobs:
   notify-failure:
     name: Notify Discord (Failure)
     runs-on: ubuntu-latest
-    needs: [test, build-and-push, deploy]
+    needs: [ test, build-and-push, deploy ]
     if: failure()
     steps:
       - name: Send Failure Message (optional)

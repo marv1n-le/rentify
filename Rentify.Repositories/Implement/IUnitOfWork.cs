@@ -13,6 +13,7 @@ public interface IUnitOfWork
     ICategoryRepository CategoryRepository { get; }
     IItemRepository ItemRepository { get; }
     IInquiryRepository InquiryRepository { get; }
+    IOtpRepository OtpRepository { get; }
 
     int SaveChanges();
     Task<int> SaveChangesAsync();

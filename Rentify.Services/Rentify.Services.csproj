@@ -16,6 +16,7 @@
       <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.15" />
       <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
       <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.15" />
+      <PackageReference Include="RestSharp" Version="112.1.1-alpha.0.4" />
     </ItemGroup>
 
 </Project>

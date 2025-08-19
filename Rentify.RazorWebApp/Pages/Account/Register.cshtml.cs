@@ -97,8 +97,8 @@ public class Register : PageModel
 
             await _userService.CreateUser(registerDto);
 
-            TempData["Message"] = "Đăng ký thành công! Vui lòng đăng nhập.";
-            return RedirectToPage("/Account/Login");
+            TempData["Message"] = "Đăng ký thành công! Vui lòng nhập OTP được gửi tới email.";
+            return RedirectToPage("/Account/Verify", new { email = Email });
         }
         catch (Exception ex)
         {

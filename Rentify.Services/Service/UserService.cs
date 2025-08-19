@@ -11,11 +11,16 @@ public class UserService : IUserService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IHttpContextAccessor _contextAccessor;
+    private readonly IOtpService _otpService;
 
-    public UserService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+    public UserService(
+        IUnitOfWork unitOfWork,
+        IHttpContextAccessor contextAccessor,
+        IOtpService otpService)
     {
         _unitOfWork = unitOfWork;
         _contextAccessor = contextAccessor;
+        _otpService = otpService;
     }
 
     public async Task<IEnumerable<User>> GetAllUsers()
@@ -31,26 +36,25 @@ public class UserService : IUserService
     public async Task<string> CreateUser(UserRegisterDto dto)
     {
         var existingUser = await _unitOfWork.UserRepository.IsEntityExistsAsync(x => x.Email == dto.Email);
-        if (existingUser)
-        {
-            throw new Exception($"Username {dto.Email} already exists.");
-        }
+        if (existingUser) throw new Exception($"Username {dto.Email} already exists.");
 
-        var userRole = await _unitOfWork.RoleRepository.FindAsync(r => r.Name == "User");
-        if (userRole == null)
-            throw new Exception("User role not found");
+        var userRole = await _unitOfWork.RoleRepository.FindAsync(r => r.Name == "User")
+                       ?? throw new Exception("User role not found");
 
-        User newUser = new User
+        var newUser = new User
         {
             Email = dto.Email,
-            Password = dto.Password,
+            Password = dto.Password, 
             FullName = dto.FullName,
             ProfilePicture = dto.ProfilePicture,
             RoleId = userRole.Id,
+            IsVerify = false
         };
 
         await _unitOfWork.UserRepository.InsertAsync(newUser);
         await _unitOfWork.SaveChangesAsync();
+        
+        await _otpService.GenerateAndSendAsync(newUser.Id);
 
         return newUser.Id;
     }
@@ -67,6 +71,7 @@ public class UserService : IUserService
             Password = dto.Password,
             FullName = dto.FullName,
             ProfilePicture = dto.ProfilePicture,
+            IsVerify = true,
             RoleId = dto.RoleId
         };
 
