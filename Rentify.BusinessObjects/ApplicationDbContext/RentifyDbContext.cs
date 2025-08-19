@@ -102,26 +102,22 @@ public class RentifyDbContext : DbContext
                 new User
                 {
                     Id = "f49aa51bbd304e77933e24bbed65b165",
-                    Email = "user@gmail.com",
+                    Email = "haitu@mtp.com",
                     Password = "123",
-                    FullName = "Người dùng 1",
+                    FullName = "User Hai Tu",
+                    ProfilePicture = "https://res.cloudinary.com/di9xfkskd/image/upload/v1755622804/rentify_photos/rentify_2e0cdddd-946d-457b-9da7-cd7bf55e2eb1.jpg",
                     RoleId = "b8d237b8b6f849988d60c6c3c1d0a943",
+                    IsVerify = true
                 },
                 new User
                 {
                     Id = "1a3bcd12345678901234567890123456",
-                    Email = "admin@gmail.com",
+                    Email = "sontung@mtp.com",
                     Password = "123",
-                    FullName = "Admin",
-                    RoleId = "2e7b5a97e42e4e84a08ffbe0bc05d2ea"
-                },
-                new User
-                {
-                    Id = "29d72211a9f7480c9812d61ee17c92b9",
-                    Email = "user2@gmail.com",
-                    Password = "123",
-                    FullName = "Người dùng 2",
-                    RoleId = "b8d237b8b6f849988d60c6c3c1d0a943"
+                    FullName = "Admin Son Tung",
+                    ProfilePicture = "https://res.cloudinary.com/di9xfkskd/image/upload/v1755622706/rentify_photos/rentify_72ae6872-62f8-4836-a1d3-5998005ec4b6.jpg",
+                    RoleId = "2e7b5a97e42e4e84a08ffbe0bc05d2ea",
+                    IsVerify = true
                 }
             );
         });

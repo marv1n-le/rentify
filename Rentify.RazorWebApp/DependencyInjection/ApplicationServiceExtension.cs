@@ -4,6 +4,7 @@ using Rentify.Repositories.Implement;
 using Rentify.Repositories.Interface;
 using Rentify.Repositories.Repository;
 using Rentify.Services.ExternalService.CloudinaryService;
+using Rentify.Services.ExternalService.MailGun;
 using Rentify.Services.ExternalService.Redis;
 using Rentify.Services.Interface;
 using Rentify.Services.Mapper;
@@ -27,6 +28,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IItemRepository, ItemRepository>();
         services.AddScoped<IInquiryRepository, InquiryRepository>();
+        services.AddScoped<IOtpRepository, OtpRepository>();
     }
 
     public static void AddServices(this IServiceCollection services)
@@ -42,6 +44,8 @@ public static class ApplicationServiceExtension
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<IInquiryService, InquiryService>();
         services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IEmailSenderService, EmailSenderService>();
+        services.AddScoped<IOtpService, OtpService>();
     }
 
     public static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)

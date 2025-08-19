@@ -37,8 +37,8 @@ public class Program
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
 
-        builder.Services.Configure<CloudinarySettings>(
-            builder.Configuration.GetSection("CloudinarySettings"));
+        builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+        builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
