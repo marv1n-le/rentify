@@ -2,96 +2,266 @@
 @model Rentify.RazorWebApp.Pages.ItemPages.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Item Details";
 }
 
-<h1>Details</h1>
+<style>
+    .details-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
 
-<div>
-    <h4>Item</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Code)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Code)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Price)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Price)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Quantity)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Quantity)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Status)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.Category)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.Category.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.User)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.User.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.CreatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.CreatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.UpdatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.UpdatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.CreatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.CreatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.UpdatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.UpdatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Item.IsDeleted)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Item.IsDeleted)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Item.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+    .details-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        margin: 2rem auto;
+        max-width: 900px;
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    .details-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .details-title {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .details-section {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 15px;
+        padding: 1.5rem;
+        border-left: 5px solid #667eea;
+    }
+
+    .section-title {
+        color: #495057;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .detail-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            transform: translateX(5px);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        min-width: 120px;
+    }
+
+    .detail-value {
+        color: #212529;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #00b894, #00cec9);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+    }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.4);
+            background: linear-gradient(135deg, #00cec9, #00b894);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-back {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+    }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(116, 185, 255, 0.4);
+            background: linear-gradient(135deg, #0984e3, #74b9ff);
+            color: white;
+            text-decoration: none;
+        }
+</style>
+
+<div class="details-container">
+    <div class="container">
+        <div class="details-card">
+            <div class="details-header">
+                <h1 class="details-title">Item Details</h1>
+                <p style="color: #666; font-size: 1.1rem;">Complete item information</p>
+            </div>
+
+            <div class="details-grid">
+                <!-- Basic Information -->
+                <div class="details-section">
+                    <h5 class="section-title">
+                        📦 Basic Information
+                    </h5>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.Code)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.Code)</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.Name)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.Name)</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.Description)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.Description)</span>
+                    </div>
+                </div>
+
+                <!-- Pricing & Inventory -->
+                <div class="details-section">
+                    <h5 class="section-title">
+                        💰 Pricing & Inventory
+                    </h5>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.Price)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.Price)</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.Quantity)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.Quantity)</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.Status)</span>
+                        <span class="detail-value status-badge" style="background: linear-gradient(135deg, #00b894, #00cec9); color: white;">
+                            @Html.DisplayFor(model => model.Item.Status)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Category & User -->
+                <div class="details-section">
+                    <h5 class="section-title">
+                        🏷️ Category & Owner
+                    </h5>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.Category)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.Category.Name)</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.User)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.User.Id)</span>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="details-section">
+                    <h5 class="section-title">
+                        ⚙️ System Information
+                    </h5>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.CreatedBy)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.CreatedBy)</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.CreatedAt)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.CreatedAt)</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.UpdatedBy)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.UpdatedBy)</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">@Html.DisplayNameFor(model => model.Item.UpdatedAt)</span>
+                        <span class="detail-value">@Html.DisplayFor(model => model.Item.UpdatedAt)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a asp-page="./Edit" asp-route-id="@Model.Item.Id" class="btn-edit">Edit Item</a>
+                <a asp-page="./Index" class="btn-back">Back to List</a>
+            </div>
+        </div>
+    </div>
 </div>

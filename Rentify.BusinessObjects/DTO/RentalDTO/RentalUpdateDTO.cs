@@ -1,4 +1,4 @@
-﻿namespace Rentify.BusinessObjects.DTO.UserDto.RentalDTO
+﻿namespace Rentify.BusinessObjects.DTO.RentalDTO
 {
     public class RentalUpdateDTO : RentalBaseDTO
     {

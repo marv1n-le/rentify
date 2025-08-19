@@ -11,6 +11,7 @@ namespace Rentify.Repositories.Interface;
 
 public interface IInquiryRepository : IGenericRepository<Inquiry>
 {
+    Task<List<Inquiry>> GetAllInquiryAsync();
     Task<Inquiry?> GetByIdAsync(string id);
     Task UpdateStatusAsync(string id, InquiryStatus status);
 }

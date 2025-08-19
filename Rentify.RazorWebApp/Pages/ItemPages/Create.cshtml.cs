@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Rentify.BusinessObjects.DTO.ItemDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.BusinessObjects.Enum;
 using Rentify.Repositories.Implement;
@@ -15,20 +17,19 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
     {
         private readonly IItemService _itemService;
         private readonly ICategoryService _categoryService;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CreateModel(IItemService itemService, ICategoryService categoryService, IUnitOfWork unitOfWork)
+        public CreateModel(IItemService itemService, ICategoryService categoryService, IMapper mapper)
         {
             _itemService = itemService;
             _categoryService = categoryService;
-            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [BindProperty]
         public Item Item { get; set; } = default!;
 
         public IEnumerable<SelectListItem> CategoryOptions { get; set; }
-        public IEnumerable<SelectListItem> StatusOptions { get; set; }
 
         public async Task<IActionResult> OnGet()
         {
@@ -40,13 +41,6 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
                 Text = c.Name
             }).ToList();
 
-            StatusOptions = Enum.GetValues(typeof(ItemStatus))
-                .Cast<ItemStatus>()
-                .Select(s => new SelectListItem
-                {
-                    Value = ((int)s).ToString(),
-                    Text = s.ToString()
-                }).ToList();
 
             return Page();
         }
@@ -62,18 +56,10 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
                     Text = c.Name
                 }).ToList();
 
-                StatusOptions = Enum.GetValues(typeof(ItemStatus))
-                    .Cast<ItemStatus>()
-                    .Select(s => new SelectListItem
-                    {
-                        Value = ((int)s).ToString(),
-                        Text = s.ToString()
-                    }).ToList();
-
                 return Page();
             }
 
-            await _itemService.CreateItem(Item);
+            await _itemService.CreateItem(_mapper.Map<ItemCreateDto>(Item));
 
             return RedirectToPage("./Index");
         }

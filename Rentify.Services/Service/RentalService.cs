@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Rentify.BusinessObjects.DTO.UserDto.RentalDTO;
+using Rentify.BusinessObjects.DTO.RentalDTO;
 using Rentify.BusinessObjects.Entities;
 using Rentify.BusinessObjects.Enum;
 using Rentify.Repositories.Implement;

@@ -18,7 +18,11 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         private readonly IItemService _itemService;
         private readonly ICloudinaryService _cloudinaryService;
 
-        public IndexModel(IPostService postService, ICommentService commentService, IUserService userService, IItemService itemService, ICloudinaryService cloudinaryService)
+        public IndexModel(IPostService postService,
+            ICommentService commentService,
+            IUserService userService,
+            IItemService itemService,
+            ICloudinaryService cloudinaryService)
         {
             _postService = postService;
             _commentService = commentService;
@@ -422,5 +426,6 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public int CommentCount { get; set; }
         public RentalStatus Status { get; set; }
         public ICollection<Inquiry> Inquiries { get; set; } = new List<Inquiry>();
+        public int ItemQuantity { get; set; }
     }
 }

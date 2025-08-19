@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Rentify.BusinessObjects.DTO.UserDto.RentalDTO;
+using Rentify.BusinessObjects.DTO.RentalDTO;
 using Rentify.BusinessObjects.Enum;
 using Rentify.Services.Interface;
 

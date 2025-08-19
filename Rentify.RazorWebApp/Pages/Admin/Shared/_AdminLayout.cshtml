@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
-    <div class="d-flex">
+    <div class="">
         <!-- Sidebar navigation -->
         <nav class="admin-sidebar text-white">
             <a href="/Admin/Dashboard" class="sidebar-brand text-decoration-none">
@@ -30,9 +30,9 @@
                             <i class="fas fa-users me-3"></i>Quản lý User
                         </a>
                     </li>
-                    <li>
-                        <a class="dropdown-item" asp-page="/PostPages/Index">
-                            <i class="fas fa-tachometer-alt me-2"></i>Page
+                    <li class ="nav-item">
+                        <a class="nav-link" asp-page="/PostPages/Index">
+                            <i class="fas fa-tachometer-alt me-2"></i>Quản lí bài viết
                         </a>
                     </li>
                     <li class="nav-item">
@@ -46,7 +46,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-page="/Admin/Items/Index">
+                        <a class="nav-link" asp-page="/ItemPages/Index">
                             <i class="fas fa-box me-3"></i>Quản lý Items
                         </a>
                     </li>

@@ -1,38 +1,50 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Rentify.BusinessObjects.DTO.ItemDto;
 using Rentify.BusinessObjects.Entities;
+using Rentify.BusinessObjects.Enum;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.ItemPages
 {
     public class EditModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext _context;
+        private readonly IItemService _itemService;
+        private readonly ICategoryService _categoryService;
+        private readonly IMapper _mapper;
 
-        public EditModel(Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext context)
+        public EditModel(IItemService itemService, ICategoryService categoryService, IMapper mapper)
         {
-            _context = context;
+            _itemService = itemService;
+            _categoryService = categoryService;
+            _mapper = mapper;
         }
 
         [BindProperty]
         public Item Item { get; set; } = default!;
 
+        public IEnumerable<SelectListItem> StatusOptions { get; set; }
+
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var item = await _context.Items.FirstOrDefaultAsync(m => m.Id == id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            Item = item;
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            Item = await _itemService.GetItemById(id);
+
+            var listCategory = await _categoryService.GetAllCategories();
+
+            ViewData["CategoryId"] = new SelectList(listCategory, "Id", "Name");
+
+            StatusOptions = Enum.GetValues(typeof(ItemStatus))
+                .Cast<ItemStatus>()
+                .Select(s => new SelectListItem
+                {
+                    Value = ((int)s).ToString(),
+                    Text = s.ToString()
+                }).ToList();
+
             return Page();
         }
 
@@ -40,35 +52,9 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            _context.Attach(Item).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ItemExists(Item.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _itemService.UpdateItem(_mapper.Map<ItemUpdateDto>(Item));
 
             return RedirectToPage("./Index");
-        }
-
-        private bool ItemExists(string id)
-        {
-            return _context.Items.Any(e => e.Id == id);
         }
     }
 }
