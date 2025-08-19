@@ -16,6 +16,7 @@ public class UnitOfWork : IUnitOfWork
     public IRentalItemRepository RentalItemRepository { get; }
     public IItemRepository ItemRepository { get; }
     public IInquiryRepository InquiryRepository { get; }
+    public IOtpRepository OtpRepository { get; }
 
     public UnitOfWork(RentifyDbContext context,
         IUserRepository userRepository,
@@ -26,7 +27,8 @@ public class UnitOfWork : IUnitOfWork
         IRentalRepository rentalRepository,
         IItemRepository itemRepository,
         IRentalItemRepository rentalItemRepository,
-        IInquiryRepository inquiryRepository)
+        IInquiryRepository inquiryRepository,
+        IOtpRepository otpRepository)
     {
         _context = context;
         _disposed = false;
@@ -39,6 +41,7 @@ public class UnitOfWork : IUnitOfWork
         ItemRepository = itemRepository;
         RentalItemRepository = rentalItemRepository;
         InquiryRepository = inquiryRepository;
+        OtpRepository = otpRepository;
     }
 
     public int SaveChanges()
