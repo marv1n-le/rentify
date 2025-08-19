@@ -2,36 +2,25 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.ItemPages
 {
     public class DetailsModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext _context;
+        private readonly IItemService _itemService;
 
-        public DetailsModel(Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext context)
+        public DetailsModel(IItemService itemService)
         {
-            _context = context;
+            _itemService = itemService;
         }
 
         public Item Item { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            Item = await _itemService.GetItemById(id);
 
-            var item = await _context.Items.FirstOrDefaultAsync(m => m.Id == id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                Item = item;
-            }
             return Page();
         }
     }

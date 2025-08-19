@@ -8,9 +8,6 @@ public class ItemUpdateDto
     [Required]
     public string Id { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "User ID là bắt buộc")]
-    public string UserId { get; set; } = string.Empty;
-
     [Required(ErrorMessage = "Category ID là bắt buộc")]
     public string CategoryId { get; set; } = string.Empty;
 

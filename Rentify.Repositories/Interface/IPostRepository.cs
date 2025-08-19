@@ -7,6 +7,7 @@ namespace Rentify.Repositories.Interface
     public interface IPostRepository : IGenericRepository<Post>
     {
         Task<List<Post>> GetAllPost(SearchFilterPostDto searchFilterPostDto);
+        Task<List<Post>> GetAllPost();
         Task<Post> GetById(string postId);
     }
 }

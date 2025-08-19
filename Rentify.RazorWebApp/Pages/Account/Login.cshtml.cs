@@ -57,6 +57,7 @@ public class Login : PageModel
 
             if (roleName == "Admin")
                 return RedirectToPage("/Admin/Dashboard");
+
             if (roleName == "User")
                 return RedirectToPage("/PostPages/Index");
             return RedirectToPage("/Index");

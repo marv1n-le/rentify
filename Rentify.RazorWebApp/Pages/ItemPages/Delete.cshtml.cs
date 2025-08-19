@@ -2,16 +2,17 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.ItemPages
 {
     public class DeleteModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext _context;
+        private readonly IItemService _itemService;
 
-        public DeleteModel(Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext context)
+        public DeleteModel(IItemService itemService)
         {
-            _context = context;
+            _itemService = itemService;
         }
 
         [BindProperty]
@@ -24,7 +25,7 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
                 return NotFound();
             }
 
-            var item = await _context.Items.FirstOrDefaultAsync(m => m.Id == id);
+            var item = await _itemService.GetItemById(id);
 
             if (item == null)
             {
@@ -44,13 +45,7 @@ namespace Rentify.RazorWebApp.Pages.ItemPages
                 return NotFound();
             }
 
-            var item = await _context.Items.FindAsync(id);
-            if (item != null)
-            {
-                Item = item;
-                _context.Items.Remove(Item);
-                await _context.SaveChangesAsync();
-            }
+            await _itemService.DeleteItem(id);
 
             return RedirectToPage("./Index");
         }

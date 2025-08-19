@@ -1,4 +1,7 @@
+using AutoMapper;
+using Rentify.BusinessObjects.DTO.ItemDto;
 using Rentify.BusinessObjects.Entities;
+using Rentify.BusinessObjects.Enum;
 using Rentify.Repositories.Implement;
 using Rentify.Services.Interface;
 
@@ -7,44 +10,57 @@ namespace Rentify.Services.Service;
 public class ItemService : IItemService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly IUserService _userService;
+    private readonly ICategoryService _categoryService;
 
-    public ItemService(IUnitOfWork unitOfWork)
+    public ItemService(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService, ICategoryService categoryService)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _userService = userService;
+        _categoryService = categoryService;
     }
 
     public async Task<IEnumerable<Item>> GetAllItems()
     {
-        return await _unitOfWork.ItemRepository.GetAllAsync();
-    }
-    
-    public async Task<Item?> GetItemById(string id)
-    {
-        return await _unitOfWork.ItemRepository.GetByIdAsync(id);
+        return await _unitOfWork.ItemRepository.GetAllItemAsync();
     }
 
-    public async Task<bool> CreateItem(Item item)
+    public async Task<Item?> GetItemById(string id)
     {
-        var existingItem = await _unitOfWork.ItemRepository.GetByIdAsync(item.Id);
-        if (existingItem != null)
-            throw new Exception($"Item with id: {item.Id} already exists.");
+        return await _unitOfWork.ItemRepository.GetItemByIdAsync(id);
+    }
+
+    public async Task<bool> CreateItem(ItemCreateDto request)
+    {
+        var userId = _userService.GetCurrentUserId();
+
+        var item = _mapper.Map<Item>(request);
+        item.UserId = userId;
+        item.Status = ItemStatus.Available;
+
         await _unitOfWork.ItemRepository.InsertAsync(item);
         await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
 
-    public async Task<bool> UpdateItem(Item item)
+    public async Task<bool> UpdateItem(ItemUpdateDto request)
     {
-        var existingItem = await _unitOfWork.ItemRepository.GetByIdAsync(item.Id);
+        var existingItem = await _unitOfWork.ItemRepository.GetByIdAsync(request.Id);
         if (existingItem == null)
-            throw new Exception($"Item with id: {item.Id} does not exist.");
+            throw new Exception($"Item with id: {request.Id} does not exist.");
 
-        _unitOfWork.ItemRepository.Update(item);
+        _mapper.Map(request, existingItem);
+
+        await _unitOfWork.ItemRepository.UpdateAsync(existingItem);
         await _unitOfWork.SaveChangesAsync();
 
         return true;
     }
+
+
 
     public async Task<bool> DeleteItem(string id)
     {
