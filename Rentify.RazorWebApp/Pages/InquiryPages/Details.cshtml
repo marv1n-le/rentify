@@ -2,90 +2,603 @@
 @model Rentify.RazorWebApp.Pages.InquiryPages.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Inquiry Details";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+@section Styles {
+    <style>
+        /* Enhanced gradient and improved spacing */
+        .details-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            overflow: hidden;
+        }
 
-<div>
-    <h4>Inquiry</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.StartDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.StartDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.EndDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.EndDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.Quantity)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.Quantity)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.Note)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.Note)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.Status)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.Post)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.Post.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.User)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.User.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.CreatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.CreatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.UpdatedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.UpdatedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.CreatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.CreatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.UpdatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.UpdatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Inquiry.IsDeleted)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Inquiry.IsDeleted)
-        </dd>
-    </dl>
+            .details-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                opacity: 0.3;
+            }
+
+        .details-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Enhanced section styling with better visual separation */
+        .details-section {
+            padding: 2.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+            .details-section:hover {
+                background: #fafbfc;
+            }
+
+            .details-section:last-child {
+                border-bottom: none;
+            }
+
+        /* Improved section title with icon styling */
+        .section-title {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 80px;
+                height: 2px;
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+                border-radius: 2px;
+            }
+
+            .section-title i {
+                color: #4f46e5;
+                margin-right: 0.75rem;
+                font-size: 1.2rem;
+            }
+
+        /* Enhanced grid layout with better responsiveness */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Improved detail item styling with card-like appearance */
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            background: white;
+            padding: 1.75rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .detail-item::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+            }
+
+            .detail-item:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+                border-color: #4f46e5;
+            }
+
+                .detail-item:hover::before {
+                    transform: scaleX(1);
+                }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Enhanced detail value styling with better typography */
+        .detail-value {
+            font-size: 1.1rem;
+            color: #2d3748;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+            .detail-value code {
+                background: #f7fafc;
+                padding: 0.25rem 0.5rem;
+                border-radius: 6px;
+                font-family: 'Monaco', 'Menlo', monospace;
+                font-size: 0.9rem;
+                color: #4f46e5;
+                border: 1px solid #e2e8f0;
+            }
+
+        /* Enhanced status badges with better visual hierarchy */
+        .status-badge {
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+            .status-badge:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            }
+
+        .status-open {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1d4ed8;
+            border: 1px solid #93c5fd;
+            animation: pulse 2s infinite;
+        }
+
+        .status-quoted {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #d97706;
+            border: 1px solid #fbbf24;
+        }
+
+        .status-accepted {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #16a34a;
+            border: 1px solid #4ade80;
+        }
+
+        .status-rejected {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc2626;
+            border: 1px solid #f87171;
+        }
+
+        .status-duplicate {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            color: #9333ea;
+            border: 1px solid #c084fc;
+        }
+
+        /* Enhanced timeline with better visual flow */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+            .timeline::before {
+                content: '';
+                position: absolute;
+                left: 1rem;
+                top: 0;
+                bottom: 0;
+                width: 3px;
+                background: linear-gradient(to bottom, #4f46e5, #7c3aed, #ec4899);
+                border-radius: 2px;
+            }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+            .timeline-item::before {
+                content: '';
+                position: absolute;
+                left: -2.25rem;
+                top: 1.5rem;
+                width: 1rem;
+                height: 1rem;
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+                border-radius: 50%;
+                border: 3px solid white;
+                box-shadow: 0 0 0 3px #4f46e5;
+            }
+
+        /* Enhanced note section with better visual appeal */
+        .note-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 5px solid #4f46e5;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border-radius: 0 16px 16px 0;
+            position: relative;
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #475569;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        /* Enhanced action buttons with better spacing and hover effects */
+        .action-buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-custom {
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-custom::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-custom:hover::before {
+                left: 100%;
+            }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
+        }
+
+            .btn-primary-custom:hover {
+                background: linear-gradient(135deg, #4338ca 0%, #6d28d9 50%, #db2777 100%);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+            }
+
+        .btn-secondary-custom {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            color: white;
+        }
+    </style>
+}
+
+<div class="details-header fade-in">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2" style="position: relative; z-index: 1;">
+                    <i class="fas fa-file-alt me-3"></i>
+                    Inquiry Details
+                </h1>
+                <p class="mb-0 opacity-75" style="position: relative, z-index: 1;">ID: #@Model.Inquiry.Id.Substring(0, 12)...</p>
+            </div>
+            <div class="col-md-4 text-md-end" style="position: relative, z-index: 1;">
+                @{
+                    var statusClass = Model.Inquiry.Status.ToString().ToLower() switch
+                    {
+                        "open" => "status-open",
+                        "quoted" => "status-quoted",
+                        "closedaccepted" => "status-accepted",
+                        "closedrejected" => "status-rejected",
+                        "closedduplicate" => "status-duplicate",
+                        _ => "status-open"
+                    };
+                }
+                <span class="status-badge @statusClass">
+                    <!-- Added status icons for better visual identification -->
+                    @switch (Model.Inquiry.Status.ToString().ToLower())
+                    {
+                        case "open":
+                            <i class="fas fa-clock"></i>
+                            break;
+                        case "quoted":
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            break;
+                        case "closedaccepted":
+                            <i class="fas fa-check-circle"></i>
+                            break;
+                        case "closedrejected":
+                            <i class="fas fa-times-circle"></i>
+                            break;
+                        case "closedduplicate":
+                            <i class="fas fa-copy"></i>
+                            break;
+                    }
+                    @Model.Inquiry.Status.ToString().Replace("Closed", "")
+                </span>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Inquiry.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+
+<div class="container fade-in">
+    <div class="details-card">
+        <!-- Basic Information -->
+        <div class="details-section">
+            <h4 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                Basic Information
+            </h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Inquiry ID</span>
+                    <span class="detail-value">
+                        <code>@Model.Inquiry.Id</code>
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value">
+                        <span class="status-badge @statusClass">
+                            @switch (Model.Inquiry.Status.ToString().ToLower())
+                            {
+                                case "open":
+                                    <i class="fas fa-clock"></i>
+                                    break;
+                                case "quoted":
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                    break;
+                                case "closedaccepted":
+                                    <i class="fas fa-check-circle"></i>
+                                    break;
+                                case "closedrejected":
+                                    <i class="fas fa-times-circle"></i>
+                                    break;
+                                case "closedduplicate":
+                                    <i class="fas fa-copy"></i>
+                                    break;
+                            }
+                            @Model.Inquiry.Status.ToString().Replace("Closed", "")
+                        </span>
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Quantity Requested</span>
+                    <span class="detail-value">
+                        <i class="fas fa-cubes me-2" style="color: #4f46e5;"></i>
+                        @Model.Inquiry.Quantity units
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Post Reference</span>
+                    <span class="detail-value">
+                        <code>@Model.Inquiry.PostId</code>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rental Period -->
+        <div class="details-section">
+            <h4 class="section-title">
+                <i class="fas fa-calendar-alt"></i>
+                Rental Period
+            </h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Start Date</span>
+                    <span class="detail-value">
+                        @if (Model.Inquiry.StartDate.HasValue)
+                        {
+                            <i class="fas fa-calendar-check me-2 text-success"></i>
+                            @Model.Inquiry.StartDate.Value.ToString("MMMM dd, yyyy")
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                <i class="fas fa-calendar-times me-2"></i>
+                                Not specified
+                            </span>
+                        }
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">End Date</span>
+                    <span class="detail-value">
+                        @if (Model.Inquiry.EndDate.HasValue)
+                        {
+                            <i class="fas fa-calendar-check me-2 text-success"></i>
+                            @Model.Inquiry.EndDate.Value.ToString("MMMM dd, yyyy")
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                <i class="fas fa-calendar-times me-2"></i>
+                                Not specified
+                            </span>
+                        }
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Duration</span>
+                    <span class="detail-value">
+                        @if (Model.Inquiry.StartDate.HasValue && Model.Inquiry.EndDate.HasValue)
+                        {
+                            var duration = (Model.Inquiry.EndDate.Value - Model.Inquiry.StartDate.Value).Days;
+                            <i class="fas fa-clock me-2 text-info"></i>
+                            @($"{duration} day(s)")
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                <i class="fas fa-question-circle me-2"></i>
+                                Cannot calculate
+                            </span>
+                        }
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Information -->
+        <div class="details-section">
+            <h4 class="section-title">
+                <i class="fas fa-user"></i>
+                User Information
+            </h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">User ID</span>
+                    <span class="detail-value">
+                        <code>@Model.Inquiry.UserId</code>
+                    </span>
+                </div>
+                @if (Model.Inquiry.User != null)
+                {
+                    <div class="detail-item">
+                        <span class="detail-label">User Details</span>
+                        <span class="detail-value">
+                            <i class="fas fa-user-circle me-2"></i>
+                            Available in User object
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Notes -->
+        @if (!string.IsNullOrEmpty(Model.Inquiry.Note))
+        {
+            <div class="details-section">
+                <h4 class="section-title">
+                    <i class="fas fa-sticky-note"></i>
+                    Additional Notes
+                </h4>
+                <div class="note-section">
+                    <i class="fas fa-quote-left me-2 text-muted"></i>
+                    @Model.Inquiry.Note
+                </div>
+            </div>
+        }
+
+        <!-- System Information -->
+        <div class="details-section">
+            <h4 class="section-title">
+                <i class="fas fa-cog"></i>
+                System Information
+            </h4>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="detail-item">
+                        <span class="detail-label">Created</span>
+                        <span class="detail-value">
+                            <i class="fas fa-plus-circle me-2 text-success"></i>
+                            @Model.Inquiry.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")
+                            @if (!string.IsNullOrEmpty(Model.Inquiry.CreatedBy))
+                            {
+                                <small class="text-muted">by @Model.Inquiry.CreatedBy</small>
+                            }
+                        </span>
+                    </div>
+                </div>
+                @if (Model.Inquiry.UpdatedAt != default)
+                {
+                    <div class="timeline-item">
+                        <div class="detail-item">
+                            <span class="detail-label">Last Updated</span>
+                            <span class="detail-value">
+                                <i class="fas fa-edit me-2 text-warning"></i>
+                                @Model.Inquiry.UpdatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")
+                                @if (!string.IsNullOrEmpty(Model.Inquiry.UpdatedBy))
+                                {
+                                    <small class="text-muted">by @Model.Inquiry.UpdatedBy</small>
+                                }
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="details-section">
+            <div class="action-buttons">
+                <a asp-page="./Edit" asp-route-id="@Model.Inquiry.Id" class="btn btn-primary-custom btn-custom">
+                    <i class="fas fa-edit"></i>
+                    Edit Inquiry
+                </a>
+                <a asp-page="./Index" class="btn btn-secondary-custom btn-custom">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to List
+                </a>
+                <a asp-page="./Delete" asp-route-id="@Model.Inquiry.Id" class="btn btn-danger btn-custom">
+                    <i class="fas fa-trash"></i>
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Added Font Awesome for enhanced icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

@@ -5,7 +5,6 @@ using Rentify.BusinessObjects.Entities;
 using Rentify.BusinessObjects.Enum;
 using Rentify.Repositories.Helper;
 using Rentify.Repositories.Implement;
-using Rentify.Repositories.Interface;
 using Rentify.Services.Interface;
 
 namespace Rentify.Services.Service;
@@ -53,18 +52,39 @@ public class InquiryService : IInquiryService
         return inquiry.Id;
     }
 
+    //public async Task SoftDeleteInquiry(object id)
+    //{
+    //    var inquiry = _unitOfWork.InquiryRepository.GetByIdAsync(id);
+    //    await _unitOfWork.InquiryRepository.SoftDeleteAsync(inquiry.Result);
+    //    await _unitOfWork.SaveChangesAsync();
+    //}
+
+    //public async Task UpdateInquiry(Inquiry Inquiry)
+    //{
+    //    var existingInquiry = _unitOfWork.InquiryRepository.GetByIdAsync(Inquiry.Id);
+    //    await _unitOfWork.InquiryRepository.UpdateAsync(Inquiry);
+    //    await _unitOfWork.SaveChangesAsync();
+    //}
 
     public async Task SoftDeleteInquiry(object id)
     {
-        var inquiry = _unitOfWork.InquiryRepository.GetByIdAsync(id);
-        await _unitOfWork.InquiryRepository.SoftDeleteAsync(inquiry.Result);
+        var inquiry = await _unitOfWork.InquiryRepository.GetByIdAsync(id.ToString());
+        if (inquiry == null) throw new Exception("Inquiry not found");
+        await _unitOfWork.InquiryRepository.SoftDeleteAsync(inquiry);
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task UpdateInquiry(Inquiry Inquiry)
+    public async Task UpdateInquiry(Inquiry inquiry)
     {
-        var existingInquiry = _unitOfWork.InquiryRepository.GetByIdAsync(Inquiry.Id);
-        await _unitOfWork.InquiryRepository.UpdateAsync(Inquiry);
+        var existingInquiry = await _unitOfWork.InquiryRepository.GetByIdAsync(inquiry.Id);
+        if (existingInquiry == null) throw new Exception("Inquiry not found");
+        await _unitOfWork.InquiryRepository.UpdateAsync(inquiry);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task UpdateInquiryStatus(string inquiryId, InquiryStatus status)
+    {
+        await _unitOfWork.InquiryRepository.UpdateStatusAsync(inquiryId, status);
         await _unitOfWork.SaveChangesAsync();
     }
 }
