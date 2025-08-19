@@ -41,7 +41,7 @@ namespace Rentify.Services.Service
                 RentalDate = inquiry.StartDate?.ToUniversalTime() ?? rentalDto.RentalDate?.ToUniversalTime(),
                 ReturnDate = inquiry.EndDate?.ToUniversalTime() ?? rentalDto.ReturnDate?.ToUniversalTime(),
                 TotalAmount = 0,
-                Status = RentalStatus.Pending,
+                Status = RentalStatus.Quoted, 
                 PaymentStatus = PaymentStatus.Pending
             };
 
@@ -66,7 +66,8 @@ namespace Rentify.Services.Service
 
             newRental.TotalAmount = await CalculateTotalAmountAsync(newRental.Id);
 
-            inquiry.RentalId = newRental.Id;
+            // Gán Rental vào Inquiry (thay vì inquiry.RentalId)
+            inquiry.Rental = newRental;
             await _unitOfWork.InquiryRepository.UpdateStatusAsync(inquiryId, InquiryStatus.Quoted);
 
             await _unitOfWork.SaveChangesAsync();
@@ -153,7 +154,7 @@ namespace Rentify.Services.Service
         public async Task ActivateRental(string rentalId)
         {
             var rental = await _unitOfWork.RentalRepository.GetById(rentalId);
-            if (rental == null || rental.Status != RentalStatus.Pending) throw new Exception("Cannot activate");
+            if (rental == null || rental.Status != RentalStatus.Confirmed) throw new Exception("Cannot activate");
 
             foreach (var ri in rental.RentalItems)
             {
@@ -166,6 +167,22 @@ namespace Rentify.Services.Service
             }
 
             rental.Status = RentalStatus.Active;
+            await _unitOfWork.RentalRepository.UpdateAsync(rental);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task ConfirmRental(string rentalId)
+        {
+            var rental = await _unitOfWork.RentalRepository.GetById(rentalId);
+            if (rental == null || rental.Status != RentalStatus.Quoted) throw new Exception("Cannot confirm");
+
+            foreach (var ri in rental.RentalItems)
+            {
+                if (!await CheckAvailabilityAsync(ri.ItemId, rental.RentalDate, rental.ReturnDate, ri.Quantity))
+                    throw new Exception($"Item {ri.ItemId} not available");
+            }
+
+            rental.Status = RentalStatus.Confirmed;
             await _unitOfWork.RentalRepository.UpdateAsync(rental);
             await _unitOfWork.SaveChangesAsync();
         }
@@ -233,10 +250,14 @@ namespace Rentify.Services.Service
             var item = await _unitOfWork.ItemRepository.GetByIdAsync(itemId);
             if (item == null || item.Quantity < requestedQty) return false;
 
-            var overlappingRentals = await _unitOfWork.RentalRepository.GetAllAsync(r => r.Status != RentalStatus.Completed && r.Status != RentalStatus.Cancelled
-                && r.RentalDate < end && r.ReturnDate > start);
+            var overlappingRentals = await _unitOfWork.RentalRepository.GetAllAsync(r =>
+                (r.Status == RentalStatus.Quoted || r.Status == RentalStatus.Confirmed || r.Status == RentalStatus.Active) &&
+                r.RentalDate < end && r.ReturnDate > start);
 
-            int bookedQty = overlappingRentals.SelectMany(r => r.RentalItems.Where(ri => ri.ItemId == itemId)).Sum(ri => ri.Quantity);
+            int bookedQty = overlappingRentals
+                .SelectMany(r => r.RentalItems)
+                .Where(ri => ri.ItemId == itemId)
+                .Sum(ri => ri.Quantity);
 
             return (item.Quantity - bookedQty) >= requestedQty;
         }
