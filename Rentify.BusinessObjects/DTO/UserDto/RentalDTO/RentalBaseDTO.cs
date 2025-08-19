@@ -10,5 +10,13 @@ namespace Rentify.BusinessObjects.DTO.UserDto.RentalDTO
         public decimal? TotalAmount { get; set; }
         public RentalStatus Status { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
+        public List<RentalItemDTO> RentalItems { get; set; } = [];
+    }
+
+    public class RentalItemDTO
+    {
+        public string? ItemId { get; set; }
+        public int Quantity { get; set; } = 1;
+        public decimal Price { get; set; } = 0;
     }
 }

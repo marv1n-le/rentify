@@ -1,4 +1,5 @@
 ﻿using Rentify.BusinessObjects.Entities;
+using Rentify.BusinessObjects.Enum;
 using Rentify.Repositories.Implement;
 using System;
 using System.Collections.Generic;
@@ -10,4 +11,6 @@ namespace Rentify.Repositories.Interface;
 
 public interface IInquiryRepository : IGenericRepository<Inquiry>
 {
+    Task<Inquiry?> GetByIdAsync(string id);
+    Task UpdateStatusAsync(string id, InquiryStatus status);
 }

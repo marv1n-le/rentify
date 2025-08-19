@@ -1,4 +1,5 @@
 namespace Rentify.BusinessObjects.Entities;
+using Rentify.BusinessObjects.Entities.Base;
 
 public class RentalItem
 {

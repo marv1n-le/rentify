@@ -2,7 +2,9 @@ namespace Rentify.BusinessObjects.Enum;
 
 public enum RentalStatus
 {
-    Pending,
+    PendingRequest,
+    Quoted,
+    Confirmed,
     Active,
     Completed,
     Cancelled
