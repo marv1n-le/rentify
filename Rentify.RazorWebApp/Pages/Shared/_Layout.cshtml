@@ -6,68 +6,256 @@
     <title>@ViewData["Title"] - Rentify</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <!-- Thêm Font Awesome cho icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Added modern user layout styling -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-color: #f093fb;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --bg-light: #f7fafc;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            border-bottom: none !important;
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+            .navbar-brand:hover {
+                transform: scale(1.05);
+            }
+
+        .nav-link {
+            font-weight: 500;
+            padding: 0.75rem 1rem !important;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+            .nav-link:hover {
+                background: var(--bg-light);
+                color: #667eea !important;
+                transform: translateY(-2px);
+            }
+
+            .nav-link i {
+                margin-right: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+        /* Enhanced dropdown styling */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 0.75rem;
+            padding: 0.75rem 0;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+            .dropdown-item:hover {
+                background: var(--bg-light);
+                color: #667eea;
+                transform: translateX(5px);
+            }
+
+            .dropdown-item i {
+                width: 20px;
+                margin-right: 0.75rem;
+            }
+
+        .dropdown-divider {
+            margin: 0.5rem 1rem;
+            border-color: #e2e8f0;
+        }
+
+        /* Enhanced authentication buttons */
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            }
+
+        /* User avatar styling */
+        .dropdown-toggle::after {
+            display: none;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        /* Main content styling */
+        .container {
+            max-width: 1200px;
+        }
+
+        main {
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0;
+        }
+
+        /* Footer styling */
+        .footer {
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Enhanced menu items for authenticated users */
+        .authenticated-menu .nav-link {
+            position: relative;
+        }
+
+            .authenticated-menu .nav-link.active {
+                background: var(--primary-gradient);
+                color: white !important;
+            }
+
+                .authenticated-menu .nav-link.active::before {
+                    content: '';
+                    position: absolute;
+                    bottom: -10px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 6px;
+                    height: 6px;
+                    background: var(--accent-color);
+                    border-radius: 50%;
+                }
+    </style>
     @RenderSection("Styles", required: false)
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <!-- Cải thiện brand với icon -->
-                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-page="/Index">
+                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-page="/PostPages/Index">
                     <i class="fas fa-home me-2"></i>Rentify
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                    <a asp-page="/PostPages/Index">
+                        <span class="navbar-toggler-icon"></span>
+                    </a>
+                </button>   
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <!-- Enhanced navigation menu for authenticated users -->
+                    <ul class="navbar-nav flex-grow-1 authenticated-menu">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/PostPages/Index">
                                 <i class="fas fa-home me-1"></i>Trang chủ
                             </a>
                         </li>
-                        <!-- Thêm menu cho user đã đăng nhập -->
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Items/Index">
-                                    <i class="fas fa-box me-1"></i>Sản phẩm
+                                <a class="nav-link text-dark" asp-page="/PostPages/Index">
+                                    <i class="fas fa-newspaper me-1"></i>Bài đăng
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/CategoryPages/Index">
-                                    <i class="fas fa-box me-1"></i>Loại
+                                <a class="nav-link text-dark" asp-page="/InquiryPages/Index">
+                                    <i class="fas fa-question-circle me-1"></i>Yêu cầu của tôi
+                                    <span class="notification-badge" id="userInquiryBadge" style="display: none;">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-page="/Rentals/Index">
+                                    <i class="fas fa-handshake me-1"></i>Đơn thuê
+                                    <span class="notification-badge" id="userRentalBadge" style="display: none;">0</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-page="/ChatPages/Chat">
                                     <i class="fas fa-comments me-1"></i>Chat
+                                    <span class="notification-badge" id="userChatBadge" style="display: none;">0</span>
                                 </a>
                             </li>
                         }
                     </ul>
-                    <!-- Cải thiện authentication menu với icons và styling -->
+
                     <ul class="navbar-nav">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-circle me-2"></i>
+                                    <div class="user-avatar">
+                                        @(Context.Request.Cookies["UserName"]?.Substring(0, 1).ToUpper() ?? User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")
+                                    </div>
                                     <span>@(Context.Request.Cookies["UserName"] ?? User.Identity.Name)</span>
+                                    <i class="fas fa-chevron-down ms-2"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-page="/Admin/Dashboard">
+                                            <a class="dropdown-item" href="/Admin/Dashboard">
                                                 <i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-page="/CategoryPages/Index">
-                                                <i class="fas fa-tachometer-alt me-2"></i>Category
                                             </a>
                                         </li>
                                         <li><hr class="dropdown-divider"></li>
@@ -75,6 +263,16 @@
                                     <li>
                                         <a class="dropdown-item" asp-page="/Account/Profile">
                                             <i class="fas fa-user me-2"></i>Hồ sơ cá nhân
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-page="/Inquiries/Index">
+                                            <i class="fas fa-question-circle me-2"></i>Yêu cầu của tôi
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-page="/Rentals/Index">
+                                            <i class="fas fa-handshake me-2"></i>Đơn thuê của tôi
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
@@ -104,6 +302,7 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -112,17 +311,78 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - Rentify - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 - Rentify - <a asp-area="" asp-page="/Privacy">Privacy</a></p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Nền tảng cho thuê hiện đại và tiện lợi</p>
+                </div>
+            </div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    
-    <!-- Added SignalR script for chat functionality -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
-    
+
+    <!-- Added user notification system -->
+    <script>
+        $(document).ready(function() {
+            if (@(User.Identity.IsAuthenticated ? "true" : "false")) {
+                initUserNotifications();
+            }
+        });
+
+        async function initUserNotifications() {
+            try {
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl("/chatHub")
+                    .build();
+
+                connection.on("ReceiveMessage", function(message) {
+                    updateUserChatNotification();
+                });
+
+                connection.on("InquiryStatusChanged", function(inquiryId, status) {
+                    updateUserInquiryNotification();
+                });
+
+                connection.on("RentalStatusChanged", function(rentalId, status) {
+                    updateUserRentalNotification();
+                });
+
+                await connection.start();
+                await connection.invoke("RegisterUser", "@(Context.Request.Cookies["UserId"] ?? "")", "@(Context.Request.Cookies["UserName"] ?? "")");
+            } catch (err) {
+                console.error('User SignalR connection error:', err);
+            }
+        }
+
+        function updateUserChatNotification() {
+            const badge = $('#userChatBadge');
+            let count = parseInt(badge.text()) || 0;
+            count++;
+            badge.text(count).show();
+        }
+
+        function updateUserInquiryNotification() {
+            const badge = $('#userInquiryBadge');
+            let count = parseInt(badge.text()) || 0;
+            count++;
+            badge.text(count).show();
+        }
+
+        function updateUserRentalNotification() {
+            const badge = $('#userRentalBadge');
+            let count = parseInt(badge.text()) || 0;
+            count++;
+            badge.text(count).show();
+        }
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
