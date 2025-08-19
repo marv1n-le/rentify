@@ -5,6 +5,7 @@ using Rentify.BusinessObjects.DTO.PostDto;
 using Rentify.BusinessObjects.Entities;
 using Rentify.BusinessObjects.Enum;
 using Rentify.Repositories.Helper;
+using Rentify.Services.ExternalService.CloudinaryService;
 using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.PostPages
@@ -15,13 +16,15 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         private readonly ICommentService _commentService;
         private readonly IUserService _userService;
         private readonly IItemService _itemService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public IndexModel(IPostService postService, ICommentService commentService, IUserService userService, IItemService itemService)
+        public IndexModel(IPostService postService, ICommentService commentService, IUserService userService, IItemService itemService, ICloudinaryService cloudinaryService)
         {
             _postService = postService;
             _commentService = commentService;
             _userService = userService;
             _itemService = itemService;
+            _cloudinaryService = cloudinaryService;
         }
 
         public class PostWithCommentCount
@@ -35,6 +38,13 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public List<SelectListItem> AvailableStatus { get; set; } = new();
         public IList<PostViewModel> Posts { get; set; } = default!;
         public IEnumerable<SelectListItem> ItemOptions { get; set; }
+
+        [BindProperty]
+        public List<IFormFile> PostImages { get; set; } = new();
+
+        [BindProperty]
+        public User CurrentUser { get; set; } = default!;
+
         public async Task OnGetAsync()
         {
             if (SearchFilterPostDto.PageIndex < 1)
@@ -50,6 +60,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
             }).ToList();
 
             Posts = new List<PostViewModel>();
+            CurrentUser = await _userService.GetUserById(_userService.GetCurrentUserId());
 
             foreach (var post in posts)
             {
@@ -109,26 +120,92 @@ namespace Rentify.RazorWebApp.Pages.PostPages
             }
         }
 
-        public async Task<IActionResult> OnPostCreateAsync([FromBody] CreatePostFormRequest request)
+        public async Task<IActionResult> OnPostCreateAsync()
         {
             try
             {
+                var imageList = new List<string>();
+
+                // Process file uploads
+                if (Request.Form.Files != null && Request.Form.Files.Count > 0)
+                {
+                    foreach (var file in Request.Form.Files)
+                    {
+                        if (file == null || file.Length == 0)
+                            continue;
+
+                        // Validate file size (5MB max)
+                        if (file.Length > 5 * 1024 * 1024)
+                        {
+                            return new JsonResult(new
+                            {
+                                success = false,
+                                message = $"File {file.FileName} is too large (max 5MB)"
+                            });
+                        }
+
+                        // Validate file extensions
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                        if (!allowedExtensions.Contains(extension))
+                        {
+                            return new JsonResult(new
+                            {
+                                success = false,
+                                message = $"File {file.FileName} has invalid extension"
+                            });
+                        }
+
+                        try
+                        {
+                            var imageResult = await _cloudinaryService.AddPhotoAsync(file);
+                            if (imageResult != null && !string.IsNullOrEmpty(imageResult.Url))
+                            {
+                                imageList.Add(imageResult.Url);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error uploading file {file.FileName}: {ex.Message}");
+                        }
+                    }
+                }
+
+                // Get form data
+                var title = Request.Form["Title"].ToString();
+                var content = Request.Form["Content"].ToString();
+                var tagsString = Request.Form["Tags"].ToString();
+                var itemId = Request.Form["ItemId"].ToString();
+                var quantityString = Request.Form["Quantity"].ToString();
+
+                // Validate required fields
+                if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(content))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "Title and content are required"
+                    });
+                }
+
                 var postDto = new PostCreateRequestDto
                 {
-                    Title = request.Title,
-                    Content = request.Content,
-                    Tags = !string.IsNullOrEmpty(request.TagsString)
-                        ? request.TagsString.Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrEmpty(t)).ToList()
+                    Title = title,
+                    Content = content,
+                    Tags = !string.IsNullOrEmpty(tagsString)
+                        ? tagsString.Split(',')
+                              .Select(t => t.Trim())
+                              .Where(t => !string.IsNullOrEmpty(t))
+                              .ToList()
                         : new List<string>(),
-                    Images = !string.IsNullOrEmpty(request.ImagesString)
-                        ? request.ImagesString.Split(',').Select(i => i.Trim()).Where(i => !string.IsNullOrEmpty(i)).ToList()
-                        : new List<string>()
+                    Images = imageList,
+                    ItemId = itemId,
+                    Quantity = int.TryParse(quantityString, out int qty) ? qty : 1
                 };
 
                 var postId = await _postService.CreatePost(postDto);
                 var createdPost = await _postService.GetPostById(postId);
 
-                // Tạo response DTO đơn giản để tránh circular reference
                 var responsePost = new PostResponseDto
                 {
                     Id = createdPost.Id,
@@ -145,40 +222,110 @@ namespace Rentify.RazorWebApp.Pages.PostPages
             }
             catch (Exception ex)
             {
-                return new JsonResult(new { success = false, message = ex.Message });
+                Console.WriteLine($"Error in OnPostCreateAsync: {ex}");
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "An error occurred while creating the post",
+                    error = ex.Message
+                });
             }
         }
 
-        public async Task<IActionResult> OnPostUpdateAsync([FromBody] UpdatePostFormRequest request)
+        public async Task<IActionResult> OnPostUpdateAsync()
         {
             try
             {
+                var imageList = new List<string>();
+
+                // Process new image uploads
+                if (Request.Form.Files != null && Request.Form.Files.Count > 0)
+                {
+                    foreach (var file in Request.Form.Files)
+                    {
+                        if (file == null || file.Length == 0)
+                            continue;
+
+                        // Validate file size (5MB max)
+                        if (file.Length > 5 * 1024 * 1024)
+                        {
+                            return new JsonResult(new
+                            {
+                                success = false,
+                                message = $"File {file.FileName} is too large (max 5MB)"
+                            });
+                        }
+
+                        // Validate file extensions
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                        if (!allowedExtensions.Contains(extension))
+                        {
+                            return new JsonResult(new
+                            {
+                                success = false,
+                                message = $"File {file.FileName} has invalid extension"
+                            });
+                        }
+
+                        try
+                        {
+                            var imageResult = await _cloudinaryService.AddPhotoAsync(file);
+                            if (imageResult != null && !string.IsNullOrEmpty(imageResult.Url))
+                            {
+                                imageList.Add(imageResult.Url);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error uploading file {file.FileName}: {ex.Message}");
+                        }
+                    }
+                }
+
+                // Get form data
+                var postId = Request.Form["PostId"].ToString();
+                var title = Request.Form["Title"].ToString();
+                var content = Request.Form["Content"].ToString();
+                var tagsString = Request.Form["Tags"].ToString();
+                var existingImagesString = Request.Form["ExistingImages"].ToString();
+
+                // Combine old and new images
+                var allImages = new List<string>();
+                if (!string.IsNullOrEmpty(existingImagesString))
+                {
+                    allImages.AddRange(existingImagesString.Split(',').Select(url => url.Trim()).Where(url => !string.IsNullOrEmpty(url)));
+                }
+                allImages.AddRange(imageList);
+
                 var postDto = new PostUpdateRequestDto
                 {
-                    PostId = request.PostId,
-                    Title = request.Title,
-                    Content = request.Content,
-                    Tags = !string.IsNullOrEmpty(request.TagsString)
-                        ? request.TagsString.Split(',').Select(t => t.Trim()).Where(t => !string.IsNullOrEmpty(t)).ToList()
+                    PostId = postId,
+                    Title = title,
+                    Content = content,
+                    Tags = !string.IsNullOrEmpty(tagsString)
+                        ? tagsString.Split(',')
+                              .Select(t => t.Trim())
+                              .Where(t => !string.IsNullOrEmpty(t))
+                              .ToList()
                         : new List<string>(),
-                    Images = !string.IsNullOrEmpty(request.ImagesString)
-                        ? request.ImagesString.Split(',').Select(i => i.Trim()).Where(i => !string.IsNullOrEmpty(i)).ToList()
-                        : new List<string>()
+                    Images = allImages,
                 };
 
                 await _postService.UpdatePost(postDto);
 
-                // Tạo response DTO với dữ liệu từ form update, không phải từ database
+                // Get updated post data
+                var updatedPost = await _postService.GetPostById(postId);
                 var responsePost = new PostResponseDto
                 {
-                    Id = request.PostId,
-                    Title = postDto.Title,
-                    Content = postDto.Content,
-                    Tags = postDto.Tags,
-                    Images = postDto.Images,  // Sử dụng ảnh từ form update
-                    CreatedAt = DateTime.Now, // Hoặc có thể lấy từ database nếu cần
-                    UserName = "Current User", // Có thể lấy từ User context
-                    UserProfilePicture = null
+                    Id = updatedPost.Id,
+                    Title = updatedPost.Title,
+                    Content = updatedPost.Content,
+                    Tags = updatedPost.Tags,
+                    Images = updatedPost.Images,
+                    CreatedAt = updatedPost.CreatedAt,
+                    UserName = updatedPost.User?.FullName,
+                    UserProfilePicture = updatedPost.User?.ProfilePicture
                 };
 
                 return new JsonResult(new { success = true, post = responsePost });
@@ -227,13 +374,14 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         }
     }
 
-    // DTO tạm thời để nhận dữ liệu từ form
     public class CreatePostFormRequest
     {
         public string? Title { get; set; }
         public string? Content { get; set; }
         public string? TagsString { get; set; }
-        public string? ImagesString { get; set; }
+        public string? ItemId { get; set; }
+        public int? Quantity { get; set; }
+        public List<string>? ImagesString { get; set; }
     }
 
     public class UpdatePostFormRequest
@@ -242,10 +390,9 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public string? Title { get; set; }
         public string? Content { get; set; }
         public string? TagsString { get; set; }
-        public string? ImagesString { get; set; }
+        public string? ExistingImages { get; set; }
     }
 
-    // DTO response đơn giản để tránh circular reference
     public class PostResponseDto
     {
         public string Id { get; set; } = string.Empty;
@@ -276,6 +423,5 @@ namespace Rentify.RazorWebApp.Pages.PostPages
         public int CommentCount { get; set; }
         public RentalStatus Status { get; set; }
         public ICollection<Inquiry> Inquiries { get; set; } = new List<Inquiry>();
-
     }
 }

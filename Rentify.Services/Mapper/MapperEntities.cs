@@ -11,6 +11,7 @@ namespace Rentify.Services.Mapper
         public MapperEntities()
         {
             CreateMap<Post, PostUpdateRequestDto>().ReverseMap();
+
             CreateMap<ChatRoom, ChatRoomDto>()
                 .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src.Participants))
                 .ReverseMap();

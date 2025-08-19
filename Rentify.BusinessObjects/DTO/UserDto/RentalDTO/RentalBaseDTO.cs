@@ -1,6 +1,6 @@
 ﻿using Rentify.BusinessObjects.Enum;
 
-namespace Rentify.BusinessObjects.DTO.RentalDTO
+namespace Rentify.BusinessObjects.DTO.UserDto.RentalDTO
 {
     public class RentalBaseDTO
     {

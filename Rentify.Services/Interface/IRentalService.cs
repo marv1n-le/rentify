@@ -1,4 +1,4 @@
-﻿using Rentify.BusinessObjects.DTO.RentalDTO;
+﻿using Rentify.BusinessObjects.DTO.UserDto.RentalDTO;
 using Rentify.BusinessObjects.Entities;
 
 namespace Rentify.Services.Interface

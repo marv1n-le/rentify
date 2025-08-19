@@ -9,79 +9,69 @@
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
-<body class="admin-body">
-    <div class="admin-wrapper">
-        <!-- Sidebar -->
-        <nav class="admin-sidebar">
-            <div class="sidebar-header">
-                <h4><i class="fas fa-shield-alt me-2"></i>Admin Panel</h4>
-            </div>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar navigation -->
+        <nav class="admin-sidebar text-white">
+            <a href="/Admin/Dashboard" class="sidebar-brand text-decoration-none">
+                <i class="fas fa-crown me-2"></i>
+                Admin Panel
+            </a>
             
-            <div class="sidebar-menu">
-                <a href="/Admin/Dashboard" class="menu-item">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
+            <div class="p-3">
+                <ul class="nav flex-column sidebar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Dashboard">
+                            <i class="fas fa-tachometer-alt me-3"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Users/Index">
+                            <i class="fas fa-users me-3"></i>Quản lý User
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-page="/PostPages/Index">
+                            <i class="fas fa-tachometer-alt me-2"></i>Page
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Roles/Index">
+                            <i class="fas fa-user-tag me-3"></i>Quản lý Role
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Category/Index">
+                            <i class="fas fa-tags me-3"></i>Quản lý Category
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Items/Index">
+                            <i class="fas fa-box me-3"></i>Quản lý Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Admin/Rentals/Index">
+                            <i class="fas fa-handshake me-3"></i>Quản lý Rentals
+                        </a>
+                    </li>
+                </ul>
                 
-                <div class="menu-section">
-                    <div class="menu-title">Quản lý người dùng</div>
-                    <a href="/Admin/Users/Index" class="menu-item">
-                        <i class="fas fa-users"></i>
-                        <span>Người dùng</span>
-                    </a>
-                    <a href="/Role/Index" class="menu-item">
-                        <i class="fas fa-user-tag"></i>
-                        <span>Vai trò</span>
-                    </a>
-                </div>
-
-                <div class="menu-section">
-                    <div class="menu-title">Quản lý sản phẩm</div>
-                    <a href="/ItemPages/Index" class="menu-item">
-                        <i class="fas fa-box"></i>
-                        <span>Sản phẩm</span>
-                    </a>
-                    <a href="/Category/Index" class="menu-item">
-                        <i class="fas fa-tags"></i>
-                        <span>Danh mục</span>
+                <!-- User info và logout ở sidebar -->
+                <div class="mt-5 pt-4 border-top border-light border-opacity-25">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">@(Context.Request.Cookies["UserName"] ?? User.Identity.Name)</div>
+                            <small class="text-white-50">Administrator</small>
+                        </div>
+                    </div>
+                    <a class="btn btn-outline-light btn-sm w-100" asp-page="/Account/Logout">
+                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                     </a>
                 </div>
-
-                <div class="menu-section">
-                    <div class="menu-title">Quản lý thuê</div>
-                    <a href="/Admin/Rentals/Index" class="menu-item">
-                        <i class="fas fa-handshake"></i>
-                        <span>Đơn thuê</span>
-                    </a>
-                    <a href="/PostPages/Index" class="menu-item">
-                        <i class="fas fa-newspaper"></i>
-                        <span>Bài đăng</span>
-                    </a>
-                </div>
-
-                <!-- Added Chat management menu for admin -->
-                <div class="menu-section">
-                    <div class="menu-title">Giao tiếp</div>
-                    <a href="/Admin/Chat/Index" class="menu-item">
-                        <i class="fas fa-comments"></i>
-                        <span>Quản lý Chat</span>
-                    </a>
-                    <a href="/ChatPages/Chat" class="menu-item">
-                        <i class="fas fa-comment-dots"></i>
-                        <span>Chat trực tiếp</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span>@(Context.Request.Cookies["UserName"] ?? User.Identity.Name)</span>
-                </div>
-                <a href="/Account/Logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Đăng xuất</span>
-                </a>
             </div>
         </nav>
 

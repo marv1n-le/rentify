@@ -32,6 +32,11 @@ namespace Rentify.Repositories.Repository
             return resultList;
         }
 
+        public Task<List<Post>> GetAllPost()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Post> GetById(string postId)
         {
             var result = await _dbSet

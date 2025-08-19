@@ -4,7 +4,90 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<form method="get" class="mb-3">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <!-- Search -->
+        <div class="flex-grow-1 flex-shrink-1 min-w-300">
+            <div class="search-box d-flex align-items-center">
+                <i class="bi bi-search text-primary me-2"></i>
+                <input asp-for="SearchFilterPostDto.Keyword"
+                       class="form-control border-0 shadow-none"
+                       placeholder="Tìm kiếm theo từ khóa hoặc status..." />
+            </div>
+        </div>
+
+        <!-- Status Dropdown -->
+        <div class="dropdown" style="flex:0 0 250px;">
+            <button class="btn btn-outline-primary dropdown-toggle rounded-pill w-100" type="button" id="statusDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                Chọn trạng thái
+            </button>
+            <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3" aria-labelledby="statusDropdown"
+                 onclick="event.stopPropagation();" style="min-width: 200px;">
+                <div class="form-check">
+                    <input class="form-check-input status-checkbox" type="checkbox"
+                           value="Pending" id="statusPending"
+                           name="SearchFilterPostDto.Status" data-text="Đang chờ xử lý">
+                    <label class="form-check-label" for="statusPending">Đang chờ xử lý</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input status-checkbox" type="checkbox"
+                           value="Active" id="statusActive"
+                           name="SearchFilterPostDto.Status" data-text="Đang hoạt động">
+                    <label class="form-check-label" for="statusActive">Đang hoạt động</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input status-checkbox" type="checkbox"
+                           value="Completed" id="statusCompleted"
+                           name="SearchFilterPostDto.Status" data-text="Đã hoàn tất">
+                    <label class="form-check-label" for="statusCompleted">Đã hoàn tất</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input status-checkbox" type="checkbox"
+                           value="Cancelled" id="statusCancelled"
+                           name="SearchFilterPostDto.Status" data-text="Đã hủy">
+                    <label class="form-check-label" for="statusCancelled">Đã hủy</label>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill" id="applyStatusBtn">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Button -->
+        <button type="submit" class="btn filter-btn">
+            <i class="bi bi-funnel-fill me-1"></i> Lọc
+        </button>
+    </div>
+</form>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="main-content p-3">
+                <!-- Danh sách bài viết -->
+                <div id="post-container">
+                    @if (Model.Posts != null && Model.Posts.Any())
+                    {
+                        foreach (var item in Model.Posts)
+                        {
+                            @Html.Partial("_PostCard", item)
+                            // <- item bây giờ là PostPages.PostViewModel
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-center">Không có thông tin bài viết.</p>
+                    }
+                </div>
+
+                <!-- Loading indicator -->
+                <div id="loading" class="text-center my-4" style="display:none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

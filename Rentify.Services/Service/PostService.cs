@@ -28,6 +28,10 @@ namespace Rentify.Services.Service
             if (user == null)
                 throw new Exception($"Please log in first");
 
+            var item = await _unitOfWork.ItemRepository.GetByIdAsync(post.ItemId);
+            if (item == null)
+                throw new Exception($"Item with id: {post.ItemId} not found");
+
             Post newPost = new Post
             {
                 UserId = userId,
@@ -36,6 +40,8 @@ namespace Rentify.Services.Service
                 Images = post.Images,
                 Tags = post.Tags,
                 Title = post.Title,
+                Item = item,
+                ItemId = item.Id,
             };
 
             await _unitOfWork.PostRepository.InsertAsync(newPost);
