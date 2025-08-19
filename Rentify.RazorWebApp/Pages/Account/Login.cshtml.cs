@@ -51,13 +51,14 @@ public class Login : PageModel
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
             
-            // Cookies phụ nếu bạn muốn
             Response.Cookies.Append("UserEmail", account.Email!);
             Response.Cookies.Append("UserName", account.FullName!);
             Response.Cookies.Append("userId", account.Id);
 
             if (roleName == "Admin")
                 return RedirectToPage("/Admin/Dashboard");
+            if (roleName == "User")
+                return RedirectToPage("/PostPages/Index");
             return RedirectToPage("/Index");
         }
 

@@ -16,13 +16,16 @@
                     </div>
                 </div>
 
-                <button class="post-menu-btn" type="button" aria-label="Mở menu" onclick="togglePostMenu('@Model.Id')">⋯</button>
-                <div id="menu-@Model.Id" class="post-menu">
+                @if (User.IsInRole("Admin"))
+                {
+                    <button class="post-menu-btn" type="button" aria-label="Mở menu" onclick="togglePostMenu('@Model.Id')">⋯</button>
+                    <div id="menu-@Model.Id" class="post-menu">
                     <a href="javascript:void(0)" onclick="openEditModal('@Model.Id', '@Html.Raw((Model.Title ?? "").Replace("'", "\\'"))', '@Html.Raw((Model.Content ?? "").Replace("'", "\\'"))', '@string.Join(",", Model.Tags ?? new List<string>())', '@string.Join(",", Model.Images ?? new List<string>())')">
                         Chỉnh sửa
                     </a>
                     <a class="text-danger" href="javascript:void(0)" onclick="deletePost('@Model.Id')">Xóa</a>
                 </div>
+                }
             </div>
         </div>
 
