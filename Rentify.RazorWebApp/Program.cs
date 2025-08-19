@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 using Rentify.RazorWebApp.DependencyInjection;
 using Rentify.RazorWebApp.Pages.ChatPages;
 using Rentify.Repositories.Helper;
@@ -36,7 +37,16 @@ public class Program
                 options.AccessDeniedPath = "/Account/Forbidden";
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
+        builder.Services.Configure<FormOptions>(o =>
+        {
+            // 100 MB, bạn chỉnh theo nhu cầu
+            o.MultipartBodyLengthLimit = 100 * 1024 * 1024;
+        });
 
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+        });
         builder.Services.Configure<CloudinarySettings>(
             builder.Configuration.GetSection("CloudinarySettings"));
         var app = builder.Build();

@@ -45,7 +45,16 @@ namespace Rentify.Services.Service
             };
 
             await _unitOfWork.PostRepository.InsertAsync(newPost);
-            await _unitOfWork.SaveChangesAsync();
+            var rowsAffected = await _unitOfWork.SaveChangesAsync();
+            var savedPost = await _unitOfWork.PostRepository.GetById(newPost.Id);
+            if (rowsAffected <= 0)
+            {
+                throw new Exception("Không thể lưu bài đăng vào database");
+            }
+            if (savedPost == null)
+            {
+                throw new Exception("Failed to save post in the database.");
+            }
             return newPost.Id;
         }
 
@@ -86,7 +95,7 @@ namespace Rentify.Services.Service
             if (post == null)
                 throw new Exception($"Post with id: {request.PostId} has not found");
 
-            _mapper.Map(post, request);
+            _mapper.Map(request, post);
 
             await _unitOfWork.PostRepository.UpdateAsync(post);
             await _unitOfWork.SaveChangesAsync();
