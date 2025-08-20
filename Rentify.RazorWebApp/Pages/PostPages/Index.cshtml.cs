@@ -55,7 +55,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                 SearchFilterPostDto.PageIndex = 1;
 
             var posts = await _postService.GetAllPost(SearchFilterPostDto);
-            var items = await _itemService.GetAllItems();
+            var items = await _itemService.GetAllItemHasNoPost();
 
             ItemOptions = items.Select(i => new SelectListItem
             {
@@ -221,7 +221,7 @@ namespace Rentify.RazorWebApp.Pages.PostPages
                     UserProfilePicture = createdPost.User?.ProfilePicture
                 };
 
-                return new JsonResult(new { success = true, post = responsePost });
+                return Page();
             }
             catch (Exception ex)
             {

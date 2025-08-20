@@ -23,6 +23,15 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<List<Item>> GetAllItemHasNoPost()
+    {
+        return await _dbSet
+            .Include(x => x.User)
+            .Include(x => x.Category)
+            .Where(x => !x.IsDeleted && x.Post == null)
+            .ToListAsync();
+    }
+
     public async Task<List<Item>> GetAllItemAsync()
     {
         return await _dbSet
