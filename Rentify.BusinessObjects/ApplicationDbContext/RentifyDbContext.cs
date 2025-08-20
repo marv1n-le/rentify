@@ -43,6 +43,10 @@ public class RentifyDbContext : DbContext
         modelBuilder.Entity<Rental>().ToTable("Rental");
         modelBuilder.Entity<RentalItem>().ToTable("RentalItem");
         modelBuilder.Entity<Inquiry>().ToTable("Inquiry");
+        modelBuilder.Entity<Otp>().ToTable("Otp");
+        modelBuilder.Entity<ChatRoom>().ToTable("ChatRoom");
+        modelBuilder.Entity<ChatMessage>().ToTable("ChatMessage");
+        modelBuilder.Entity<ChatParticipant>().ToTable("ChatParticipant");
 
         modelBuilder.Entity<RentalItem>(entity =>
         {
