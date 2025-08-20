@@ -46,7 +46,9 @@ public class UserService : IUserService
             Email = dto.Email,
             Password = dto.Password, 
             FullName = dto.FullName,
-            BirthDate = dto.BirthDate,
+            BirthDate = dto.BirthDate.HasValue
+                ? DateTime.SpecifyKind(dto.BirthDate.Value, DateTimeKind.Utc)
+                : null,
             ProfilePicture = dto.ProfilePicture,
             RoleId = userRole.Id,
             IsVerify = false

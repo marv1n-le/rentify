@@ -86,6 +86,9 @@ public class Register : PageModel
                 profileUrl = upload.Url;
             }
 
+            if (BirthDate.HasValue)
+                BirthDate = DateTime.SpecifyKind(BirthDate.Value, DateTimeKind.Utc);
+            
             var registerDto = new UserRegisterDto
             {
                 Email = Email,
