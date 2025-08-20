@@ -57,7 +57,7 @@ namespace Rentify.Services.Service
                 RentalId = newRental.Id,
                 ItemId = item.Id,
                 Item = item,
-                Quantity = inquiry.Quantity, // Use Inquiry.Quantity
+                Quantity = inquiry.Quantity,
                 Price = item.Price
             };
 
@@ -69,6 +69,9 @@ namespace Rentify.Services.Service
             await _unitOfWork.RentalItemRepository.GetByRentalIdAsync(newRental.Id);
             inquiry.Rental = newRental;
             inquiry.Status = InquiryStatus.Quoted;
+            if (item.RemainingQuantity - inquiry.Quantity < 0)
+                throw new Exception("Not enough quantity");
+            item.RemainingQuantity -= inquiry.Quantity;
             await _unitOfWork.InquiryRepository.UpdateAsync(inquiry);
             await _unitOfWork.SaveChangesAsync();
             return newRental.Id;
@@ -108,7 +111,7 @@ namespace Rentify.Services.Service
                     RentalId = newRental.Id,
                     ItemId = item.Id,
                     Item = item,
-                    Quantity = itemDto.Quantity, 
+                    Quantity = itemDto.Quantity,
                     Price = item.Price
                 };
                 newRental.RentalItems.Add(rentalItem);
@@ -204,6 +207,7 @@ namespace Rentify.Services.Service
             }
 
             rental.Status = RentalStatus.Confirmed;
+            rental.PaymentStatus = PaymentStatus.Paid;
             await _unitOfWork.RentalRepository.UpdateAsync(rental);
             await _unitOfWork.SaveChangesAsync();
         }
@@ -223,7 +227,7 @@ namespace Rentify.Services.Service
 
             rental.TotalAmount += damageFee + lateFee;
             rental.Status = RentalStatus.Completed;
-            rental.PaymentStatus = PaymentStatus.Paid;
+
             await _unitOfWork.RentalRepository.UpdateAsync(rental);
 
             if (rental.Inquiry != null)

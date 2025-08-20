@@ -5,9 +5,6 @@ namespace Rentify.BusinessObjects.DTO.ItemDto;
 
 public class ItemCreateDto
 {
-    [Required(ErrorMessage = "User ID là bắt buộc")]
-    public string UserId { get; set; } = string.Empty;
-
     [Required(ErrorMessage = "Category ID là bắt buộc")]
     public string CategoryId { get; set; } = string.Empty;
 
@@ -30,6 +27,4 @@ public class ItemCreateDto
     [Range(0, int.MaxValue, ErrorMessage = "Số lượng không được âm")]
     public int Quantity { get; set; }
 
-    [Required(ErrorMessage = "Trạng thái là bắt buộc")]
-    public ItemStatus Status { get; set; }
 }

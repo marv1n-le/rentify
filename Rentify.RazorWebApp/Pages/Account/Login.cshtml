@@ -5,55 +5,205 @@
     Layout = null;
 }
 
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Login - Rentify</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-</head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #6f42c1;
+            --light-bg: #f8f9fc;
+        }
 
-<body class="body">
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .login-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .login-body {
+            padding: 2rem;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.15);
+            }
+
+        .input-group-icon {
+            position: relative;
+        }
+
+            .input-group-icon i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #6c757d;
+                z-index: 5;
+            }
+
+            .input-group-icon .form-control {
+                padding-left: 45px;
+            }
+
+        .btn-login {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+            }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+            .divider::before,
+            .divider::after {
+                content: "";
+                flex: 1;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+        .divider-text {
+            padding: 0 1rem;
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .alert-message {
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Rentify Shop</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <a class="navbar-brand fw-bold" asp-area="" asp-page="/PostPages/Index">
+                    <i class="fas fa-home me-2"></i>Rentify
+                </a>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <div class="row">
-            <h2 class="text-center">Log-in</h2>
-            <div class="col-md-4 mx-auto">
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h3><i class="fas fa-lock me-2"></i>Welcome Back</h3>
+                <p class="mb-0">Sign in to your account</p>
+            </div>
+
+            <div class="login-body">
                 @if (TempData["Message"] != null)
                 {
-                    <div class="text-danger">@TempData["Message"]</div>
+                    <div class="alert alert-danger alert-message d-flex align-items-center" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <div>@TempData["Message"]</div>
+                    </div>
                 }
 
                 <form method="post">
-                    <div class="form-group">
-                        <label asp-for="Email"></label>
-                        <input type="text" class="form-control" asp-for="Email" required />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+                    <div class="form-group mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold">Email Address</label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" class="form-control" asp-for="Email" placeholder="Enter your email" required />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="Password"></label>
-                        <input type="password" class="form-control" asp-for="Password" required />
-                        <span asp-validation-for="Password" class="text-danger"></span>
+                    <div class="form-group mb-4">
+                        <label asp-for="Password" class="form-label fw-semibold">Password</label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-key"></i>
+                            <input type="password" class="form-control" asp-for="Password" placeholder="Enter your password" required />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
                     </div>
-                    <br />
-                    <button type="submit" class="btn btn-primary">Login</button>
-                    <div class="mt-3 text-center">
-                        <p>Don't have account? <a asp-page="/Account/Register" class="text-decoration-none">Register now</a></p>
+
+                    <button type="submit" class="btn btn-login mb-3">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </button>
+
+                    <div class="divider">
+                        <span class="divider-text">New to Rentify?</span>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="mb-0">Don't have an account? <a asp-page="/Account/Register" class="text-decoration-none fw-semibold">Register now</a></p>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <footer class="border-top footer text-muted mt-auto py-3">
+        <div class="container text-center">
+            &copy; 2023 Rentify Shop - <a asp-page="/Privacy" class="text-decoration-none">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+</html>

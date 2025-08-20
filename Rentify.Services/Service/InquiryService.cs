@@ -23,7 +23,7 @@ public class InquiryService : IInquiryService
     }
     public async Task<IEnumerable<Inquiry>> GetAllInquiries()
     {
-        return await _unitOfWork.InquiryRepository.GetAllAsync();
+        return await _unitOfWork.InquiryRepository.GetAllInquiryAsync();
     }
 
     public async Task<Inquiry?> GetInquiryById(string id)

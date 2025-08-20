@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 using Rentify.RazorWebApp.DependencyInjection;
 using Rentify.RazorWebApp.Pages.ChatPages;
 using Rentify.Repositories.Helper;
@@ -23,7 +24,7 @@ public class Program
         builder.Services.AddSignalR();
         builder.Services.AddSession(options =>
         {
-            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.IdleTimeout = TimeSpan.FromMinutes(60);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
         });
@@ -34,11 +35,22 @@ public class Program
             {
                 options.LoginPath = "/Account/Login";
                 options.AccessDeniedPath = "/Account/Forbidden";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
             });
+        builder.Services.Configure<FormOptions>(o =>
+        {
+            // 100 MB, bạn chỉnh theo nhu cầu
+            o.MultipartBodyLengthLimit = 100 * 1024 * 1024;
+        });
 
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+        });
+        builder.Services.Configure<CloudinarySettings>(
+            builder.Configuration.GetSection("CloudinarySettings"));
         builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-        builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

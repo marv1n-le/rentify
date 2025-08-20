@@ -4,7 +4,6 @@
 @{
     ViewData["Title"] = "Bài viết";
 }
-@* TODO: Cần phải centralize css  *@
 <!-- Search + Filter -->
 <form method="get" class="mb-3">
     <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -14,45 +13,7 @@
                 <i class="bi bi-search text-primary me-2"></i>
                 <input asp-for="SearchFilterPostDto.Keyword"
                        class="form-control border-0 shadow-none"
-                       placeholder="Tìm kiếm theo từ khóa hoặc status..." />
-            </div>
-        </div>
-
-        <!-- Status Dropdown -->
-        <div class="dropdown" style="flex:0 0 250px;">
-            <button class="btn btn-outline-primary dropdown-toggle rounded-pill w-100" type="button" id="statusDropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                Chọn trạng thái
-            </button>
-            <div class="dropdown-menu p-3 shadow-lg border-0 rounded-3" aria-labelledby="statusDropdown"
-                 onclick="event.stopPropagation();" style="min-width: 200px;">
-                <div class="form-check">
-                    <input class="form-check-input status-checkbox" type="checkbox"
-                           value="Pending" id="statusPending"
-                           name="SearchFilterPostDto.Status" data-text="Đang chờ xử lý">
-                    <label class="form-check-label" for="statusPending">Đang chờ xử lý</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input status-checkbox" type="checkbox"
-                           value="Active" id="statusActive"
-                           name="SearchFilterPostDto.Status" data-text="Đang hoạt động">
-                    <label class="form-check-label" for="statusActive">Đang hoạt động</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input status-checkbox" type="checkbox"
-                           value="Completed" id="statusCompleted"
-                           name="SearchFilterPostDto.Status" data-text="Đã hoàn tất">
-                    <label class="form-check-label" for="statusCompleted">Đã hoàn tất</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input status-checkbox" type="checkbox"
-                           value="Cancelled" id="statusCancelled"
-                           name="SearchFilterPostDto.Status" data-text="Đã hủy">
-                    <label class="form-check-label" for="statusCancelled">Đã hủy</label>
-                </div>
-                <div class="d-flex justify-content-end mt-3">
-                    <button type="button" class="btn btn-primary btn-sm rounded-pill" id="applyStatusBtn">Apply</button>
-                </div>
+                       placeholder="Tìm kiếm theo từ khóa hoặc tag..." />
             </div>
         </div>
 
@@ -63,131 +24,50 @@
     </div>
 </form>
 
-@section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const dropdownBtn = document.getElementById('statusDropdown');
-            const checkboxes = Array.from(document.querySelectorAll('.status-checkbox'));
-            const applyBtn = document.getElementById('applyStatusBtn');
-
-            // map tên trạng thái -> bootstrap badge classes
-            const colorMap = {
-                "Pending": "bg-warning text-dark",
-                "Active": "bg-success",
-                "Completed": "bg-primary",
-                "Cancelled": "bg-danger"
-            };
-
-            function mapColorClass(text) {
-                return colorMap[text] || "bg-secondary text-white";
-            }
-
-            // Apply -> close dropdown
-            applyBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownBtn);
-                bsDropdown.hide();
-            });
-        });
-    </script>
-}
-
-<style>
-    /* Container */
-    .d-flex.align-items-center.gap-2 {
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    /* Search box */
-    .search-box {
-        border: 1px solid #e6e9ef;
-        border-radius: 28px;
-        padding: 0.5rem 0.9rem;
-        background: #fff;
-        min-height: 44px;
-    }
-
-    .search-box input {
-        border: none;
-        outline: none;
-        box-shadow: none;
-        padding: 0;
-    }
-
-    /* Dropdown */
-    .dropdown-menu {
-        border-radius: 12px;
-        border: 1px solid #e9eef7;
-    }
-
-    .dropdown-menu .form-check-label {
-        user-select: none;
-    }
-
-    .dropdown-menu .form-check-input {
-        width: 1.05em;
-        height: 1.05em;
-    }
-
-    /* Filter Button */
-    .filter-btn {
-        border-radius: 28px;
-        padding: .45rem 1rem;
-        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-        border: none;
-        color: white;
-        font-weight: 500;
-        box-shadow: 0 2px 6px rgba(13,110,253,0.18);
-        height: 44px;
-        flex: 0 0 auto;
-    }
-
-    .min-w-300 {
-        min-width: 300px;
-    }
-</style>
-
-
 <div class="container">
     <div class="row justify-content-center">
         <!-- Nội dung chính -->
         <div class="col-md-8">
             <div class="main-content p-3">
-                <!-- Header tạo bài viết -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="https://via.placeholder.com/40" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
-                            <div class="flex-grow-1">
-                                <button class="btn btn-light w-100 text-start text-muted" onclick="openCreateModal()">
-                                    Bạn đang nghĩ gì?
-                                </button>
+                @if (User.IsInRole("Admin"))
+                {
+                    <!-- Header tạo bài viết -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="@Model.CurrentUser.ProfilePicture" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
+                                <div class="flex-grow-1">
+                                    <button class="btn btn-light w-100 text-start text-muted" onclick="openCreateModal()">
+                                        Bạn đang nghĩ gì?
+                                    </button>
+                                </div>
+
                             </div>
-                        </div>
-                        <hr>
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
-                                    <i class="bi bi-camera-video me-2"></i>
-                                    Video trực tiếp
-                                </button>
-                            </div>
-                            <div class="col-4">
-                                <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
-                                    <i class="bi bi-images me-2"></i>
-                                    Ảnh/Video
-                                </button>
-                            </div>
-                            <div class="col-4">
-                                <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
-                                    <i class="bi bi-emoji-smile me-2"></i>
-                                    Cảm xúc
-                                </button>
+                            <hr>
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
+                                        <i class="bi bi-camera-video me-2"></i>
+                                        Video trực tiếp
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
+                                        <i class="bi bi-images me-2"></i>
+                                        Ảnh/Video
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-link text-decoration-none text-muted" onclick="openCreateModal()">
+                                        <i class="bi bi-emoji-smile me-2"></i>
+                                        Cảm xúc
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                }
 
                 <!-- Danh sách bài viết -->
                 <div id="post-container">
@@ -221,19 +101,24 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createPostModalLabel">Tạo bài viết mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal('createPostModal')"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="closeModal('createPostModal')"></button>
             </div>
-            <form id="createPostForm">
+            <form id="createPostForm" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
-                    <div class="mb-3">
+                    <div id="formErrorAlert" class="alert alert-danger d-none" role="alert"></div>
+
+                    <div class="form-group mb-3">
                         <label for="postTitle" class="form-label">Tiêu đề</label>
-                        <input type="text" class="form-control" id="postTitle" name="Title" placeholder="Nhập tiêu đề bài viết...">
+                        <input type="text" class="form-control" id="postTitle" name="Title"
+                               placeholder="Nhập tiêu đề bài viết..." required />
+                        <span class="text-danger" id="titleError"></span>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="form-group mb-3">
                         <label for="postItem" class="form-label">Chọn vật phẩm</label>
-                        <select class="form-select" id="postItem">
+                        <select class="form-select" id="postItem" name="ItemId" required>
                             <option value="">-- Chọn một vật phẩm --</option>
                             @if (Model.ItemOptions != null)
                             {
@@ -243,27 +128,48 @@
                                 }
                             }
                         </select>
+                        <span class="text-danger" id="itemError"></span>
                     </div>
-                    <div class="col-md-4 mb-3">
+
+                    <div class="form-group mb-3">
                         <label for="postQuantity" class="form-label">Số lượng</label>
-                        <input type="number" class="form-control" id="postQuantity" min="1" placeholder="Số lượng" disabled>
+                        <input type="number" class="form-control" id="postQuantity" name="Quantity" min="1"
+                               placeholder="Số lượng" required />
+                        <span class="text-danger" id="quantityError"></span>
                     </div>
-                    <div class="mb-3">
+
+                    <div class="form-group mb-3">
                         <label for="postContent" class="form-label">Nội dung</label>
-                        <textarea class="form-control" id="postContent" name="Content" rows="5" placeholder="Bạn đang nghĩ gì?"></textarea>
+                        <textarea class="form-control" id="postContent" name="Content" rows="5"
+                                  placeholder="Bạn đang nghĩ gì?" required></textarea>
+                        <span class="text-danger" id="contentError"></span>
                     </div>
-                    <div class="mb-3">
+
+                    <div class="form-group mb-3">
                         <label for="postTags" class="form-label">Tags (phân cách bằng dấu phẩy)</label>
-                        <input type="text" class="form-control" id="postTags" name="Tags" placeholder="tag1, tag2, tag3">
+                        <input type="text" class="form-control" id="postTags" name="Tags"
+                               placeholder="tag1, tag2, tag3" />
+                        <span class="text-danger" id="tagsError"></span>
                     </div>
-                    <div class="mb-3">
-                        <label for="postImages" class="form-label">Hình ảnh (URLs, phân cách bằng dấu phẩy)</label>
-                        <input type="text" class="form-control" id="postImages" name="Images" placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg">
+
+                    <div class="form-group mb-3">
+                        <label for="postImages" class="form-label">
+                            Hình ảnh (JPEG, PNG, GIF, WEBP - tối đa 5MB mỗi
+                            ảnh)
+                        </label>
+                        <input type="file" class="form-control" id="postImages" name="PostImages" multiple accept="image/jpeg,image/png,image/gif,image/webp" />
+                        <span class="text-danger" id="imagesError"></span>
+                        <div id="imagePreview" class="mt-2 d-flex flex-wrap gap-2"></div>
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Đăng bài</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="submitButtonText">Đăng bài</span>
+                        <span id="submitButtonSpinner" class="spinner-border spinner-border-sm d-none" role="status"
+                              aria-hidden="true"></span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -276,33 +182,35 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editPostModalLabel">Chỉnh sửa bài viết</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal('editPostModal')"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="closeModal('editPostModal')"></button>
             </div>
-            <form id="editPostForm">
+            <form id="editPostForm" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
-                <input type="hidden" id="editPostId" name="Id">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="editPostTitle" class="form-label">Tiêu đề</label>
-                        <input type="text" class="form-control" id="editPostTitle" name="Title" placeholder="Nhập tiêu đề bài viết...">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPostContent" class="form-label">Nội dung</label>
-                        <textarea class="form-control" id="editPostContent" name="Content" rows="5" placeholder="Bạn đang nghĩ gì?"></textarea>
-                    </div>
-
-
-                    <div class="mb-3">
-                        <label for="editPostTags" class="form-label">Tags (phân cách bằng dấu phẩy)</label>
-                        <input type="text" class="form-control" id="editPostTags" name="Tags" placeholder="tag1, tag2, tag3">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPostImages" class="form-label">Hình ảnh (URLs, phân cách bằng dấu phẩy)</label>
-                        <input type="text" class="form-control" id="editPostImages" name="Images" placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg">
-                    </div>
+                <input type="hidden" id="editPostId" name="PostId">
+                <div class="mb-3">
+                    <label for="editPostTitle" class="form-label">Tiêu đề</label>
+                    <input type="text" class="form-control" id="editPostTitle" name="Title">
                 </div>
+                <div class="mb-3">
+                    <label for="editPostContent" class="form-label">Nội dung</label>
+                    <textarea class="form-control" id="editPostContent" name="Content"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="editPostTags" class="form-label">Tags</label>
+                    <input type="text" class="form-control" id="editPostTags" name="Tags">
+                </div>
+                <div class="mb-3">
+                    <label for="editPostImages" class="form-label">Hình ảnh</label>
+                    <input type="file"
+                           class="form-control"
+                           id="editPostImages"
+                           name="PostImages"
+                           multiple
+                           accept="image/jpeg,image/png,image/gif,image/webp" />
+                </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                     <button type="submit" class="btn btn-primary">Cập nhật</button>
                 </div>
             </form>
@@ -315,10 +223,12 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content bg-transparent border-0">
             <div class="modal-header border-0 bg-transparent">
-                <button type="button" class="btn-close btn-close-white" onclick="closeImageModal()" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" onclick="closeImageModal()"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body text-center p-0">
-                <img id="modalImage" src="" alt="Post image" class="img-fluid" style="max-height: 90vh; max-width: 100%; object-fit: contain;">
+                <img id="modalImage" src="" alt="Post image" class="img-fluid"
+                     style="max-height: 90vh; max-width: 100%; object-fit: contain;">
             </div>
         </div>
     </div>
@@ -330,7 +240,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="commentModalLabel">Bình luận bài viết</h5>
-                <button type="button" class="btn-close" onclick="closeModal('commentModal')" aria-label="Close"></button>
+                <button type="button" class="btn-close" onclick="closeModal('commentModal')"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="commentModalContent">
@@ -361,10 +272,10 @@
         line-height: 1.5;
     }
 
-    .post-content.expanded {
-        display: block;
-        -webkit-line-clamp: unset;
-    }
+        .post-content.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+        }
 
     .show-more-link {
         color: #1877f2;
@@ -374,9 +285,9 @@
         font-weight: 500;
     }
 
-    .show-more-link:hover {
-        text-decoration: underline;
-    }
+        .show-more-link:hover {
+            text-decoration: underline;
+        }
 
     .btn-light {
         background-color: #f0f2f5;
@@ -385,9 +296,9 @@
         padding: 10px 15px;
     }
 
-    .btn-light:hover {
-        background-color: #e4e6eb;
-    }
+        .btn-light:hover {
+            background-color: #e4e6eb;
+        }
 
     .text-muted {
         color: #65676b !important;
@@ -416,7 +327,6 @@
         padding: 20px 24px;
     }
 
-    /* Style cho modal hình ảnh */
     #imageModal .modal-content {
         background: transparent;
         box-shadow: none;
@@ -446,629 +356,746 @@
         min-height: 80vh;
     }
 
-    /* Style cho ảnh trong bài viết có thể click */
     .clickable-image {
         cursor: pointer;
         transition: opacity 0.2s;
     }
 
-    .clickable-image:hover {
-        opacity: 0.8;
+        .clickable-image:hover {
+            opacity: 0.8;
+        }
+
+    /* Search + Filter styles */
+    .d-flex.align-items-center.gap-2 {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        border: 1px solid #e6e9ef;
+        border-radius: 28px;
+        padding: 0.5rem 0.9rem;
+        background: #fff;
+        min-height: 44px;
+    }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            box-shadow: none;
+            padding: 0;
+        }
+
+    .dropdown-menu {
+        border-radius: 12px;
+        border: 1px solid #e9eef7;
+    }
+
+        .dropdown-menu .form-check-label {
+            user-select: none;
+        }
+
+        .dropdown-menu .form-check-input {
+            width: 1.05em;
+            height: 1.05em;
+        }
+
+    .filter-btn {
+        border-radius: 28px;
+        padding: .45rem 1rem;
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        border: none;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(13, 110, 253, 0.18);
+        height: 44px;
+        flex: 0 0 auto;
+    }
+
+    .min-w-300 {
+        min-width: 300px;
     }
 </style>
 
-<script>
-    let page = 1;
-    let isLoading = false;
-    const pageSize = 5;
+@section Scripts {
+    <script>
+        // Initialize variables
+        let page = 1;
+        let isLoading = false;
+        const pageSize = 5;
 
-    // Infinite scroll
-    window.addEventListener('scroll', () => {
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
-            if (!isLoading) {
-                loadMorePosts();
-            }
-        }
-    });
-
-    function loadMorePosts() {
-        isLoading = true;
-        document.getElementById("loading").style.display = "block";
-
-        fetch(`?handler=MorePosts&page=${++page}&pageSize=${pageSize}`)
-            .then(res => res.text())
-            .then(html => {
-                if (html.trim() !== "") {
-                    document.getElementById("post-container").insertAdjacentHTML('beforeend', html);
-                    // Re-initialize các function cho các bài post mới
-                    initializeNewPosts();
+        // Infinite scroll
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+                if (!isLoading) {
+                    loadMorePosts();
                 }
-                document.getElementById("loading").style.display = "none";
-                isLoading = false;
-            })
-            .catch(() => {
-                document.getElementById("loading").style.display = "none";
-                isLoading = false;
-            });
-    }
-
-    function initializeNewPosts() {
-        // Tìm tất cả các bài post mới được thêm vào
-        const newPosts = document.querySelectorAll('[id^="post-"]');
-        newPosts.forEach(post => {
-            const postId = post.id.replace('post-', '');
-            
-            // Kiểm tra xem post này đã được khởi tạo chưa
-            if (!post.hasAttribute('data-initialized')) {
-                // Khởi tạo các function cho post mới
-                initializePostFunctions(postId);
-                post.setAttribute('data-initialized', 'true');
             }
         });
-    }
 
-    function initializePostFunctions(postId) {
-        // Khởi tạo nút "Hiển thị thêm" cho post mới
-        const content = document.getElementById(`content-${postId}`);
-        const showMoreLink = document.getElementById(`showmore-${postId}`);
-        
-        if (content && showMoreLink) {
-            // Thêm event listener cho nút "Hiển thị thêm"
-            showMoreLink.addEventListener('click', function() {
-                toggleContent(postId);
+        function loadMorePosts() {
+            isLoading = true;
+            document.getElementById("loading").style.display = "block";
+
+            fetch(`?handler=MorePosts&page=${++page}&pageSize=${pageSize}`)
+                .then(res => res.text())
+                .then(html => {
+                    if (html.trim() !== "") {
+                        document.getElementById("post-container").insertAdjacentHTML('beforeend', html);
+                        initializeNewPosts();
+                    }
+                    document.getElementById("loading").style.display = "none";
+                    isLoading = false;
+                })
+                .catch(() => {
+                    document.getElementById("loading").style.display = "none";
+                    isLoading = false;
+                });
+        }
+
+        function initializeNewPosts() {
+            const newPosts = document.querySelectorAll('[id^="post-"]');
+            newPosts.forEach(post => {
+                const postId = post.id.replace('post-', '');
+
+                if (!post.hasAttribute('data-initialized')) {
+                    initializePostFunctions(postId);
+                    post.setAttribute('data-initialized', 'true');
+                }
             });
         }
 
-        // Khởi tạo menu 3 chấm cho post mới
-        const postMenuBtn = document.querySelector(`#post-${postId} .post-menu-btn`);
-        if (postMenuBtn) {
-            postMenuBtn.onclick = function() {
-                togglePostMenu(postId);
-            };
-        }
-    }
+        function initializePostFunctions(postId) {
+            const content = document.getElementById(`content-${postId}`);
+            const showMoreLink = document.getElementById(`showmore-${postId}`);
 
-    function initializeItemAndQuantityControls() {
-        const itemDropdown = document.getElementById('postItem');
-        const quantityInput = document.getElementById('postQuantity');
-        if (!itemDropdown || !quantityInput) {
-            return;
-        }
-        const handleItemChange = () => {
-            if (itemDropdown.value) {
-                quantityInput.disabled = false; 
-                if (!quantityInput.value) {
-                    quantityInput.value = 1;
-                }
-            } else {
-                quantityInput.disabled = true;
-                quantityInput.value = '';      
+            if (content && showMoreLink) {
+                showMoreLink.addEventListener('click', function () {
+                    toggleContent(postId);
+                });
             }
-        };
 
-        itemDropdown.addEventListener('change', handleItemChange);
-        handleItemChange();
-    }
-    function toggleContent(postId) {
-        const content = document.getElementById("content-" + postId);
-        const btn = document.getElementById("showmore-" + postId);
-
-        if (content.classList.contains("expanded")) {
-            content.classList.remove("expanded");
-            btn.innerText = "Hiển thị thêm";
-        } else {
-            content.classList.add("expanded");
-            btn.innerText = "Thu gọn";
+            const postMenuBtn = document.querySelector(`#post-${postId} .post-menu-btn`);
+            if (postMenuBtn) {
+                postMenuBtn.onclick = function () {
+                    togglePostMenu(postId);
+                };
+            }
         }
-    }
 
-    // Modal functions
-    function openCreateModal() {
-        document.getElementById('createPostModal').classList.add('show');
-        document.getElementById('createPostModal').style.display = 'block';
-        document.body.classList.add('modal-open');
-        addBackdrop();
-    }
-
-    function openEditModal(postId, title, content, tags, images) {
-        document.getElementById('editPostId').value = postId;
-        document.getElementById('editPostTitle').value = title || '';
-        document.getElementById('editPostContent').value = content || '';
-        document.getElementById('editPostTags').value = tags || '';
-        document.getElementById('editPostImages').value = images || '';
-
-        document.getElementById('editPostModal').classList.add('show');
-        document.getElementById('editPostModal').style.display = 'block';
-        document.body.classList.add('modal-open');
-        addBackdrop();
-    }
-
-    function openImageModal(imageSrc) {
-        document.getElementById('modalImage').src = imageSrc;
-        document.getElementById('imageModal').classList.add('show');
-        document.getElementById('imageModal').style.display = 'block';
-        document.body.classList.add('modal-open');
-        addBackdrop();
-    }
-
-    function openCommentModal(postId) {
-        document.getElementById('commentModal').classList.add('show');
-        document.getElementById('commentModal').style.display = 'block';
-        document.body.classList.add('modal-open');
-        addBackdrop();
-
-        fetch(`?handler=GetComments&postId=${postId}`)
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('commentModalContent').innerHTML = html;
-                const form = document.getElementById('commentForm');
-                if (form) {
-                    form.onsubmit = function (e) {
-                        e.preventDefault();
-                        submitComment(postId, form);
-                    };
+        function initializeItemAndQuantityControls() {
+            const itemDropdown = document.getElementById('postItem');
+            const quantityInput = document.getElementById('postQuantity');
+            if (!itemDropdown || !quantityInput) {
+                return;
+            }
+            const handleItemChange = () => {
+                if (itemDropdown.value) {
+                    quantityInput.disabled = false;
+                    if (!quantityInput.value) {
+                        quantityInput.value = 1;
+                    }
+                } else {
+                    quantityInput.disabled = true;
+                    quantityInput.value = '';
                 }
-            });
-    }
+            };
 
-    function submitComment(postId, form) {
-        const content = form.Content.value.trim();
-        if (!content) return;
+            itemDropdown.addEventListener('change', handleItemChange);
+            handleItemChange();
+        }
 
-        fetch(`?handler=AddComment`, {
+        function toggleContent(postId) {
+            const content = document.getElementById("content-" + postId);
+            const btn = document.getElementById("showmore-" + postId);
+
+            if (content.classList.contains("expanded")) {
+                content.classList.remove("expanded");
+                btn.innerText = "Hiển thị thêm";
+            } else {
+                content.classList.add("expanded");
+                btn.innerText = "Thu gọn";
+            }
+        }
+
+        // Modal functions
+        function openCreateModal() {
+            document.getElementById('createPostModal').classList.add('show');
+            document.getElementById('createPostModal').style.display = 'block';
+            document.body.classList.add('modal-open');
+            addBackdrop();
+        }
+
+        function openEditModal(postId, title, content, tags, images) {
+            document.getElementById('editPostId').value = postId;
+            document.getElementById('editPostTitle').value = title || '';
+            document.getElementById('editPostContent').value = content || '';
+            document.getElementById('editPostTags').value = tags || '';
+            document.getElementById('editPostImages').value = images || '';
+
+            document.getElementById('editPostModal').classList.add('show');
+            document.getElementById('editPostModal').style.display = 'block';
+            document.body.classList.add('modal-open');
+            addBackdrop();
+        }
+
+        function openImageModal(imageSrc) {
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('imageModal').classList.add('show');
+            document.getElementById('imageModal').style.display = 'block';
+            document.body.classList.add('modal-open');
+            addBackdrop();
+        }
+
+        function openCommentModal(postId) {
+            document.getElementById('commentModal').classList.add('show');
+            document.getElementById('commentModal').style.display = 'block';
+            document.body.classList.add('modal-open');
+            addBackdrop();
+
+            fetch(`?handler=GetComments&postId=${postId}`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('commentModalContent').innerHTML = html;
+                    const form = document.getElementById('commentForm');
+                    if (form) {
+                        form.onsubmit = function (e) {
+                            e.preventDefault();
+                            submitComment(postId, form);
+                        };
+                    }
+                });
+        }
+
+        function submitComment(postId, form) {
+            const content = form.Content.value.trim();
+            if (!content) return;
+
+            fetch(`?handler=AddComment`, {
                 method: "POST",
                 headers: {
-            'Content-Type': 'application/json',
-            'RequestVerificationToken': document.querySelector('#commentForm input[name="__RequestVerificationToken"]')?.value || ''
-        },
-        body: JSON.stringify({ PostId: postId, Content: content })
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#commentForm input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify({PostId: postId, Content: content})
             })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                openCommentModal(postId); // Reload comments
-            } else {
-                alert("Bình luận thất bại: " + (data.message || "Vui lòng thử lại."));
-            }
-        });
-    }
-
-    function closeImageModal() {
-        closeModal('imageModal');
-    }
-
-    function addBackdrop() {
-        if (!document.querySelector('.modal-backdrop')) {
-            const backdrop = document.createElement('div');
-            backdrop.className = 'modal-backdrop fade show';
-            document.body.appendChild(backdrop);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        openCommentModal(postId);
+                    } else {
+                        alert("Bình luận thất bại: " + (data.message || "Vui lòng thử lại."));
+                    }
+                });
         }
-    }
 
-    function closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (!modal) return;
-        modal.classList.remove('show');
-        modal.style.display = 'none';
-        document.body.classList.remove('modal-open');
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) backdrop.remove();
-    }
+        function closeImageModal() {
+            closeModal('imageModal');
+        }
 
-    // Form submit handlers
-        document.getElementById('createPostForm').addEventListener('submit', function(e) {
+        function addBackdrop() {
+            if (!document.querySelector('.modal-backdrop')) {
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                document.body.appendChild(backdrop);
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+        }
+
+        // Form submit handlers
+        document.getElementById('createPostForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const formData = {
-                Title: document.getElementById('postTitle').value,
-                Content: document.getElementById('postContent').value,
-                TagsString: document.getElementById('postTags').value,
-                ImagesString: document.getElementById('postImages').value,
-                ItemId: document.getElementById('postItem').value,
-                // Thêm Quantity vào đây. Gửi null nếu không có giá trị
-                Quantity: document.getElementById('postQuantity').value ? parseInt(document.getElementById('postQuantity').value) : null
-            };
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(this);
+            const fileInput = document.getElementById('postImages');
+            const maxSize = 5 * 1024 * 1024;
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+            for (let i = 0; i < fileInput.files.length; i++) {
+                const file = fileInput.files[i];
+                if (!allowedTypes.includes(file.type)) {
+                    showErrorAlert(`File ${file.name} không phải là định dạng ảnh hỗ trợ (JPEG, PNG, GIF, WEBP)`);
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                if (file.size > maxSize) {
+                    showErrorAlert(`File ${file.name} quá lớn (tối đa 5MB)`);
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+            }
 
             fetch('?handler=Create', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'RequestVerificationToken': document.querySelector('#createPostForm input[name="__RequestVerificationToken"]')?.value || ''
                 },
-                body: JSON.stringify(formData)
+                body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Tạo bài viết thất bại: ' + data.message);
+                .then(response => {
+                    if (!response.ok) throw new Error('Server error');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        if (data.post) {
+                            addNewPostToUI(data.post);
+                            this.reset();
+                            document.getElementById('imagePreview').innerHTML = '';
+                            closeModal('createPostModal');
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        const msg = data.message || 'Tạo bài viết thất bại';
+                        const detail = data.error ? `: ${data.error}` : '';
+                        showErrorAlert(msg + detail, data.errors);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorAlert('Có lỗi xảy ra khi tạo bài viết: ' + error.message);
+                })
+                .finally(() => {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                });
+        });
+
+        function showErrorAlert(message, errors = null) {
+            const alertContainer = document.getElementById('formErrorAlert');
+            alertContainer.classList.remove('d-none');
+
+            let errorHtml = `<strong>Lỗi:</strong> ${message}`;
+            if (errors && errors.length > 0) {
+                errorHtml += '<ul class="mb-0 mt-2">';
+                errors.forEach(err => {
+                    errorHtml += `<li>${err}</li>`;
+                });
+                errorHtml += '</ul>';
+            }
+
+            alertContainer.innerHTML = errorHtml;
+
+            setTimeout(() => {
+                alertContainer.classList.add('d-none');
+            }, 5000);
+        }
+
+        function addNewPostToUI(post) {
+            const postContainer = document.getElementById('post-container');
+            const postHtml = `
+                <div class="card mb-3" id="post-${post.Id}">
+                    <div class="card-body">
+                        <h5 class="card-title">${post.Title}</h5>
+                        <p class="card-text">${post.Content}</p>
+                        ${post.Images && post.Images.length > 0 ?
+                `<div class="mt-3">
+                                <img src="${post.Images[0]}" class="img-fluid rounded" alt="Post image">
+                            </div>` : ''
+            }
+                    </div>
+                </div>
+            `;
+
+            postContainer.insertAdjacentHTML('afterbegin', postHtml);
+        }
+
+        // Image preview functionality
+        document.getElementById('postImages').addEventListener('change', function (e) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+
+            if (this.files && this.files.length > 0) {
+                for (let i = 0; i < Math.min(this.files.length, 5); i++) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.style.width = '100px';
+                        img.style.height = '100px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '4px';
+                        preview.appendChild(img);
+                    }
+                    reader.readAsDataURL(this.files[i]);
                 }
+
+                if (this.files.length > 5) {
+                    const info = document.createElement('div');
+                    info.textContent = `+${this.files.length - 5} ảnh khác`;
+                    info.style.fontSize = '0.8rem';
+                    info.style.color = '#666';
+                    info.style.width = '100%';
+                    preview.appendChild(info);
+                }
+            }
+        });
+
+        document.getElementById('editPostForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const fd = new FormData();
+            fd.append('PostId', document.getElementById('editPostId').value);
+            fd.append('Title', document.getElementById('editPostTitle').value);
+            fd.append('Content', document.getElementById('editPostContent').value);
+            fd.append('Tags', document.getElementById('editPostTags').value);
+
+            const files = document.getElementById('editPostImages').files;
+            for (let i = 0; i < files.length; i++) {
+                fd.append('PostImages', files[i]);
+            }
+
+            fetch('?handler=Update', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken':
+                        document.querySelector('#editPostForm input[name="__RequestVerificationToken"]')?.value || ''
+                    // KHÔNG set Content-Type, browser sẽ tự set boundary
+                },
+                body: fd
             })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi tạo bài viết');
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        updatePostInUI(data.post);
+                        closeModal('editPostModal');
+                    } else {
+                        alert('Cập nhật thất bại: ' + data.message);
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+        });
+
+        function updatePostInUI(updatedPost) {
+            const postElement = document.getElementById(`post-${updatedPost.id}`);
+            if (postElement) {
+                const titleElement = postElement.querySelector('h6');
+                if (titleElement && updatedPost.title) {
+                    titleElement.textContent = updatedPost.title;
+                }
+
+                const contentElement = postElement.querySelector(`#content-${updatedPost.id}`);
+                if (contentElement) {
+                    contentElement.textContent = updatedPost.content;
+                }
+
+                const tagsContainer = postElement.querySelector('.px-3.pb-2:last-of-type');
+                if (tagsContainer && updatedPost.tags && updatedPost.tags.length > 0) {
+                    tagsContainer.innerHTML = '';
+                    updatedPost.tags.forEach(tag => {
+                        const tagSpan = document.createElement('span');
+                        tagSpan.className = 'badge bg-light text-primary me-1';
+                        tagSpan.textContent = `#${tag}`;
+                        tagsContainer.appendChild(tagSpan);
+                    });
+                }
+
+                if (updatedPost.images && updatedPost.images.length > 0) {
+                    const imagesContainer = postElement.querySelector('.px-3.pb-2:has(img)') ||
+                        postElement.querySelector('.px-3.pb-2:has(.row)') ||
+                        postElement.querySelector('.px-3.pb-2:nth-last-child(3)');
+
+                    if (imagesContainer) {
+                        imagesContainer.innerHTML = '';
+
+                        if (updatedPost.images.length === 1) {
+                            const img = document.createElement('img');
+                            img.src = updatedPost.images[0];
+                            img.alt = 'Post image';
+                            img.className = 'img-fluid rounded clickable-image';
+                            img.style.maxHeight = '400px';
+                            img.style.width = '100%';
+                            img.style.objectFit = 'cover';
+                            img.onclick = function () {
+                                openImageModal(updatedPost.images[0]);
+                            };
+                            imagesContainer.appendChild(img);
+                        } else if (updatedPost.images.length === 2) {
+                            const row = document.createElement('div');
+                            row.className = 'row g-1';
+
+                            updatedPost.images.forEach(imageUrl => {
+                                const col = document.createElement('div');
+                                col.className = 'col-6';
+
+                                const img = document.createElement('img');
+                                img.src = imageUrl;
+                                img.alt = 'Post image';
+                                img.className = 'img-fluid rounded clickable-image';
+                                img.style.height = '200px';
+                                img.style.width = '100%';
+                                img.style.objectFit = 'cover';
+                                img.onclick = function () {
+                                    openImageModal(imageUrl);
+                                };
+
+                                col.appendChild(img);
+                                row.appendChild(col);
+                            });
+
+                            imagesContainer.appendChild(row);
+                        } else {
+                            const row = document.createElement('div');
+                            row.className = 'row g-1';
+
+                            const col8 = document.createElement('div');
+                            col8.className = 'col-8';
+                            const img1 = document.createElement('img');
+                            img1.src = updatedPost.images[0];
+                            img1.alt = 'Post image';
+                            img1.className = 'img-fluid rounded clickable-image';
+                            img1.style.height = '200px';
+                            img1.style.width = '100%';
+                            img1.style.objectFit = 'cover';
+                            img1.onclick = function () {
+                                openImageModal(updatedPost.images[0]);
+                            };
+                            col8.appendChild(img1);
+                            row.appendChild(col8);
+
+                            const col4 = document.createElement('div');
+                            col4.className = 'col-4';
+                            const col4Container = document.createElement('div');
+                            col4Container.className = 'd-flex flex-column g-1';
+
+                            const img2 = document.createElement('img');
+                            img2.src = updatedPost.images[1];
+                            img2.alt = 'Post image';
+                            img2.className = 'img-fluid rounded clickable-image mb-1';
+                            img2.style.height = '98px';
+                            img2.style.width = '100%';
+                            img2.style.objectFit = 'cover';
+                            img2.onclick = function () {
+                                openImageModal(updatedPost.images[1]);
+                            };
+                            col4Container.appendChild(img2);
+
+                            if (updatedPost.images.length > 2) {
+                                const img3Container = document.createElement('div');
+                                img3Container.className = 'position-relative';
+
+                                const img3 = document.createElement('img');
+                                img3.src = updatedPost.images[2];
+                                img3.alt = 'Post image';
+                                img3.className = 'img-fluid rounded clickable-image';
+                                img3.style.height = '98px';
+                                img3.style.width = '100%';
+                                img3.style.objectFit = 'cover';
+                                img3.onclick = function () {
+                                    openImageModal(updatedPost.images[2]);
+                                };
+                                img3Container.appendChild(img3);
+
+                                if (updatedPost.images.length > 3) {
+                                    const overlay = document.createElement('div');
+                                    overlay.className = 'position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 rounded d-flex align-items-center justify-content-center';
+                                    const overlayText = document.createElement('span');
+                                    overlayText.className = 'text-white fw-bold';
+                                    overlayText.textContent = `+${updatedPost.images.length - 3}`;
+                                    overlay.appendChild(overlayText);
+                                    img3Container.appendChild(overlay);
+                                }
+
+                                col4Container.appendChild(img3Container);
+                            }
+
+                            col4.appendChild(col4Container);
+                            row.appendChild(col4);
+                            imagesContainer.appendChild(row);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Initialize post functions on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const initialPosts = document.querySelectorAll('[id^="post-"]');
+            initializeItemAndQuantityControls();
+
+            initialPosts.forEach(post => {
+                const postId = post.id.replace('post-', '');
+                initializePostFunctions(postId);
+                post.setAttribute('data-initialized', 'true');
             });
         });
 
-    document.getElementById('editPostForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            PostId: document.getElementById('editPostId').value,
-            Title: document.getElementById('editPostTitle').value,
-            Content: document.getElementById('editPostContent').value,
-            TagsString: document.getElementById('editPostTags').value,
-            ImagesString: document.getElementById('editPostImages').value
-        };
-
-        fetch('?handler=Update', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Debug: Log data nhận được
-                console.log('Update response data:', data);
-                console.log('Images count:', data.post.images ? data.post.images.length : 0);
-                console.log('Images:', data.post.images);
-                
-                // Cập nhật UI với dữ liệu mới
-                updatePostInUI(data.post);
-                closeModal('editPostModal');
-            } else {
-                alert('Cập nhật bài viết thất bại: ' + data.message);
+        function togglePostMenu(postId) {
+            closeAllPostMenus();
+            const menu = document.getElementById('menu-' + postId);
+            if (menu) {
+                menu.classList.toggle('show');
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi cập nhật bài viết');
-        });
-    });
+        }
 
-    function updatePostInUI(updatedPost) {
-        const postElement = document.getElementById(`post-${updatedPost.id}`);
-        if (postElement) {
-            // Cập nhật tiêu đề
-            const titleElement = postElement.querySelector('h6');
-            if (titleElement && updatedPost.title) {
-                titleElement.textContent = updatedPost.title;
-            }
+        function closeAllPostMenus() {
+            document.querySelectorAll('.post-menu').forEach(m => m.classList.remove('show'));
+        }
 
-            // Cập nhật nội dung
-            const contentElement = postElement.querySelector(`#content-${updatedPost.id}`);
-            if (contentElement) {
-                contentElement.textContent = updatedPost.content;
-            }
-
-            // Cập nhật tags
-            const tagsContainer = postElement.querySelector('.px-3.pb-2:last-of-type');
-            if (tagsContainer && updatedPost.tags && updatedPost.tags.length > 0) {
-                tagsContainer.innerHTML = '';
-                updatedPost.tags.forEach(tag => {
-                    const tagSpan = document.createElement('span');
-                    tagSpan.className = 'badge bg-light text-primary me-1';
-                    tagSpan.textContent = `#${tag}`;
-                    tagsContainer.appendChild(tagSpan);
-                });
-            }
-
-            // Cập nhật hình ảnh nếu có
-            if (updatedPost.images && updatedPost.images.length > 0) {
-                // Debug: Log thông tin update
-                console.log('Updating images for post:', updatedPost.id);
-                console.log('Images to update:', updatedPost.images);
-                
-                // Tìm container hình ảnh chính xác hơn
-                const imagesContainer = postElement.querySelector('.px-3.pb-2:has(img)') || 
-                                      postElement.querySelector('.px-3.pb-2:has(.row)') ||
-                                      postElement.querySelector('.px-3.pb-2:nth-last-child(3)');
-                
-                console.log('Found images container:', imagesContainer);
-                
-                if (imagesContainer) {
-                    // Xóa hình ảnh cũ
-                    imagesContainer.innerHTML = '';
-                    console.log('Cleared old images, adding new ones...');
-                    
-                    // Thêm hình ảnh mới theo logic hiển thị
-                    if (updatedPost.images.length === 1) {
-                        console.log('Adding single image:', updatedPost.images[0]);
-                        // 1 ảnh: hiển thị full width
-                        const img = document.createElement('img');
-                        img.src = updatedPost.images[0];
-                        img.alt = 'Post image';
-                        img.className = 'img-fluid rounded clickable-image';
-                        img.style.maxHeight = '400px';
-                        img.style.width = '100%';
-                        img.style.objectFit = 'cover';
-                        img.onclick = function() { openImageModal(updatedPost.images[0]); };
-                        imagesContainer.appendChild(img);
-                    } else if (updatedPost.images.length === 2) {
-                        console.log('Adding 2 images');
-                        // 2 ảnh: hiển thị 2 cột bằng nhau
-                        const row = document.createElement('div');
-                        row.className = 'row g-1';
-                        
-                        updatedPost.images.forEach(imageUrl => {
-                            const col = document.createElement('div');
-                            col.className = 'col-6';
-                            
-                            const img = document.createElement('img');
-                            img.src = imageUrl;
-                            img.alt = 'Post image';
-                            img.className = 'img-fluid rounded clickable-image';
-                            img.style.height = '200px';
-                            img.style.width = '100%';
-                            img.style.objectFit = 'cover';
-                            img.onclick = function() { openImageModal(imageUrl); };
-                            
-                            col.appendChild(img);
-                            row.appendChild(col);
-                        });
-                        
-                        imagesContainer.appendChild(row);
-                    } else {
-                        console.log('Adding multiple images:', updatedPost.images.length);
-                        // Nhiều ảnh: ảnh đầu tiên lớn, 2 ảnh nhỏ bên phải
-                        const row = document.createElement('div');
-                        row.className = 'row g-1';
-                        
-                        // Ảnh đầu tiên (chiếm 8 cột)
-                        const col8 = document.createElement('div');
-                        col8.className = 'col-8';
-                        const img1 = document.createElement('img');
-                        img1.src = updatedPost.images[0];
-                        img1.alt = 'Post image';
-                        img1.className = 'img-fluid rounded clickable-image';
-                        img1.style.height = '200px';
-                        img1.style.width = '100%';
-                        img1.style.objectFit = 'cover';
-                        img1.onclick = function() { openImageModal(updatedPost.images[0]); };
-                        col8.appendChild(img1);
-                        row.appendChild(col8);
-                        
-                        // Cột phải (4 cột) chứa 2 ảnh nhỏ
-                        const col4 = document.createElement('div');
-                        col4.className = 'col-4';
-                        const col4Container = document.createElement('div');
-                        col4Container.className = 'd-flex flex-column g-1';
-                        
-                        // Ảnh thứ 2
-                        const img2 = document.createElement('img');
-                        img2.src = updatedPost.images[1];
-                        img2.alt = 'Post image';
-                        img2.className = 'img-fluid rounded clickable-image mb-1';
-                        img2.style.height = '98px';
-                        img2.style.width = '100%';
-                        img2.style.objectFit = 'cover';
-                        img2.onclick = function() { openImageModal(updatedPost.images[1]); };
-                        col4Container.appendChild(img2);
-                        
-                        // Ảnh thứ 3 (nếu có)
-                        if (updatedPost.images.length > 2) {
-                            const img3Container = document.createElement('div');
-                            img3Container.className = 'position-relative';
-                            
-                            const img3 = document.createElement('img');
-                            img3.src = updatedPost.images[2];
-                            img3.alt = 'Post image';
-                            img3.className = 'img-fluid rounded clickable-image';
-                            img3.style.height = '98px';
-                            img3.style.width = '100%';
-                            img3.style.objectFit = 'cover';
-                            img3.onclick = function() { openImageModal(updatedPost.images[2]); };
-                            img3Container.appendChild(img3);
-                            
-                            // Hiển thị số ảnh còn lại nếu có nhiều hơn 3 ảnh
-                            if (updatedPost.images.length > 3) {
-                                const overlay = document.createElement('div');
-                                overlay.className = 'position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 rounded d-flex align-items-center justify-content-center';
-                                const overlayText = document.createElement('span');
-                                overlayText.className = 'text-white fw-bold';
-                                overlayText.textContent = `+${updatedPost.images.length - 3}`;
-                                overlay.appendChild(overlayText);
-                                img3Container.appendChild(overlay);
-                            }
-                            
-                            col4Container.appendChild(img3Container);
-                        }
-                        
-                        col4.appendChild(col4Container);
-                        row.appendChild(col4);
-                        imagesContainer.appendChild(row);
+        function deletePost(postId) {
+            if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+                fetch(`?handler=Delete&id=${postId}`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
                     }
-                } else {
-                    console.error('Could not find images container for post:', updatedPost.id);
-                }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById(`post-${postId}`).remove();
+                        } else {
+                            alert("Xóa thất bại: " + (data.message || "Vui lòng thử lại."));
+                        }
+                    })
+                    .catch(() => alert("Có lỗi xảy ra. Vui lòng thử lại."));
             }
         }
-    }
 
-    // Khởi tạo các function cho các bài post ban đầu
-    document.addEventListener('DOMContentLoaded', function() {
-        const initialPosts = document.querySelectorAll('[id^="post-"]');
-            initializeItemAndQuantityControls();
-        initialPosts.forEach(post => {
-            const postId = post.id.replace('post-', '');
-            initializePostFunctions(postId);
-            post.setAttribute('data-initialized', 'true');
-        });
-    });
-
-    // Function xử lý menu 3 chấm
-    function togglePostMenu(postId) {
-        closeAllPostMenus();
-        const menu = document.getElementById('menu-' + postId);
-        if (menu) { 
-            menu.classList.toggle('show'); 
-        }
-    }
-
-    function closeAllPostMenus() {
-        document.querySelectorAll('.post-menu').forEach(m => m.classList.remove('show'));
-    }
-
-    // Function xóa post
-    function deletePost(postId) {
-        if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-            fetch(`?handler=Delete&id=${postId}`, { 
+        function deleteComment(commentId) {
+            if (!confirm("Are you sure to delete this comment?")) return;
+            fetch(`?handler=DeleteComment`, {
                 method: "POST",
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-                }
+                },
+                body: JSON.stringify({commentId: commentId})
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById(`post-${postId}`).remove();
-                } else {
-                    alert("Xóa thất bại: " + (data.message || "Vui lòng thử lại."));
-                }
-            })
-            .catch(() => alert("Có lỗi xảy ra. Vui lòng thử lại."));
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`comment-${commentId}`).remove();
+                    } else {
+                        alert("Delete fail.");
+                    }
+                });
         }
-    }
 
-    function deleteComment(commentId) {
-    if (!confirm("Are you sure to delete this comment?")) return;
-    fetch(`?handler=DeleteComment`, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-        },
-        body: JSON.stringify({ commentId: commentId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById(`comment-${commentId}`).remove();
-        } else {
-            alert("Delete fail.");
-        }
-    });
-}
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.post-menu') && !e.target.closest('.post-menu-btn')) {
+                closeAllPostMenus();
+            }
+        });
 
-    // Close tất cả menu khi click bên ngoài
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.post-menu') && !e.target.closest('.post-menu-btn')) {
-            closeAllPostMenus();
-        }
-    });
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('editPostModal').classList.contains('show')) closeModal('editPostModal');
+                if (document.getElementById('createPostModal').classList.contains('show')) closeModal('createPostModal');
+                if (document.getElementById('imageModal').classList.contains('show')) closeModal('imageModal');
+                if (document.getElementById('commentModal').classList.contains('show')) closeModal('commentModal');
+            }
+        });
 
-    // Close modal khi nhấn ESC
-    window.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (document.getElementById('editPostModal').classList.contains('show')) closeModal('editPostModal');
-            if (document.getElementById('createPostModal').classList.contains('show')) closeModal('createPostModal');
-            if (document.getElementById('imageModal').classList.contains('show')) closeModal('imageModal');
-            if (document.getElementById('commentModal').classList.contains('show')) closeModal('commentModal');
-        }
-    });
+        window.addEventListener('click', function (e) {
+            const createM = document.getElementById('createPostModal');
+            const editM = document.getElementById('editPostModal');
+            const imageM = document.getElementById('imageModal');
+            const commentM = document.getElementById('commentModal');
+            if (e.target === createM) closeModal('createPostModal');
+            if (e.target === editM) closeModal('editPostModal');
+            if (e.target === imageM) closeModal('imageModal');
+            if (e.target === commentM) closeModal('commentModal');
+        });
 
-    // Close modal khi click bên ngoài
-    window.addEventListener('click', function(e) {
-        const createM = document.getElementById('createPostModal');
-        const editM = document.getElementById('editPostModal');
-        const imageM = document.getElementById('imageModal');
-        const commentM = document.getElementById('commentModal');
-        if (e.target === createM) closeModal('createPostModal');
-        if (e.target === editM) closeModal('editPostModal');
-        if (e.target === imageM) closeModal('imageModal');
-        if (e.target === commentM) closeModal('commentModal');
-    });
-
-</script>
-
-<script>
-    function toggleCommentMenu(commentId) {
-        closeAllCommentMenus();
-        const menu = document.getElementById('comment-menu-' + commentId);
-        if (menu) { menu.classList.toggle('show'); }
-    }
-    function closeAllCommentMenus() {
-        document.querySelectorAll('.comment-menu').forEach(m => m.classList.remove('show'));
-    }
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.comment-menu') && !e.target.closest('.comment-menu-btn')) {
+        function toggleCommentMenu(commentId) {
             closeAllCommentMenus();
-        }
-    });
-
-    function openInquiryModal(postId) {
-        const postElement = document.getElementById(`post-${postId}`);
-        const modalContent = document.getElementById('inquiryModalContent');
-
-        if (!postElement) {
-            console.error(`Post element with id 'post-${postId}' not found.`);
-            return;
+            const menu = document.getElementById('comment-menu-' + commentId);
+            if (menu) {
+                menu.classList.toggle('show');
+            }
         }
 
-        const inquiries = JSON.parse(postElement.dataset.inquiries || '[]');
-        let contentHtml = '';
+        function closeAllCommentMenus() {
+            document.querySelectorAll('.comment-menu').forEach(m => m.classList.remove('show'));
+        }
 
-        if (inquiries && inquiries.length > 0) {
-            // Ánh xạ InquiryStatus (số) sang text và màu sắc badge
-            const statusMap = {
-                0: { text: "Open", class: "bg-primary" },
-                1: { text: "Quoted", class: "bg-info text-dark" },
-                2: { text: "Accepted", class: "bg-success" },
-                3: { text: "Rejected", class: "bg-danger" },
-                4: { text: "Duplicate", class: "bg-secondary" }
-            };
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.comment-menu') && !e.target.closest('.comment-menu-btn')) {
+                closeAllCommentMenus();
+            }
+        });
 
-            let inquiryItemsHtml = inquiries.map(inquiry => {
-                // Lấy thông tin trạng thái từ map
-                const statusInfo = statusMap[inquiry.Status] || { text: "Unknown", class: "bg-dark" };
-                const userAvatar = inquiry.User?.ProfilePicture ?? 'https://via.placeholder.com/40';
-                const userName = inquiry.User?.FullName ?? 'Người dùng ẩn danh';
-                const inquiryDate = new Date(inquiry.CreatedAt).toLocaleString('vi-VN');
+        function openInquiryModal(postId) {
+            const postElement = document.getElementById(`post-${postId}`);
+            const modalContent = document.getElementById('inquiryModalContent');
 
-                // Nút hành động chỉ active khi status là 'Open' (giá trị 0)
-                const areActionsDisabled = inquiry.Status !== 0;
-                const disabledAttr = areActionsDisabled ? 'disabled' : '';
+            if (!postElement) {
+                console.error(`Post element with id 'post-${postId}' not found.`);
+                return;
+            }
 
-                return `
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <img src="${userAvatar}" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
-                            <div>
-                                <h6 class="mb-0">${userName}</h6>
-                                <small class="text-muted">Gửi lúc: ${inquiryDate}</small>
+            const inquiries = JSON.parse(postElement.dataset.inquiries || '[]');
+            let contentHtml = '';
+
+            if (inquiries && inquiries.length > 0) {
+                const statusMap = {
+                    0: {text: "Open", class: "bg-primary"},
+                    1: {text: "Quoted", class: "bg-info text-dark"},
+                    2: {text: "Accepted", class: "bg-success"},
+                    3: {text: "Rejected", class: "bg-danger"},
+                    4: {text: "Duplicate", class: "bg-secondary"}
+                };
+
+                let inquiryItemsHtml = inquiries.map(inquiry => {
+                    const statusInfo = statusMap[inquiry.Status] || {text: "Unknown", class: "bg-dark"};
+                    const userAvatar = inquiry.User?.ProfilePicture ?? 'https://via.placeholder.com/40';
+                    const userName = inquiry.User?.FullName ?? 'Người dùng ẩn danh';
+                    const inquiryDate = new Date(inquiry.CreatedAt).toLocaleString('vi-VN');
+
+                    const areActionsDisabled = inquiry.Status !== 0;
+                    const disabledAttr = areActionsDisabled ? 'disabled' : '';
+
+                    return `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="${userAvatar}" alt="Avatar" class="rounded-circle me-3" width="40" height="40">
+                                <div>
+                                    <h6 class="mb-0">${userName}</h6>
+                                    <small class="text-muted">Gửi lúc: ${inquiryDate}</small>
+                                </div>
                             </div>
-                        </div>
-                        <div class="d-flex align-items-center">
-
-                            <span class="badge ${statusInfo.class} me-3">${statusInfo.text}</span>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-success" ${disabledAttr}>Chấp nhận</button>
-                                <button class="btn btn-sm btn-outline-danger" ${disabledAttr}>Từ chối</button>
+                            <div class="d-flex align-items-center">
+                                <span class="badge ${statusInfo.class} me-3">${statusInfo.text}</span>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-success" ${disabledAttr}>Chấp nhận</button>
+                                    <button class="btn btn-sm btn-outline-danger" ${disabledAttr}>Từ chối</button>
+                                </div>
                             </div>
-                        </div>
-                    </li>
+                        </li>
+                    `;
+                }).join('');
+
+                contentHtml = `<ul class="list-group list-group-flush">${inquiryItemsHtml}</ul>`;
+            } else {
+                contentHtml = `
+                    <div class="text-center p-4">
+                        <p class="text-muted mb-0">Chưa có yêu cầu nào cho bài viết này.</p>
+                    </div>
                 `;
-            }).join('');
+            }
 
-            contentHtml = `<ul class="list-group list-group-flush">${inquiryItemsHtml}</ul>`;
-
-        } else {
-            contentHtml = `
-                <div class="text-center p-4">
-                    <p class="text-muted mb-0">Chưa có yêu cầu nào cho bài viết này.</p>
-                </div>
-            `;
+            modalContent.innerHTML = contentHtml;
+            const inquiryModal = new bootstrap.Modal(document.getElementById('inquiryModal'));
+            inquiryModal.show();
         }
-
-        // Đưa HTML vào modal và hiển thị
-        modalContent.innerHTML = contentHtml;
-        const inquiryModal = new bootstrap.Modal(document.getElementById('inquiryModal'));
-        inquiryModal.show();
-    }
-</script>
+    </script>
+}

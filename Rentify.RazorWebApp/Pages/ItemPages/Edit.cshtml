@@ -2,94 +2,225 @@
 @model Rentify.RazorWebApp.Pages.ItemPages.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Item";
 }
 
-<h1>Edit</h1>
+<style>
+    .edit-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
 
-<h4>Item</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Item.UserId" class="control-label"></label>
-                <select asp-for="Item.UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="Item.UserId" class="text-danger"></span>
+    .edit-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        margin: 2rem auto;
+        max-width: 800px;
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    .edit-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .edit-title {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-section {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 1rem 0;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .form-control:hover, .form-select:hover {
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+    .btn-save {
+        background: linear-gradient(135deg, #00b894, #00cec9);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+        margin-right: 1rem;
+    }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.4);
+            background: linear-gradient(135deg, #00cec9, #00b894);
+        }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+    }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(116, 185, 255, 0.4);
+            background: linear-gradient(135deg, #0984e3, #74b9ff);
+            color: white;
+            text-decoration: none;
+        }
+
+    .validation-summary {
+        background: linear-gradient(135deg, #ff7675, #fd79a8);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .text-danger {
+        color: #ff6b6b !important;
+        font-weight: 500;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+
+<div class="edit-container">
+    <div class="container">
+        <div class="edit-card">
+            <div class="edit-header">
+                <h1 class="edit-title">Edit Item</h1>
+                <p style="color: #666; font-size: 1.1rem;">Update item information</p>
             </div>
-            <div class="form-group">
-                <label asp-for="Item.CategoryId" class="control-label"></label>
-                <select asp-for="Item.CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="Item.CategoryId" class="text-danger"></span>
+
+            <div class="form-section">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Item.CategoryId" class="form-label"></label>
+                                <select asp-for="Item.CategoryId" class="form-select" asp-items="ViewBag.CategoryId"></select>
+                                <span asp-validation-for="Item.CategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Item.Code" class="form-label"></label>
+                                <input asp-for="Item.Code" class="form-control" />
+                                <span asp-validation-for="Item.Code" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Item.Name" class="form-label"></label>
+                                <input asp-for="Item.Name" class="form-control" />
+                                <span asp-validation-for="Item.Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Item.Description" class="form-label"></label>
+                        <textarea asp-for="Item.Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Item.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Item.Price" class="form-label"></label>
+                                <input asp-for="Item.Price" class="form-control" />
+                                <span asp-validation-for="Item.Price" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Item.Quantity" class="form-label"></label>
+                                <input asp-for="Item.Quantity" class="form-control" />
+                                <span asp-validation-for="Item.Quantity" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Item.Status" class="form-label"></label>
+                                <select asp-for="Item.Status" class="form-select" asp-items="Model.StatusOptions"></select>
+                                <span asp-validation-for="Item.Status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" asp-for="Item.Id" />
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <input type="submit" value="Save Changes" class="btn-save" />
+                        <a asp-page="./Index" class="btn-cancel">Cancel</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="Item.Code" class="control-label"></label>
-                <input asp-for="Item.Code" class="form-control" />
-                <span asp-validation-for="Item.Code" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.Name" class="control-label"></label>
-                <input asp-for="Item.Name" class="form-control" />
-                <span asp-validation-for="Item.Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.Description" class="control-label"></label>
-                <input asp-for="Item.Description" class="form-control" />
-                <span asp-validation-for="Item.Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.Price" class="control-label"></label>
-                <input asp-for="Item.Price" class="form-control" />
-                <span asp-validation-for="Item.Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.Quantity" class="control-label"></label>
-                <input asp-for="Item.Quantity" class="form-control" />
-                <span asp-validation-for="Item.Quantity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.Status" class="control-label"></label>
-                <select asp-for="Item.Status" class="form-control"></select>
-                <span asp-validation-for="Item.Status" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Item.Id" />
-            <div class="form-group">
-                <label asp-for="Item.CreatedBy" class="control-label"></label>
-                <input asp-for="Item.CreatedBy" class="form-control" />
-                <span asp-validation-for="Item.CreatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.UpdatedBy" class="control-label"></label>
-                <input asp-for="Item.UpdatedBy" class="form-control" />
-                <span asp-validation-for="Item.UpdatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.CreatedAt" class="control-label"></label>
-                <input asp-for="Item.CreatedAt" class="form-control" />
-                <span asp-validation-for="Item.CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.UpdatedAt" class="control-label"></label>
-                <input asp-for="Item.UpdatedAt" class="form-control" />
-                <span asp-validation-for="Item.UpdatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Item.IsDeleted" /> @Html.DisplayNameFor(model => model.Item.IsDeleted)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

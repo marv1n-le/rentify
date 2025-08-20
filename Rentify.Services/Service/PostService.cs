@@ -28,6 +28,10 @@ namespace Rentify.Services.Service
             if (user == null)
                 throw new Exception($"Please log in first");
 
+            var item = await _unitOfWork.ItemRepository.GetByIdAsync(post.ItemId);
+            if (item == null)
+                throw new Exception($"Item with id: {post.ItemId} not found");
+
             Post newPost = new Post
             {
                 UserId = userId,
@@ -36,10 +40,21 @@ namespace Rentify.Services.Service
                 Images = post.Images,
                 Tags = post.Tags,
                 Title = post.Title,
+                Item = item,
+                ItemId = item.Id,
             };
 
             await _unitOfWork.PostRepository.InsertAsync(newPost);
-            await _unitOfWork.SaveChangesAsync();
+            var rowsAffected = await _unitOfWork.SaveChangesAsync();
+            var savedPost = await _unitOfWork.PostRepository.GetById(newPost.Id);
+            if (rowsAffected <= 0)
+            {
+                throw new Exception("Không thể lưu bài đăng vào database");
+            }
+            if (savedPost == null)
+            {
+                throw new Exception("Failed to save post in the database.");
+            }
             return newPost.Id;
         }
 
@@ -80,7 +95,7 @@ namespace Rentify.Services.Service
             if (post == null)
                 throw new Exception($"Post with id: {request.PostId} has not found");
 
-            _mapper.Map(post, request);
+            _mapper.Map(request, post);
 
             await _unitOfWork.PostRepository.UpdateAsync(post);
             await _unitOfWork.SaveChangesAsync();
