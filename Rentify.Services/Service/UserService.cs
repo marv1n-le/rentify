@@ -46,6 +46,9 @@ public class UserService : IUserService
             Email = dto.Email,
             Password = dto.Password, 
             FullName = dto.FullName,
+            BirthDate = dto.BirthDate.HasValue
+                ? DateTime.SpecifyKind(dto.BirthDate.Value, DateTimeKind.Utc)
+                : null,
             ProfilePicture = dto.ProfilePicture,
             RoleId = userRole.Id,
             IsVerify = false
@@ -82,10 +85,14 @@ public class UserService : IUserService
 
     public async Task UpdateUser(User user)
     {
-        _unitOfWork.UserRepository.UpdateAsync(user);
+        await _unitOfWork.UserRepository.UpdateAsync(user);
         await _unitOfWork.SaveChangesAsync();
     }
 
+    // public async Task<bool> UpdateUserProfile(UpdateUserDto dto)
+    // {
+    //     
+    // }
     public async Task<User?> GetUserAccount(string username, string password)
     {
         return await _unitOfWork.UserRepository.GetUserAccount(username, password);
