@@ -6,30 +6,70 @@
     ViewData["Title"] = "Chat";
 }
 
-<div class="chat-container">
+<div class="chat-app-container">
     <form method="post" style="display: none;">
         @Html.AntiForgeryToken()
     </form>
-    <div class="user-list">
-        <h3>Online Users</h3>
-        <div class="list-group">
-            <div id="onlineUsersList"></div>
+
+    <div class="chat-sidebar">
+        <div class="sidebar-header">
+            <h4><i class="fas fa-comments me-2"></i>Chat</h4>
+            <div class="online-indicator">
+                <span class="online-dot"></span>
+                <span>Online</span>
+            </div>
+        </div>
+
+        <div class="sidebar-search">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+            </div>
+        </div>
+
+        <div class="user-list-container">
+            <h5>Contacts</h5>
+            <div class="list-group user-list" id="onlineUsersList"></div>
         </div>
     </div>
 
-    <div class="chat-area">
-        <div id="currentRoomInfo" style="display: none;">
+    <div class="chat-main">
+        <div id="currentRoomInfo" class="chat-room">
             <div class="chat-header">
-                <h4 id="currentRoomName"></h4>
+                <div class="chat-partner-info">
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h5 id="currentRoomName">Select a user to chat</h5>
+                        <small class="status-text" id="partnerStatus">Online</small>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
             </div>
-            <div class="message-container" id="messageContainer"></div>
-            <div class="message-input">
-                <input type="text" id="newMessage" placeholder="Type your message..."/>
-                <button id="sendButton" disabled>Send</button>
+
+            <div class="message-container" id="messageContainer">
+                <div class="welcome-message" id="chatPlaceholder">
+                    <div class="welcome-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4>Welcome to Rentify Chat</h4>
+                    <p>Select a user from the sidebar to start a conversation</p>
+                </div>
             </div>
-        </div>
-        <div id="chatPlaceholder" class="chat-placeholder">
-            <p>Select a user to start chatting</p>
+
+            <div class="message-input-container" id="messageInputContainer">
+                <div class="input-group">
+                    <input type="text" id="newMessage" class="form-control" placeholder="Type your message..." disabled>
+                    <button id="sendButton" class="btn btn-primary" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -87,26 +127,54 @@
             function renderUserList(users) {
                 const $list = $('#onlineUsersList');
                 $list.empty();
+
+                if (users.length === 0) {
+                    $list.append(`
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <p>No users available</p>
+                        </div>
+                    `);
+                    return;
+                }
+
                 users.forEach(u => {
                     $list.append(
-                        `<button class="list-group-item list-group-item-action user-item" data-userid="${u.id}" data-name="${u.fullName}">
-                           ${u.fullName}
-                         </button>`
+                        `<div class="user-item" data-userid="${u.id}" data-name="${u.fullName}" data-picture="${u.profilePicture || ''}">
+                            <div class="user-avatar">
+                                ${u.profilePicture
+                                    ? `<img src="${u.profilePicture}" alt="${u.fullName}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`
+                                    : `<i class="fas fa-user"></i>`
+                                }
+                            </div>
+                            <div class="user-info">
+                                <div class="user-name">${u.fullName}</div>
+                                <div class="user-status online">Online</div>
+                            </div>
+                         </div>`
                     );
                 });
             }
 
-            // CHỈ CÓ MỘT CLICK HANDLER DUY NHẤT
             $(document).on('click', '.user-item', async function () {
+                $('.user-item').removeClass('active');
+                $(this).addClass('active');
+
                 const otherUserId = this.dataset.userid;
                 const otherUserName = this.dataset.name;
+                const otherUserPicture = this.dataset.picture; 
 
-                // Lấy CSRF token từ form ẩn
+                if (otherUserPicture) {
+                    $('.avatar-placeholder').html(
+                        `<img src="${otherUserPicture}" alt="${otherUserName}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`
+                    );
+                } else {
+                    $('.avatar-placeholder').html('<i class="fas fa-user"></i>');
+                }
+
                 const token = $('input[name="__RequestVerificationToken"]').val();
-                console.log('Token found:', token ? 'YES' : 'NO');
 
                 try {
-                    // Tạo/lấy private room với CSRF token
                     const resp = await fetch('/ChatPages/Chat?handler=CreateRoom', {
                         method: 'POST',
                         headers: {
@@ -131,14 +199,14 @@
                     showChatUI(otherUserName);
                     await loadMessages(currentRoomId);
                     $('#sendButton').prop('disabled', false);
-                    $('#newMessage').focus();
+                    $('#newMessage').prop('disabled', false).focus();
 
                 } catch (error) {
                     console.error('Error in user click:', error);
                 }
             });
 
-            async function loadMessages(roomId) {
+            async function loadMessages(roomId = null) {
                 try {
                     const res = await fetch(`/ChatPages/Chat?handler=GetRoomMessages&roomId=${encodeURIComponent(roomId)}`);
                     if (!res.ok) {
@@ -155,16 +223,20 @@
             }
 
             function renderMessage(m) {
-                // Kiểm tra cả userId và userEmail
+                // Check both userId and userEmail
                 const mine = (m.userId === userId) || (m.userEmail === userEmail);
                 const cls = mine ? 'sent' : 'received';
-                $('#messageContainer').append(
-                    `<div class="message ${cls}">
-           <div class="message-sender">${m.userName || m.userEmail || m.userId}</div>
-           <div class="message-content">${m.message || m.content}</div>
-           <div class="message-time">${m.timestamp}</div>
-         </div>`
-                );
+
+                const messageHtml = `
+                    <div class="message ${cls}">
+                        <div class="message-content">
+                            <div class="message-text">${m.message || m.content}</div>
+                            <div class="message-time">${m.timestamp}</div>
+                        </div>
+                    </div>
+                `;
+
+                $('#messageContainer').append(messageHtml);
             }
 
             async function sendMessage() {
@@ -186,7 +258,6 @@
 
             function showChatUI(name) {
                 $('#currentRoomName').text(name);
-                $('#currentRoomInfo').show();
                 $('#chatPlaceholder').hide();
             }
 
@@ -195,120 +266,348 @@
                 c.scrollTop(c[0].scrollHeight);
             }
 
+            // Search functionality
+            $('#userSearch').on('keyup', function() {
+                const searchText = $(this).val().toLowerCase();
+                $('.user-item').each(function() {
+                    const userName = $(this).find('.user-name').text().toLowerCase();
+                    if (userName.includes(searchText)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
             connection.onclose(startSignalR);
         });
     </script>
 }
 
-
 <style>
-    .chat-container {
+    .chat-app-container {
         display: flex;
         height: 80vh;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: white;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
     }
 
-    .user-list {
-        width: 250px;
-        border-right: 1px solid #ddd;
+    .chat-sidebar {
+        width: 300px;
+        background: #f8f9fa;
+        border-right: 1px solid #e9ecef;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        background: #fff;
+    }
+
+        .sidebar-header h4 {
+            margin: 0;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+    .online-indicator {
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .online-dot {
+        width: 8px;
+        height: 8px;
+        background: #28a745;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+    }
+
+    .sidebar-search {
+        padding: 1rem;
+        background: #fff;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .input-group-text {
+        background: #fff;
+        border-right: none;
+    }
+
+    .sidebar-search .form-control {
+        border-left: none;
+    }
+
+    .user-list-container {
+        flex: 1;
         overflow-y: auto;
-        background-color: #f8f9fa;
+        padding: 1rem;
     }
 
-    .chat-area {
+        .user-list-container h5 {
+            color: #6c757d;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+    .user-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+    }
+
+        .user-item:hover {
+            background: #e9ecef;
+        }
+
+        .user-item.active {
+            background: #007bff;
+            color: white;
+        }
+
+            .user-item.active .user-status {
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+        color: #6c757d;
+    }
+
+    .user-item.active .user-avatar {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .user-info {
+        flex: 1;
+    }
+
+    .user-name {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .user-status {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+        .user-status.online {
+            color: #28a745;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+    .chat-main {
         flex: 1;
         display: flex;
         flex-direction: column;
     }
 
+    .chat-room {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
     .chat-header {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-        background-color: #f1f1f1;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chat-partner-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #007bff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+        color: white;
+    }
+
+    .chat-header h5 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .status-text {
+        color: #28a745;
+        font-size: 0.875rem;
     }
 
     .message-container {
         flex: 1;
         overflow-y: auto;
-        padding: 10px;
-        background-color: white;
+        padding: 1.5rem;
+        background: #f8f9fa;
     }
 
-    .message {
-        margin: 10px;
-        padding: 10px;
-        border-radius: 10px;
-        max-width: 70%;
-        word-wrap: break-word;
-    }
-
-    .message.sent {
-        background-color: #007bff;
-        color: white;
-        margin-left: auto;
-    }
-
-    .message.received {
-        background-color: #e9ecef;
-        margin-right: auto;
-    }
-
-    .message-sender {
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .message-time {
-        font-size: 0.8em;
-        opacity: 0.7;
-        margin-top: 5px;
-    }
-
-    .message-input {
-        display: flex;
-        padding: 10px;
-        border-top: 1px solid #ddd;
-        background-color: #f8f9fa;
-    }
-
-    .message-input input {
-        flex: 1;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        margin-right: 10px;
-    }
-
-    .message-input button {
-        padding: 8px 15px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .message-input button:disabled {
-        background-color: #cccccc;
-        cursor: not-allowed;
-    }
-
-    .chat-placeholder {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
+    .welcome-message {
+        text-align: center;
+        padding: 3rem 1rem;
         color: #6c757d;
     }
 
-    .list-group-item {
-        cursor: pointer;
-        transition: background-color 0.2s;
+    .welcome-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
     }
 
-    .list-group-item:hover {
-        background-color: #e9ecef;
+    .welcome-message h4 {
+        margin-bottom: 0.5rem;
+        color: #2d3748;
+    }
+
+    .message {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+    .message-content {
+        max-width: 70%;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        position: relative;
+    }
+
+    .message.sent .message-content {
+        background: #007bff;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message.received .message-content {
+        background: white;
+        color: #2d3748;
+        border: 1px solid #e9ecef;
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-text {
+        margin-bottom: 0.25rem;
+        line-height: 1.4;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.8;
+        text-align: right;
+    }
+
+    .message.received .message-time {
+        text-align: left;
+    }
+
+    .message-input-container {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e9ecef;
+        background: #fff;
+    }
+
+    .input-group {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 25px;
+        overflow: hidden;
+    }
+
+    .form-control {
+        border: none;
+        padding: 0.75rem 1.25rem;
+    }
+
+        .form-control:focus {
+            box-shadow: none;
+        }
+
+    .btn-primary {
+        border-radius: 0 25px 25px 0;
+        padding: 0.75rem 1.25rem;
+        border: none;
+    }
+
+    /* Scrollbar styling */
+    .message-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .message-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .message-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+        .message-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+    .user-list-container::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .user-list-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .user-list-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 2px;
     }
 </style>

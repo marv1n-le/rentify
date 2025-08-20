@@ -14,6 +14,15 @@ public class InquiryRepository : GenericRepository<Inquiry>, IInquiryRepository
             : base(context, httpContextAccessor)
     {
     }
+
+    public async Task<List<Inquiry>> GetAllInquiryAsync()
+    {
+        return await _dbSet.Include(x => x.User)
+            .Include(x => x.Post).ThenInclude(x => x.Item)
+            .Where(x => !x.IsDeleted)
+            .ToListAsync();
+    }
+
     public async Task<Inquiry?> GetByIdAsync(string id)
     {
         return await _dbSet

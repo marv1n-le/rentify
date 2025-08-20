@@ -66,7 +66,8 @@ namespace Rentify.RazorWebApp.Pages.ChatPages
             var result = users.Select(u => new
             {
                 u.Id,
-                u.FullName
+                u.FullName,
+                u.ProfilePicture 
             });
 
             return new JsonResult(result);

@@ -1,25 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rentify.BusinessObjects.Entities;
+using Rentify.Services.Interface;
 
 namespace Rentify.RazorWebApp.Pages.ItemPages
 {
     public class IndexModel : PageModel
     {
-        private readonly Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext _context;
+        private readonly IItemService _itemService;
 
-        public IndexModel(Rentify.BusinessObjects.ApplicationDbContext.RentifyDbContext context)
+        public IndexModel(IItemService itemService)
         {
-            _context = context;
+            _itemService = itemService;
         }
 
         public IList<Item> Item { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Item = await _context.Items
-                .Include(i => i.Category)
-                .Include(i => i.User).ToListAsync();
+            Item = (IList<Item>)await _itemService.GetAllItems();
         }
     }
 }
