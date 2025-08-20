@@ -6,5 +6,6 @@ namespace Rentify.Repositories.Interface;
 public interface IItemRepository : IGenericRepository<Item>
 {
     Task<Item> GetItemByIdAsync(string itemId);
+    Task<List<Item>> GetAllItemHasNoPost();
     Task<List<Item>> GetAllItemAsync();
 }
