@@ -32,6 +32,11 @@ public class ItemService : IItemService
         return await _unitOfWork.ItemRepository.GetItemByIdAsync(id);
     }
 
+    public async Task<List<Item>> GetAllItemHasNoPost()
+    {
+        return await _unitOfWork.ItemRepository.GetAllItemHasNoPost();
+    }
+
     public async Task<bool> CreateItem(ItemCreateDto request)
     {
         var userId = _userService.GetCurrentUserId();
@@ -39,6 +44,7 @@ public class ItemService : IItemService
         var item = _mapper.Map<Item>(request);
         item.UserId = userId;
         item.Status = ItemStatus.Available;
+        item.RemainingQuantity = request.Quantity;
 
         await _unitOfWork.ItemRepository.InsertAsync(item);
         await _unitOfWork.SaveChangesAsync();
